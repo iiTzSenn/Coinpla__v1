@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Técnicos</h2>
+
+  <!-- Caja de Añadir Técnico -->
+  <div class="card mb-4">
+    <div class="card-header" style="background-color: var(--header-bg); color: var(--button-text);">
+      <h4 class="mb-0">Añadir Técnico</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('technicians.crear_tecnico') }}">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6">
+            <label for="first_name" class="form-label">Nombre del Técnico:</label>
+            <input type="text" name="first_name" id="first_name" class="form-control trabajo-input" placeholder="Ingrese el nombre del técnico" required>
+          </div>
+          <div class="col-md-6">
+            <label for="last_name" class="form-label">Apellido del Técnico:</label>
+            <input type="text" name="last_name" id="last_name" class="form-control trabajo-input" placeholder="Ingrese el apellido del técnico" required>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="telefono" class="form-label">Teléfono:</label>
+          <input type="text" name="telefono" id="telefono" class="form-control trabajo-input" placeholder="Ingrese el teléfono" required
+                 pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+                 title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+                 maxlength="15">
+        </div>
+        <button type="submit" class="btn btn-third">Añadir Técnico</button>
+      </form>
+    </div>
+  </div>
+
+  {% if tecnicos %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+          <tr>
+            <th>Nombre</th>
+            <th class="text-center">Teléfono</th>
+            <th class="text-center">Disponibilidad</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tecnico in tecnicos %}
+          <tr class="tech-row">
+            <td>{{ (tecnico.nombre or '') ~ ' ' ~ (tecnico.apellido or '') | trim }}</td>
+            <td class="text-center">{{ tecnico.telefono or '' }}</td>
+            <td class="text-center">
+              {% if tecnico.available %}
+                <span class="badge badge-success">Disponible</span>
+              {% else %}
+                <span class="badge badge-danger">No disponible</span>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center align-items-center">
+                <!-- Botón para editar -->
+                <button 
+                  class="btn btn-warning btn-sm btn-action editar-tecnico" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#editTecnicoModal"
+                  data-id="{{ tecnico.id }}"
+                  data-first_name="{{ tecnico.nombre }}"
+                  data-last_name="{{ tecnico.apellido }}"
+                  data-telefono="{{ tecnico.telefono }}">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+
+                <!-- Botón para eliminar -->
+                <button 
+                  class="btn btn-danger btn-sm btn-action confirm-delete-tech" 
+                  data-tech-id="{{ tecnico.id }}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmDeleteTechModal">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+
+                <!-- Botón para toggle de disponibilidad -->
+                <form method="POST" action="{{ url_for('technicians.toggle_tecnico', id=tecnico.id) }}" class="d-inline">
+                  <button type="button" class="btn btn-info btn-sm btn-action toggle-disponibilidad" title="Alternar disponibilidad">
+                    {% if tecnico.available %}
+                      <i class="bi bi-toggle-on"></i>
+                    {% else %}
+                      <i class="bi bi-toggle-off"></i>
+                    {% endif %}
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info persistent-alert text-center">
+      <i class="bi bi-info-circle"></i> No hay técnicos registrados.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal para editar técnico -->
+<div class="modal fade" id="editTecnicoModal" tabindex="-1" aria-labelledby="editTecnicoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <form id="editTecnicoForm" method="POST" action="">
+      <div class="modal-content modal-rectangular">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTecnicoModalLabel">Editar Técnico</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="modalFirstName" class="form-label">Nombre del Técnico:</label>
+              <input type="text" class="form-control trabajo-input" id="modalFirstName" name="first_name" required>
+            </div>
+            <div class="col-md-6">
+              <label for="modalLastName" class="form-label">Apellido del Técnico:</label>
+              <input type="text" class="form-control trabajo-input" id="modalLastName" name="last_name" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="modalTelefono" class="form-label">Teléfono:</label>
+            <input type="text" class="form-control trabajo-input" id="modalTelefono" name="telefono" required
+                   pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+                   title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+                   maxlength="15">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-third btn-sm">Guardar Cambios</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para confirmar eliminación de técnico -->
+<div class="modal fade" id="confirmDeleteTechModal" tabindex="-1" aria-labelledby="confirmDeleteTechModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <form id="deleteTechForm" method="POST" action="">
+      <div class="modal-content modal-rectangular">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDeleteTechModalLabel">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar este técnico?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-third btn-sm">Eliminar</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">Historial</h2>
+
+  <!-- Caja de Filtro -->
+  <div class="card mb-4">
+    <div class="card-header" style="background-color: var(--header-bg); color: var(--button-text);">
+      Filtrar Historial
+    </div>
+    <div class="card-body">
+      <form class="row g-3" method="GET" action="{{ url_for('jobs.historial') }}">
+        <div class="col-md-3">
+          <input type="text" class="form-control" name="cliente" placeholder="Cliente" value="{{ cliente or '' }}">
+        </div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" name="fecha_inicio" placeholder="Fecha Inicio" value="{{ fecha_inicio or '' }}">
+        </div>
+        <div class="col-md-3">
+          <input type="date" class="form-control" name="fecha_fin" placeholder="Fecha Fin" value="{{ fecha_fin or '' }}">
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" name="tecnico" placeholder="Técnico" value="{{ tecnico or '' }}">
+        </div>
+        <div class="col-md-12 text-end">
+          <button type="submit" class="btn btn-third btn-sm">Filtrar</button>
+          <a href="{{ url_for('jobs.historial') }}" class="btn btn-secondary btn-sm ms-2">Borrar Filtros</a>
+          <a href="{{ url_for('export.exportar_pdf', cliente=cliente, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, tecnico=tecnico) }}" class="btn btn-danger btn-sm ms-2" target="_blank">
+            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla de Historial -->
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th>Cliente</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Técnico</th>
+          <th>Día Completado</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trabajo in trabajos %}
+        <tr>
+          <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
+          <td>{{ trabajo.telefono }}</td>
+          <td>{{ trabajo.direccion }}</td>
+          <td>{{ trabajo.descripcion }}</td>
+          <td>{{ trabajo.fecha.strftime('%d-%m-%Y') }}</td>
+          <td>{{ trabajo.hora }}</td>
+          <td>
+            {% if trabajo.technician %}
+              {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
+            {% else %}
+              Sin asignar
+            {% endif %}
+          </td>
+          <td>{{ trabajo.updated_at.strftime('%d-%m-%Y') }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-third btn-sm ver-detalles"
+                data-nombre="{{ trabajo.nombre_cliente }}"
+                data-apellido="{{ trabajo.apellido_cliente }}"
+                data-telefono="{{ trabajo.telefono }}"
+                data-direccion="{{ trabajo.direccion }}"
+                data-descripcion="{{ trabajo.descripcion }}"
+                data-codigo_postal="{{ trabajo.codigo_postal }}"
+                data-duracion="{{ trabajo.duracion }}"
+                data-fecha="{{ trabajo.fecha.strftime('%d-%m-%Y') }}"
+                data-hora="{{ trabajo.hora }}"
+                data-tecnico="{% if trabajo.technician %}{{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}{% else %}Sin asignar{% endif %}"
+                data-dia-completado="{{ trabajo.updated_at.strftime('%d-%m-%Y') }}">
+                Ver Detalles
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para ver detalles del trabajo completado -->
+<div class="modal fade" id="detalleTrabajoModal" tabindex="-1" aria-labelledby="detalleTrabajoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content modal-rectangular">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="detalleTrabajoModalLabel">Detalles del Trabajo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><strong>Cliente:</strong> <span id="detalleCliente"></span></li>
+          <li class="list-group-item"><strong>Teléfono:</strong> <span id="detalleTelefono"></span></li>
+          <li class="list-group-item"><strong>Dirección:</strong> <span id="detalleDireccion"></span></li>
+          <li class="list-group-item"><strong>Descripción:</strong> <span id="detalleDescripcion"></span></li>
+          <li class="list-group-item"><strong>Código Postal:</strong> <span id="detalleCodigoPostal"></span></li>
+          <li class="list-group-item"><strong>Duración:</strong> <span id="detalleDuracion"></span></li>
+          <li class="list-group-item"><strong>Fecha:</strong> <span id="detalleFecha"></span></li>
+          <li class="list-group-item"><strong>Hora:</strong> <span id="detalleHora"></span></li>
+          <li class="list-group-item"><strong>Técnico:</strong> <span id="detalleTecnico"></span></li>
+          <li class="list-group-item"><strong>Día Completado:</strong> <span id="detalleDiaCompletado"></span></li>
+        </ul>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary btn-modal-close" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

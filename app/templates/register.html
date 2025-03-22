@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5">
+      <div class="card shadow">
+        <!-- Cabecera centrada con altura fija -->
+        <div class="card-header d-flex align-items-center justify-content-center" style="height: 60px;">
+          <h4 class="mb-0">Registro de Usuario</h4>
+        </div>
+        <div class="card-body">
+          <form id="registerForm" method="POST" action="{{ url_for('auth.register') }}">
+            <div class="mb-3">
+              <label for="username" class="form-label">Usuario</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" required>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo Electrónico</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="Ingresa tu correo" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                <span class="input-group-text" id="toggle-password" style="cursor: pointer;">
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Repite la contraseña" required>
+                <span class="input-group-text" id="toggle-confirm-password" style="cursor: pointer;">
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-third w-100">Registrarse</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Modal de error por contraseñas no coincidentes -->
+<div class="modal fade" id="passwordMismatchModal" tabindex="-1" aria-labelledby="passwordMismatchModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-rectangular">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passwordMismatchModalLabel">Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        Las contraseñas no coinciden. Por favor, verifica e inténtalo de nuevo.
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-secondary btn-modal-close" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

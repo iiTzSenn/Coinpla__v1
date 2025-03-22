@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coinpla - Sistema de Gestión</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
+  
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+</head>
+<body>
+  {% if current_user.is_authenticated %}
+  <header class="navbar">
+    <div class="navbar-left">
+      <nav>
+        <ul>
+          <li>
+            <a class="nav-link {% if request.endpoint in ['jobs.listar_trabajos','jobs.crear_trabajo','jobs.editar_trabajo'] %}active{% endif %}" href="{{ url_for('jobs.listar_trabajos') }}">
+              <i class="bi bi-card-checklist me-1"></i>Trabajos
+            </a>
+          </li>
+          <li>
+            <a class="nav-link {% if request.endpoint in ['technicians.listar_tecnicos','technicians.crear_tecnico','technicians.editar_tecnico'] %}active{% endif %}" href="{{ url_for('technicians.listar_tecnicos') }}">
+              <i class="bi bi-people me-1"></i>Técnicos
+            </a>
+          </li>
+          <li>
+            <a class="nav-link {% if request.endpoint == 'jobs.historial' %}active{% endif %}" href="{{ url_for('jobs.historial') }}">
+              <i class="bi bi-clock-history me-1"></i>Historial
+            </a>            
+          </li>
+          {% if current_user.role == 'admin' %}
+          <li>
+            <a class="nav-link {% if request.endpoint.startswith('admin.') %}active{% endif %}" href="{{ url_for('admin.admin_users') }}">
+              <i class="bi bi-person-check me-1"></i>Usuarios
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    <div class="navbar-center">
+      <a class="navbar-brand" href="{{ url_for('jobs.index') }}">Coinpla</a>
+    </div>
+    <div class="navbar-right">
+      <a href="{{ url_for('auth.logout') }}" id="logoutButton" class="navbar-btn">
+        <i class="bi bi-box-arrow-right"></i>
+      </a>
+    </div>
+  </header>
+  {% endif %}
+
+  <!-- Contenido Principal -->
+  <div class="main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div id="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+
+  {% block modals %}{% endblock %}
+
+  <!-- Bootstrap 5 Bundle JS (incluye Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JS personalizado -->
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

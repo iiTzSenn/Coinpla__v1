@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5">
+      <div class="card shadow">
+        <div class="card-header d-flex align-items-center justify-content-center" style="height: 60px;">
+          <h4 class="mb-0">Inicio de sesión</h4>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('auth.login') }}">
+            <div class="mb-3">
+              <label for="username" class="form-label">Usuario</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" required>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+                <span class="input-group-text" id="toggle-password" style="cursor: pointer;">
+                  <i class="bi bi-eye"></i>
+                </span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-third w-100">Iniciar sesión</button>
+          </form>
+          <p class="text-center mt-3">¿No tienes cuenta? <a href="{{ url_for('auth.register') }}">Regístrate</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

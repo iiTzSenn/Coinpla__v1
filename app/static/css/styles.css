@@ -1,0 +1,413 @@
+/* ========== RESET & GLOBAL STYLES ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
+}
+
+/* ========== VARIABLES ========== */
+:root {
+  --primary: #43ab01;
+  --secondary: #85eb3c;
+  --sidebar-bg: #3a4f41;
+  --background: #f8f9fa;
+  --text: #212529;
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+  --navbar-bg: #43ab01; /* Igual que primary */
+  --button-text: #ffffff;
+  --header-bg: #43ab01;
+}
+
+/* ========== BASE & LAYOUT ========== */
+
+/* Contenedor principal */
+.main-content {
+  padding: 1rem;
+  background-color: #fff;
+}
+
+.container {
+  margin-top: 20px;
+  padding: 15px;
+}
+
+/* ========== HEADER & NAVIGATION ========== */
+
+/* Header principal */
+header.navbar {
+  background-color: var(--navbar-bg);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: none;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  border-bottom: none;
+  transition: background-color 0.3s ease;
+}
+
+/* Secciones del header */
+dl, ol, ul {
+  margin-top: 0;
+  margin-bottom: 0rem;
+}
+.navbar-left {
+  display: flex;
+  height: 100%;
+}
+.navbar-left nav {
+  margin-top: 15px;
+}
+.navbar-left nav ul {
+  list-style: none;
+  display: flex;
+}
+.navbar-left nav ul li {
+  margin: 0;
+}
+.navbar-left nav ul li a {
+  display: block;
+  padding: 0.5rem 1.5rem;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background-color: transparent;
+  color: var(--button-text);
+  transition: background-color 0.3s ease;
+  position: relative;
+}
+.navbar-left nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+.navbar-left nav ul li a.active {
+  background-color: #fff;
+  color: var(--navbar-bg);
+  border: 1px solid #fff;
+  border-bottom: none;
+  margin-bottom: -10px;
+  position: relative;
+  box-shadow: none;
+}
+.navbar-left nav ul li a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 10px;
+  background-color: #fff;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  z-index: -1;
+}
+
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.navbar-center .navbar-brand {
+  color: var(--button-text) !important;
+  font-size: 1.5rem;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.navbar-right .navbar-btn {
+  border: none;
+  background: none;
+  color: var(--button-text);
+  padding: 0.75rem;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: opacity 0.2s ease;
+}
+.navbar-right .navbar-btn:hover {
+  opacity: 0.8;
+}
+
+/* Barra de fichas (si se utiliza) */
+.fichas-nav {
+  border-bottom: 2px solid #ddd;
+  background-color: var(--background);
+  padding: 0.5rem 1rem;
+  margin: 0;
+}
+.fichas-nav .nav-link {
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 0.25rem 0.25rem 0 0;
+  margin-right: 5px;
+  background-color: #eaeaea;
+  color: #333;
+  padding: 8px 16px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+.fichas-nav .nav-link:hover {
+  background-color: #ddd;
+  text-decoration: none;
+}
+.fichas-nav .nav-link.active {
+  background-color: #fff;
+  border-bottom: 2px solid #fff;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+/* ========== COMPONENTES ========== */
+
+/* Jumbotron */
+.jumbotron {
+  background-color: var(--navbar-bg);
+  color: var(--button-text);
+  padding: 2rem 1rem;
+  border-radius: 0.3rem;
+  margin-bottom: 20px;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 0.25rem;
+  margin-bottom: 20px;
+}
+.card-header {
+  background-color: var(--header-bg) !important;
+  color: var(--button-text) !important;
+}
+
+/* Tables */
+.table {
+  background-color: var(--card-bg);
+  color: var(--text);
+}
+.table thead th {
+  background-color: var(--navbar-bg);
+  color: var(--button-text);
+}
+.table-responsive {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Forms & Inputs */
+.form-control,
+.form-select {
+  border-radius: 0.25rem;
+  background-color: var(--card-bg);
+  color: var(--text);
+  border: 1px solid #ced4da;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #6c757d;
+}
+
+/* Buttons */
+.btn-first,
+.btn-second,
+.btn-third,
+.btn-fourth,
+.btn-action {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.btn-first {
+  background-color: var(--navbar-bg);
+  border-color: var(--navbar-bg);
+  color: var(--button-text);
+}
+.btn-second {
+  background-color: var(--sidebar-bg);
+  border-color: var(--sidebar-bg);
+  color: var(--button-text);
+}
+.btn-third {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--button-text);
+}
+.btn-fourth {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0;
+  color: var(--text);
+}
+.btn-action {
+  margin-right: 5px;
+}
+.btn-first:hover,
+.btn-second:hover,
+.btn-third:hover,
+.btn-fourth:hover,
+.btn-action:hover {
+  transform: translateY(2px);
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+.navbar-btn:active,
+.btn-first:active,
+.btn-second:active,
+.btn-third:active,
+.btn-fourth:active,
+.btn-action:active {
+  transform: translateY(4px);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Badges */
+.badge-success {
+  background-color: var(--primary) !important;
+}
+.badge-danger {
+  background-color: #dc3545 !important;
+}
+
+/* Otros componentes */
+.trabajo-input {
+  width: 100%;
+}
+
+/* Modals */
+.modal-content {
+  border-radius: 0.5rem !important;
+}
+.modal-dialog {
+  margin: auto !important;
+}
+.modal-dialog.modal-dialog-centered {
+  display: flex !important;
+  align-items: center !important;
+}
+.modal-dialog.modal-dialog-centered.modal-xl {
+  max-width: 60% !important;
+  margin: auto !important;
+}
+
+/* Alerts */
+.alert {
+  transition: opacity 1s ease-out;
+}
+.alert.shrink {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Focus styles for inputs */
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0.5rem rgba(67, 171, 1, 0.5) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Alineación en tablas */
+.table thead th,
+.table tbody td {
+  vertical-align: initial;
+  text-align: center;
+}
+
+/* ========== PAGE-SPECIFIC STYLES ========== */
+
+/* Trabajos Page */
+.trabajos-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+/* Historial Page */
+.ver-detalles {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ver-detalles:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+.btn-modal-close {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-modal-close:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Export PDF Page */
+@media print {
+  body {
+    font-family: 'Georgia', serif;
+    margin: 1cm;
+    color: #212529;
+  }
+}
+.header-table {
+  border: 1px solid #43ab01;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 40px;
+}
+.header-table td {
+  border: 1px solid #43ab01;
+  padding: 10px;
+  vertical-align: middle;
+  font-size: 12px;
+}
+.logo-cell {
+  text-align: center;
+  width: 120px;
+}
+.logo-cell img {
+  max-width: 100px;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.data-table thead {
+  background-color: #43ab01;
+  color: #ffffff;
+}
+.data-table th,
+.data-table td {
+  border: 1px solid #dee2e6;
+  padding: 10px;
+  text-align: left;
+}
+.data-table tbody tr:nth-child(odd) {
+  background-color: #f8f9fa;
+}
+.data-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+.data-table tbody tr:hover {
+  background-color: #e6ffe6;
+}

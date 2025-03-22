@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Editar Trabajo{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Editar Trabajo</h2>
+<form method="POST" action="{{ url_for('jobs.editar_trabajo', id=trabajo.id) }}" class="mb-4" id="formEditarTrabajo">
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label for="nombre_cliente" class="form-label">Nombre del Cliente:</label>
+      <input type="text" name="nombre_cliente" id="nombre_cliente" class="form-control" value="{{ trabajo.nombre_cliente }}" required>
+    </div>
+    <div class="col-md-6">
+      <label for="apellido_cliente" class="form-label">Apellido del Cliente:</label>
+      <input type="text" name="apellido_cliente" id="apellido_cliente" class="form-control" value="{{ trabajo.apellido_cliente }}" required>
+    </div>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label for="direccion" class="form-label">Dirección:</label>
+      <input type="text" name="direccion" id="direccion" class="form-control" value="{{ trabajo.direccion }}" required>
+    </div>
+    <div class="col-md-6">
+      <label for="fecha" class="form-label">Fecha:</label>
+      <input type="date" name="fecha" id="fecha" class="form-control" value="{{ trabajo.fecha.strftime('%Y-%m-%d') }}" required>
+    </div>
+  </div>
+  <div class="mb-3">
+    <label for="descripcion" class="form-label">Descripción:</label>
+    <textarea name="descripcion" id="descripcion" class="form-control" rows="3" required>{{ trabajo.descripcion }}</textarea>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label for="telefono" class="form-label">Teléfono:</label>
+      <input type="text" name="telefono" id="telefono" class="form-control" value="{{ trabajo.telefono }}" maxlength="15">
+      <div class="invalid-feedback">
+        Formato de teléfono inválido. Ej: +34 612345678 o 612-345-678
+      </div>
+    </div>
+    <div class="col-md-6">
+      <label for="codigo_postal" class="form-label">Código Postal:</label>
+      <input type="text" name="codigo_postal" id="codigo_postal" class="form-control" value="{{ trabajo.codigo_postal }}">
+    </div>
+  </div>
+  <div class="form-group mb-3">
+    <label for="duracion">Duración:</label>
+    <select class="form-control" id="duracion" name="duracion" required>
+      <option value="corta" {% if trabajo.duracion == 'corta' %}selected{% endif %}>Corta (1 hora)</option>
+      <option value="media" {% if trabajo.duracion == 'media' %}selected{% endif %}>Media (2 horas)</option>
+      <option value="larga" {% if trabajo.duracion == 'larga' %}selected{% endif %}>Larga (3 horas)</option>
+    </select>
+  </div>
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label for="hora" class="form-label">Hora:</label>
+      <input type="time" name="hora" id="hora" class="form-control" value="{{ trabajo.hora }}" required>
+    </div>
+    <div class="col-md-4">
+      <label for="tecnico_id" class="form-label">Técnico Asignado:</label>
+      <select name="tecnico_id" id="tecnico_id" class="form-control">
+        <option value="">-- Seleccionar --</option>
+        {% for tecnico in tecnicos %}
+          <option value="{{ tecnico.id }}" {% if trabajo.technician_id == tecnico.id %}selected{% endif %}>
+            {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="estado" class="form-label">Estado:</label>
+      <select name="estado" id="estado" class="form-control">
+        <option value="Pendiente" {% if trabajo.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="En Proceso" {% if trabajo.estado == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+        <option value="Completado" {% if trabajo.estado == 'Completado' %}selected{% endif %}>Completado</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-third">Guardar Cambios</button>
+</form>
+{% endblock %}

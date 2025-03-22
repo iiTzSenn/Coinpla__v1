@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Editar Técnico</h2>
+<form method="POST" action="{{ url_for('editar_tecnico', id=tecnico.id) }}">
+  <div class="form-group">
+    <label for="nombre">Nombre del Técnico</label>
+    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ tecnico.nombre }}" required>
+  </div>
+  <div class="form-group form-check">
+    <input type="checkbox" class="form-check-input" id="disponible" name="disponible" {% if tecnico.available %}checked{% endif %}>
+    <label class="form-check-label" for="disponible">Disponible</label>
+  </div>
+  <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>
+{% endblock %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ asunto }}</title>
+  <!-- Usar URL absoluta para que wkhtmltopdf pueda cargar el CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css', _external=True) }}">
+</head>
+<body>
+  <!-- ENCABEZADO -->
+  <table class="header-table">
+    <tr>
+      <!-- Celda con el logo, abarcando dos filas -->
+      <td rowspan="2" class="logo-cell">
+        <img src="{{ url_for('static', filename='img/logo.png', _external=True) }}" alt="Logo">
+      </td>
+      <td>Fecha: <strong>{{ fecha_actual }}</strong></td>
+      <td>Versión: <strong>{{ version }}</strong></td>
+      <td>Autor: <strong>{{ autor }}</strong></td>
+    </tr>
+    <tr>
+      <td>Empresa: <strong>COINPLA</strong></td>
+      <td colspan="2">Asunto: <strong>"{{ asunto }}"</strong></td>
+    </tr>
+  </table>  
+
+  <!-- TABLA DE DATOS -->
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>Teléfono</th>
+        <th>Dirección</th>
+        <th>Descripción</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Técnico</th>
+        <th>Día Completado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for trabajo in trabajos %}
+      <tr>
+        <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
+        <td>{{ trabajo.telefono }}</td>
+        <td>{{ trabajo.direccion }}</td>
+        <td>{{ trabajo.descripcion }}</td>
+        <td>{{ trabajo.fecha.strftime('%d-%m-%Y') }}</td>
+        <td>{{ trabajo.hora }}</td>
+        <td>
+          {% if trabajo.technician %}
+            {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
+          {% else %}
+            Sin asignar
+          {% endif %}
+        </td>
+        <td>{{ trabajo.updated_at.strftime('%d-%m-%Y') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
