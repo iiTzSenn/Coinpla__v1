@@ -1,10 +1,9 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="container mt-4">
   <!-- Caja de Añadir Trabajo -->
   <div class="card mb-4">
-    <div class="card-header" style="background-color: var(--header-bg) !important; color: var(--button-text) !important;">
+    <div class="card-header">
       <h4 class="mb-0">Añadir Trabajo</h4>
     </div>
     <div class="card-body">
@@ -150,10 +149,12 @@
   </div>
   {% endif %}
 </div>
+{% endblock %}
 
+{% block modals %}
 <!-- Modal para editar trabajo -->
 <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered">
     <form id="editJobForm" method="POST" action="">
       <div class="modal-content modal-rectangular">
         <div class="modal-header">
@@ -233,8 +234,8 @@
           </div>
         </div>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-third btn-sm">Guardar Cambios</button>
         </div>
       </div>
     </form>
@@ -254,8 +255,8 @@
           ¿Estás seguro de que deseas eliminar este trabajo?
         </div>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-danger">Eliminar</button>
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-third btn-sm">Eliminar</button>
         </div>
       </div>
     </form>
@@ -275,8 +276,8 @@
           ¿Deseas marcar este trabajo como completado?
         </div>
         <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-success">Confirmar</button>
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-third btn-sm">Confirmar</button>
         </div>
       </div>
     </form>

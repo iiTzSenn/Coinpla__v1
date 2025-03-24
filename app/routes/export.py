@@ -9,7 +9,7 @@ from app.extensions import db
 
 export_bp = Blueprint('export', __name__)
 
-# Ruta al ejecutable de wkhtmltopdf (ajústala si estás en Linux o Mac)
+# Configuración de wkhtmltopdf. Ajusta la ruta según tu sistema.
 pdfkit_config = pdfkit.configuration(wkhtmltopdf=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe')
 
 @export_bp.route('/export/pdf')
@@ -38,14 +38,14 @@ def exportar_pdf():
 
     trabajos = query.order_by(Job.updated_at.desc()).all()
 
-    # Construcción del asunto dinámico
+    # Construcción dinámica del asunto
     filtros = []
     if cliente: filtros.append(f"Cliente: {cliente}")
     if fecha_inicio: filtros.append(f"Desde: {fecha_inicio}")
     if fecha_fin: filtros.append(f"Hasta: {fecha_fin}")
     if tecnico: filtros.append(f"Técnico: {tecnico}")
-
     asunto = " | ".join(filtros) if filtros else "Historial de trabajos completados"
+
     fecha_actual = datetime.now().strftime('%d/%m/%Y')
 
     html = render_template(
@@ -62,7 +62,7 @@ def exportar_pdf():
         'page-size': 'A4',
         'margin-top': '10mm',
         'margin-bottom': '20mm',
-        'enable-local-file-access': '',
+        'enable-local-file-access': True,
     })
 
     response = make_response(pdf)

@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ asunto }}</title>
-  <!-- Usar URL absoluta para que wkhtmltopdf pueda cargar el CSS -->
+  <base href="{{ request.host_url }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css', _external=True) }}">
 </head>
 <body>
   <!-- ENCABEZADO -->
   <table class="header-table">
     <tr>
-      <!-- Celda con el logo, abarcando dos filas -->
       <td rowspan="2" class="logo-cell">
         <img src="{{ url_for('static', filename='img/logo.png', _external=True) }}" alt="Logo">
       </td>
