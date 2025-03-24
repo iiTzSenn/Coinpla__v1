@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app.extensions import db
 from app.models.models import Job, Technician, JobHistory
-from app.utils.validators import verificar_telefono
+from app.utils.validators import validar_y_normalizar_telefono
 
 jobs_bp = Blueprint('jobs', __name__)
 
@@ -31,11 +31,12 @@ def crear_trabajo():
     apellido = request.form.get('apellido_cliente')
     direccion = request.form.get('direccion')
     descripcion = request.form.get('descripcion')
-    telefono = request.form.get('telefono')
+    telefono_raw = request.form.get('telefono')
 
-    # Validar teléfono
-    if telefono and not verificar_telefono(telefono):
-        flash("Teléfono inválido. Asegúrate de usar un formato correcto.", "danger")
+    try:
+        telefono = validar_y_normalizar_telefono(telefono_raw) if telefono_raw else None
+    except ValueError as e:
+        flash(str(e), "danger")
         return redirect(url_for('jobs.listar_trabajos'))
 
     duracion = request.form.get('duracion') or 'media'
@@ -64,10 +65,8 @@ def crear_trabajo():
         estado='Pendiente'
     )
 
-    # Autoasignación de técnicos disponibles
     tecnicos = Technician.query.filter_by(available=True).all()
     candidatos = []
-
     for tecnico in tecnicos:
         trabajos = Job.query.filter_by(technician_id=tecnico.id).all()
         conflicto = False
@@ -100,52 +99,57 @@ def crear_trabajo():
     flash("Trabajo creado correctamente", "success")
     return redirect(url_for('jobs.listar_trabajos'))
 
-
-    return render_template('crear_trabajo.html')
-
-@jobs_bp.route('/jobs/edit/<int:id>', methods=['GET', 'POST'])
+@jobs_bp.route('/jobs/edit/<int:id>', methods=['POST'])
 @login_required
 def editar_trabajo(id):
     trabajo = Job.query.get_or_404(id)
     tecnicos = Technician.query.all()
 
-    if request.method == 'POST':
-        trabajo.nombre_cliente = request.form.get('nombre_cliente')
-        trabajo.apellido_cliente = request.form.get('apellido_cliente')
-        trabajo.direccion = request.form.get('direccion')
-        trabajo.descripcion = request.form.get('descripcion')
-        telefono = request.form.get('telefono')
-        if telefono and not verificar_telefono(telefono):
-            flash("Teléfono inválido", "danger")
-            return redirect(url_for('jobs.editar_trabajo', id=id))
-        trabajo.telefono = telefono
-        trabajo.codigo_postal = request.form.get('codigo_postal')
-        trabajo.duracion = request.form.get('duracion')
-        trabajo.fecha = datetime.strptime(request.form.get('fecha'), '%Y-%m-%d')
-        trabajo.hora = request.form.get('hora')
-        nuevo_tecnico = request.form.get('tecnico_id')
-        if nuevo_tecnico:
-            nuevo_tecnico = int(nuevo_tecnico)
-            if trabajo.technician_id != nuevo_tecnico:
-                anterior = Technician.query.get(trabajo.technician_id)
-                if anterior:
-                    anterior.workload = max(0, anterior.workload - 1)
-                nuevo = Technician.query.get(nuevo_tecnico)
-                trabajo.technician_id = nuevo_tecnico
-                if nuevo:
-                    nuevo.workload += 1
+    # Recogida de datos
+    trabajo.nombre_cliente = request.form.get('nombre_cliente')
+    trabajo.apellido_cliente = request.form.get('apellido_cliente')
+    trabajo.direccion = request.form.get('direccion')
+    trabajo.descripcion = request.form.get('descripcion')
 
-        trabajo.estado = request.form.get('estado')
-        db.session.commit()
+    telefono_raw = request.form.get('telefono')
+    try:
+        trabajo.telefono = validar_y_normalizar_telefono(telefono_raw) if telefono_raw else None
+    except ValueError as e:
+        trabajos = Job.query.filter(Job.estado != 'Completado').all()
+        return render_template(
+            'trabajos.html',
+            trabajos=trabajos,
+            tecnicos=tecnicos,
+            error_modal_id=trabajo.id,
+            error_telefono=str(e)
+        )
 
-        historial = JobHistory(job_id=trabajo.id, action="Edición", details=f"Actualizado por {current_user.username}")
-        db.session.add(historial)
-        db.session.commit()
+    trabajo.codigo_postal = request.form.get('codigo_postal')
+    trabajo.duracion = request.form.get('duracion')
+    trabajo.fecha = datetime.strptime(request.form.get('fecha'), '%Y-%m-%d')
+    trabajo.hora = request.form.get('hora')
 
-        flash("Trabajo actualizado", "success")
-        return redirect(url_for('jobs.listar_trabajos'))
+    nuevo_tecnico = request.form.get('tecnico_id')
+    if nuevo_tecnico:
+        nuevo_tecnico = int(nuevo_tecnico)
+        if trabajo.technician_id != nuevo_tecnico:
+            anterior = Technician.query.get(trabajo.technician_id)
+            if anterior:
+                anterior.workload = max(0, anterior.workload - 1)
+            nuevo = Technician.query.get(nuevo_tecnico)
+            trabajo.technician_id = nuevo_tecnico
+            if nuevo:
+                nuevo.workload += 1
 
-    return render_template('editar_trabajo.html', trabajo=trabajo, tecnicos=tecnicos)
+    trabajo.estado = request.form.get('estado')
+    db.session.commit()
+
+    historial = JobHistory(job_id=trabajo.id, action="Edición", details=f"Actualizado por {current_user.username}")
+    db.session.add(historial)
+    db.session.commit()
+
+    flash("Trabajo actualizado", "success")
+    return redirect(url_for('jobs.listar_trabajos'))
 
 @jobs_bp.route('/jobs/delete/<int:id>', methods=['POST'])
 @login_required
@@ -219,5 +223,3 @@ def historial():
         fecha_fin=fecha_fin,
         tecnico=tecnico
     )
-
-

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.extensions import db
 from app.models.models import Technician, Job, JobHistory
-from app.utils.validators import verificar_telefono
+from app.utils.validators import validar_y_normalizar_telefono
 
 tech_bp = Blueprint('technicians', __name__, url_prefix='/technicians')
 

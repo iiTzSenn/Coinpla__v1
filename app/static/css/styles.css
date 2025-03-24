@@ -23,14 +23,12 @@ body {
   --text: #212529;
   --card-bg: #ffffff;
   --card-border: #dee2e6;
-  --navbar-bg: #43ab01; /* Igual que primary */
+  --navbar-bg: #43ab01;
   --button-text: #ffffff;
   --header-bg: #43ab01;
 }
 
 /* ========== BASE & LAYOUT ========== */
-
-/* Contenedor principal */
 .main-content {
   padding: 1rem;
   background-color: #fff;
@@ -42,8 +40,6 @@ body {
 }
 
 /* ========== HEADER & NAVIGATION ========== */
-
-/* Header principal */
 header.navbar {
   background-color: var(--navbar-bg);
   padding: 0;
@@ -59,11 +55,11 @@ header.navbar {
   transition: background-color 0.3s ease;
 }
 
-/* Secciones del header */
 dl, ol, ul {
   margin-top: 0;
   margin-bottom: 0rem;
 }
+
 .navbar-left {
   display: flex;
   height: 100%;
@@ -147,37 +143,7 @@ dl, ol, ul {
   opacity: 0.8;
 }
 
-/* Barra de fichas (si se utiliza) */
-.fichas-nav {
-  border-bottom: 2px solid #ddd;
-  background-color: var(--background);
-  padding: 0.5rem 1rem;
-  margin: 0;
-}
-.fichas-nav .nav-link {
-  border: 1px solid #ccc;
-  border-bottom: none;
-  border-radius: 0.25rem 0.25rem 0 0;
-  margin-right: 5px;
-  background-color: #eaeaea;
-  color: #333;
-  padding: 8px 16px;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-.fichas-nav .nav-link:hover {
-  background-color: #ddd;
-  text-decoration: none;
-}
-.fichas-nav .nav-link.active {
-  background-color: #fff;
-  border-bottom: 2px solid #fff;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  color: #000;
-}
-
 /* ========== COMPONENTES ========== */
-
-/* Jumbotron */
 .jumbotron {
   background-color: var(--navbar-bg);
   color: var(--button-text);
@@ -186,7 +152,6 @@ dl, ol, ul {
   margin-bottom: 20px;
 }
 
-/* Cards */
 .card {
   background-color: var(--card-bg);
   color: var(--text);
@@ -199,7 +164,6 @@ dl, ol, ul {
   color: var(--button-text) !important;
 }
 
-/* Tables */
 .table {
   background-color: var(--card-bg);
   color: var(--text);
@@ -213,7 +177,6 @@ dl, ol, ul {
   overflow: hidden;
 }
 
-/* Forms & Inputs */
 .form-control,
 .form-select {
   border-radius: 0.25rem;
@@ -226,7 +189,23 @@ textarea::placeholder {
   color: #6c757d;
 }
 
-/* Buttons */
+/* Validación de formularios */
+.is-invalid {
+  border-color: #dc3545 !important;
+  padding-right: calc(1.5em + 0.75rem);
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Botones */
 .btn-first,
 .btn-second,
 .btn-third,
@@ -266,7 +245,6 @@ textarea::placeholder {
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.2);
 }
-.navbar-btn:active,
 .btn-first:active,
 .btn-second:active,
 .btn-third:active,
@@ -274,14 +252,6 @@ textarea::placeholder {
 .btn-action:active {
   transform: translateY(4px);
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* Badges */
-.badge-success {
-  background-color: var(--primary) !important;
-}
-.badge-danger {
-  background-color: #dc3545 !important;
 }
 
 /* Otros componentes */
@@ -295,7 +265,23 @@ textarea::placeholder {
 }
 .modal-dialog {
   margin: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
+
+.modal-dialog.modal-lg {
+  max-width: 800px !important;
+}
+
+.modal-content.modal-rectangular {
+  border-radius: 0.5rem !important;
+  background-color: var(--card-bg) !important;
+  color: var(--text) !important;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--card-border);
+}
+
 .modal-dialog.modal-dialog-centered {
   display: flex !important;
   align-items: center !important;
@@ -316,7 +302,7 @@ textarea::placeholder {
   padding: 0;
 }
 
-/* Focus styles for inputs */
+/* Focus styles */
 input:focus,
 textarea:focus,
 select:focus,
@@ -333,8 +319,6 @@ select:focus,
   vertical-align: initial;
   text-align: center;
 }
-
-/* ========== PAGE-SPECIFIC STYLES ========== */
 
 /* Trabajos Page */
 .trabajos-table td {
