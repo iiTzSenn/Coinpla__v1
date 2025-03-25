@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ===================== */
-/* 6. FORM VALIDATION */
+/* 6. FORM VALIDATION (Registro) */
 /* ===================== */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -228,7 +228,6 @@ document.addEventListener("DOMContentLoaded", function () {
     editJobForm.addEventListener("submit", function (e) {
       const telefono = telefonoInput.value.trim();
       const telefonoRegex = /^(?:\+34\s?)?\d{9}$/;
-
       if (telefono && !telefonoRegex.test(telefono)) {
         e.preventDefault();
         telefonoInput.classList.add("is-invalid");
@@ -242,6 +241,39 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         telefonoInput.classList.remove("is-invalid");
         const errorDiv = document.getElementById("telefono-error");
+        if (errorDiv) {
+          errorDiv.remove();
+        }
+      }
+    });
+  }
+});
+
+/* ===================== */
+/* 9. VALIDACIÓN TELÉFONO EN FORMULARIO AÑADIR TRABAJO */
+/* ===================== */
+
+document.addEventListener("DOMContentLoaded", function () {
+  const addJobForm = document.getElementById("addJobForm");
+  if (addJobForm) {
+    addJobForm.addEventListener("submit", function (e) {
+      const telefonoInput = document.getElementById("telefono");
+      const telefono = telefonoInput.value.trim();
+      // Usamos la misma expresión regular que el pattern del input
+      const telefonoRegex = /^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$/;
+      if (telefono && !telefonoRegex.test(telefono)) {
+        e.preventDefault();
+        telefonoInput.classList.add("is-invalid");
+        if (!document.getElementById("telefono-error-add")) {
+          const errorDiv = document.createElement("div");
+          errorDiv.id = "telefono-error-add";
+          errorDiv.className = "invalid-feedback d-block";
+          errorDiv.innerText = "Formato de teléfono inválido. Ejemplo: +34 612345678 o 123-456-789.";
+          telefonoInput.parentNode.appendChild(errorDiv);
+        }
+      } else {
+        telefonoInput.classList.remove("is-invalid");
+        const errorDiv = document.getElementById("telefono-error-add");
         if (errorDiv) {
           errorDiv.remove();
         }

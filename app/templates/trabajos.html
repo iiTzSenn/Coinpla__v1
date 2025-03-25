@@ -7,7 +7,7 @@
       <h4 class="mb-0">Añadir Trabajo</h4>
     </div>
     <div class="card-body">
-      <form method="POST" action="{{ url_for('jobs.crear_trabajo') }}">
+      <form method="POST" action="{{ url_for('jobs.crear_trabajo') }}" id="addJobForm">
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <label for="nombre_cliente" class="form-label">Nombre del Cliente:</label>
