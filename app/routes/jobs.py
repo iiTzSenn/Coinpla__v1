@@ -3,9 +3,8 @@ from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from sqlalchemy import func
-
 from app.extensions import db
-from app.models.models import Job, Technician, JobHistory
+from app.models.models import User, Job, Technician, JobHistory
 from app.utils.validators import validar_y_normalizar_telefono
 
 jobs_bp = Blueprint('jobs', __name__)
@@ -13,7 +12,60 @@ jobs_bp = Blueprint('jobs', __name__)
 @jobs_bp.route('/')
 @login_required
 def index():
-    return render_template('index.html')
+    # Si el usuario es técnico y se detecta que se accede desde un dispositivo móvil
+    if current_user.role == 'tecnico' and "Mobile" in request.user_agent.string:
+        if current_user.technician_profile:
+            trabajos = Job.query.filter(Job.technician_id == current_user.technician_profile.id).all()
+        else:
+            trabajos = []
+        return render_template('index_mobile.html', trabajos=trabajos)
+    else:
+        # Vista para administradores y técnicos en escritorio
+        trabajos_recientes = Job.query.order_by(Job.updated_at.desc()).limit(10).all()
+        total_usuarios = User.query.count()
+        total_trabajos = Job.query.count()
+        trabajos_pendientes = Job.query.filter_by(estado='Pendiente').count()
+        trabajos_completados = Job.query.filter_by(estado='Completado').count()
+        
+        # Preparar datos para el gráfico: trabajos por mes en los últimos 6 meses
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+        meses_labels = []
+        trabajos_mes = []
+        for i in range(6):
+            month = current_month - i
+            year = current_year
+            if month <= 0:
+                month += 12
+                year -= 1
+            label = datetime(year, month, 1).strftime('%b %Y')
+            meses_labels.append(label)
+            count = Job.query.filter(
+                func.extract('year', Job.fecha) == year,
+                func.extract('month', Job.fecha) == month
+            ).count()
+            trabajos_mes.append(count)
+        meses_labels.reverse()
+        trabajos_mes.reverse()
+        
+        # Preparar eventos para el calendario: usar todos los trabajos con fecha definida
+        jobs_for_calendar = Job.query.filter(Job.fecha != None).all()
+        eventos_calendario = []
+        for job in jobs_for_calendar:
+            eventos_calendario.append({
+                'titulo': f"{job.nombre_cliente} {job.apellido_cliente or ''}",
+                'start': job.fecha.strftime('%Y-%m-%d')
+            })
+        
+        return render_template('dashboard_admin.html',
+                               trabajos_recientes=trabajos_recientes,
+                               total_usuarios=total_usuarios,
+                               total_trabajos=total_trabajos,
+                               trabajos_pendientes=trabajos_pendientes,
+                               trabajos_completados=trabajos_completados,
+                               meses_labels=meses_labels,
+                               trabajos_mes=trabajos_mes,
+                               eventos_calendario=eventos_calendario)
 
 @jobs_bp.route('/jobs')
 @login_required
@@ -21,6 +73,12 @@ def listar_trabajos():
     trabajos = Job.query.filter(Job.estado != 'Completado').all()
     tecnicos = Technician.query.all()
     return render_template('trabajos.html', trabajos=trabajos, tecnicos=tecnicos)
+
+@jobs_bp.route('/jobs/<int:id>')
+@login_required
+def ver_trabajo(id):
+    trabajo = Job.query.get_or_404(id)
+    return render_template('detalle_trabajo.html', trabajo=trabajo)
 
 @jobs_bp.route('/jobs/create', methods=['POST'])
 @login_required
@@ -68,9 +126,9 @@ def crear_trabajo():
     tecnicos = Technician.query.filter_by(available=True).all()
     candidatos = []
     for tecnico in tecnicos:
-        trabajos = Job.query.filter_by(technician_id=tecnico.id).all()
+        trabajos_asignados = Job.query.filter_by(technician_id=tecnico.id).all()
         conflicto = False
-        for t in trabajos:
+        for t in trabajos_asignados:
             t_inicio = datetime.combine(t.fecha.date(), datetime.strptime(t.hora, '%H:%M').time())
             t_duracion = DURACION_MAP.get(t.duracion, 2)
             t_fin = t_inicio + timedelta(hours=t_duracion)
@@ -105,7 +163,6 @@ def editar_trabajo(id):
     trabajo = Job.query.get_or_404(id)
     tecnicos = Technician.query.all()
 
-    # Recogida de datos
     trabajo.nombre_cliente = request.form.get('nombre_cliente')
     trabajo.apellido_cliente = request.form.get('apellido_cliente')
     trabajo.direccion = request.form.get('direccion')
@@ -116,14 +173,11 @@ def editar_trabajo(id):
         trabajo.telefono = validar_y_normalizar_telefono(telefono_raw) if telefono_raw else None
     except ValueError as e:
         trabajos = Job.query.filter(Job.estado != 'Completado').all()
-        return render_template(
-            'trabajos.html',
-            trabajos=trabajos,
-            tecnicos=tecnicos,
-            error_modal_id=trabajo.id,
-            error_telefono=str(e)
-        )
-
+        return render_template('trabajos.html',
+                               trabajos=trabajos,
+                               tecnicos=tecnicos,
+                               error_modal_id=trabajo.id,
+                               error_telefono=str(e))
     trabajo.codigo_postal = request.form.get('codigo_postal')
     trabajo.duracion = request.form.get('duracion')
     trabajo.fecha = datetime.strptime(request.form.get('fecha'), '%Y-%m-%d')
@@ -183,7 +237,6 @@ def completar_trabajo(id):
 @login_required
 def historial():
     query = Job.query.filter_by(estado='Completado')
-
     cliente = request.args.get('cliente', '').strip()
     fecha_inicio = request.args.get('fecha_inicio', '').strip()
     fecha_fin = request.args.get('fecha_fin', '').strip()
@@ -215,11 +268,9 @@ def historial():
 
     trabajos = query.order_by(Job.updated_at.desc()).all()
 
-    return render_template(
-        'historial.html',
-        trabajos=trabajos,
-        cliente=cliente,
-        fecha_inicio=fecha_inicio,
-        fecha_fin=fecha_fin,
-        tecnico=tecnico
-    )
+    return render_template('historial.html',
+                           trabajos=trabajos,
+                           cliente=cliente,
+                           fecha_inicio=fecha_inicio,
+                           fecha_fin=fecha_fin,
+                           tecnico=tecnico)

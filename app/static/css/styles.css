@@ -1,3 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root {
+  --primary: #43ab01;
+  --secondary: #85eb3c;
+  --sidebar-bg: #3a4f41;
+  --background: #f8f9fa;
+  --text: #212529;
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+  --navbar-bg: #43ab01;
+  --button-text: #ffffff;
+  --header-bg: #43ab01;
+  /* Colores para el sidebar */
+  --base-bg: #11121a;
+  --hover-clr: #222533;
+  --accent-clr: #5e63ff;
+}
+
+/* Estilos base */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+  margin: 0;
+  padding: 0;
+}
+
+/* Header fijo */
+.main-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1050;
+}
+
+/* Layout: Ajuste para dejar espacio al header */
+.layout {
+  display: flex;
+  margin-top: 56px; /* Ajusta según la altura de tu navbar */
+}
+
+/* Sidebar */
+#sidebar {
+  width: 250px;
+  background-color: var(--base-bg);
+  color: var(--button-text);
+  transition: width 0.3s ease;
+  padding: 1em 0.5em; /* Un poco de padding horizontal */
+  min-height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+#sidebar.close {
+  width: 60px;
+}
+
+/* Parte superior de la sidebar: toggle + logo */
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Al estar abierta, toggle y logo a la izquierda */
+  gap: 8px;
+  margin-bottom: 1em;
+  transition: justify-content 0.3s ease;
+}
+
+#toggle-btn {
+  background: none;
+  border: none;
+  color: var(--button-text);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo {
+  font-size: 1.25em;
+  font-weight: 600;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Al cerrar la sidebar:
+   - El logo se oculta
+   - Se centra el toggle (justify-content: center) */
+#sidebar.close .sidebar-top {
+  justify-content: center;
+}
+
+#sidebar.close .logo {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Lista del sidebar */
+#sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#sidebar ul li {
+  margin-bottom: 1em;
+}
+
+/* Enlaces y botones del sidebar */
+#sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  text-decoration: none;
+  color: var(--button-text);
+  padding: 0.5em;
+  border-radius: 0.5em;
+  transition: background-color 0.2s ease;
+}
+
+#sidebar a:hover {
+  background-color: var(--hover-clr);
+}
+
+/* Ocultar el texto de los links cuando se cierra */
+#sidebar.close a span {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* Contenido principal */
+.content {
+  flex-grow: 1;
+  padding: 1em;
+}
+
 /* ========== RESET & GLOBAL STYLES ========== */
 * {
   margin: 0;
@@ -10,33 +143,6 @@ body {
   background-color: var(--background);
   color: var(--text);
   transition: background-color 0.3s, color 0.3s;
-  margin: 0;
-  padding: 0;
-}
-
-/* ========== VARIABLES ========== */
-:root {
-  --primary: #43ab01;
-  --secondary: #85eb3c;
-  --sidebar-bg: #3a4f41;
-  --background: #f8f9fa;
-  --text: #212529;
-  --card-bg: #ffffff;
-  --card-border: #dee2e6;
-  --navbar-bg: #43ab01;
-  --button-text: #ffffff;
-  --header-bg: #43ab01;
-}
-
-/* ========== BASE & LAYOUT ========== */
-.main-content {
-  padding: 1rem;
-  background-color: #fff;
-}
-
-.container {
-  margin-top: 20px;
-  padding: 15px;
 }
 
 /* ========== HEADER & NAVIGATION ========== */
@@ -55,25 +161,20 @@ header.navbar {
   transition: background-color 0.3s ease;
 }
 
-dl, ol, ul {
-  margin-top: 0;
-  margin-bottom: 0rem;
-}
-
 .navbar-left {
   display: flex;
   height: 100%;
 }
+
 .navbar-left nav {
   margin-top: 15px;
 }
+
 .navbar-left nav ul {
   list-style: none;
   display: flex;
 }
-.navbar-left nav ul li {
-  margin: 0;
-}
+
 .navbar-left nav ul li a {
   display: block;
   padding: 0.5rem 1.5rem;
@@ -87,70 +188,15 @@ dl, ol, ul {
   transition: background-color 0.3s ease;
   position: relative;
 }
+
 .navbar-left nav ul li a:hover {
   background-color: rgba(255, 255, 255, 0.15);
   color: #ffffff;
 }
-.navbar-left nav ul li a.active {
-  background-color: #fff;
-  color: var(--navbar-bg);
-  border: 1px solid #fff;
-  border-bottom: none;
-  margin-bottom: -10px;
-  position: relative;
-  box-shadow: none;
-}
-.navbar-left nav ul li a.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 10px;
-  background-color: #fff;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  z-index: -1;
-}
-
-.navbar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.navbar-center .navbar-brand {
-  color: var(--button-text) !important;
-  font-size: 1.5rem;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-}
-
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-.navbar-right .navbar-btn {
-  border: none;
-  background: none;
-  color: var(--button-text);
-  padding: 0.75rem;
-  cursor: pointer;
-  font-size: 1.3rem;
-  transition: opacity 0.2s ease;
-}
-.navbar-right .navbar-btn:hover {
-  opacity: 0.8;
-}
 
 /* ========== COMPONENTES ========== */
-.jumbotron {
-  background-color: var(--navbar-bg);
-  color: var(--button-text);
-  padding: 2rem 1rem;
-  border-radius: 0.3rem;
-  margin-bottom: 20px;
-}
+/* Ejemplo de jumbotron, tarjetas, tablas, etc. 
+   Ajusta o elimina según tu proyecto. */
 
 .card {
   background-color: var(--card-bg);
@@ -164,131 +210,9 @@ dl, ol, ul {
   color: var(--button-text) !important;
 }
 
-.table {
-  background-color: var(--card-bg);
-  color: var(--text);
-}
 .table thead th {
   background-color: var(--navbar-bg);
   color: var(--button-text);
-}
-.table-responsive {
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.form-control,
-.form-select {
-  border-radius: 0.25rem;
-  background-color: var(--card-bg);
-  color: var(--text);
-  border: 1px solid #ced4da;
-}
-input::placeholder,
-textarea::placeholder {
-  color: #6c757d;
-}
-
-/* Validación de formularios */
-.is-invalid {
-  border-color: #dc3545 !important;
-  padding-right: calc(1.5em + 0.75rem);
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.invalid-feedback {
-  display: block;
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-/* Botones */
-.btn-first,
-.btn-second,
-.btn-third,
-.btn-fourth,
-.btn-action {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.btn-first {
-  background-color: var(--navbar-bg);
-  border-color: var(--navbar-bg);
-  color: var(--button-text);
-}
-.btn-second {
-  background-color: var(--sidebar-bg);
-  border-color: var(--sidebar-bg);
-  color: var(--button-text);
-}
-.btn-third {
-  background-color: var(--primary);
-  border-color: var(--primary);
-  color: var(--button-text);
-}
-.btn-fourth {
-  background-color: #e0e0e0;
-  border-color: #e0e0e0;
-  color: var(--text);
-}
-.btn-action {
-  margin-right: 5px;
-}
-.btn-first:hover,
-.btn-second:hover,
-.btn-third:hover,
-.btn-fourth:hover,
-.btn-action:hover {
-  transform: translateY(2px);
-  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-}
-.btn-first:active,
-.btn-second:active,
-.btn-third:active,
-.btn-fourth:active,
-.btn-action:active {
-  transform: translateY(4px);
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.15);
-}
-
-/* Otros componentes */
-.trabajo-input {
-  width: 100%;
-}
-
-/* Modals */
-.modal-content {
-  border-radius: 0.5rem !important;
-}
-.modal-dialog {
-  margin: auto !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.modal-dialog.modal-lg {
-  max-width: 800px !important;
-}
-
-.modal-content.modal-rectangular {
-  border-radius: 0.5rem !important;
-  background-color: var(--card-bg) !important;
-  color: var(--text) !important;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--card-border);
-}
-
-.modal-dialog.modal-dialog-centered {
-  display: flex !important;
-  align-items: center !important;
-}
-.modal-dialog.modal-dialog-centered.modal-xl {
-  max-width: 60% !important;
-  margin: auto !important;
 }
 
 /* Alerts */
@@ -394,4 +318,106 @@ select:focus,
 }
 .data-table tbody tr:hover {
   background-color: #e6ffe6;
+}
+
+/* ================================================
+   Modern Card Styles with Background Icon y Glow Mejorado
+   ================================================ */
+
+.card.custom-card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 1rem;
+  background: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.custom-card::before {
+  content: "\2605";
+  font-family: Arial, sans-serif;
+  font-size: 80px;
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  color: rgba(67, 171, 1, 0.1);
+  transition: color 0.3s ease;
+  z-index: 0;
+}
+
+.card.custom-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0 25px 4px rgba(67, 171, 1, 0);
+  transition: box-shadow 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+.card.custom-card:hover::before {
+  color: rgba(67, 171, 1, 0.2);
+}
+.card.custom-card:hover::after {
+  box-shadow: 0 0 35px 6px rgba(67, 171, 1, 0.9);
+}
+
+.card.custom-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================================================
+   Dashboard Card Styles para tarjetas de resumen con emoticonos
+   ================================================ */
+.dashboard-card {
+  padding: 1rem;
+  border-radius: 1rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dashboard-card::before {
+  content: "\2605";
+  font-family: Arial, sans-serif;
+  font-size: 100px;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  color: rgba(255, 255, 255, 0.1);
+  transition: color 0.3s ease;
+  z-index: 0;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.dashboard-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-card.usuarios::before {
+  content: "👤";
+}
+.dashboard-card.trabajos::before {
+  content: "🛠️";
+}
+.dashboard-card.pendientes::before {
+  content: "⏰";
+}
+.dashboard-card.completados::before {
+  content: "✔";
 }

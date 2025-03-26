@@ -15,7 +15,7 @@
             <th>ID</th>
             <th>Usuario</th>
             <th>Email</th>
-            <th class="text-center">Acción</th>
+            <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -25,9 +25,16 @@
             <td>{{ user.username }}</td>
             <td>{{ user.email }}</td>
             <td class="text-center">
-              <form method="POST" action="{{ url_for('admin.admin_verify_user', user_id=user.id) }}">
+              <!-- Botón para verificar -->
+              <form method="POST" action="{{ url_for('admin.admin_verify_user', user_id=user.id) }}" style="display:inline;">
                 <button type="submit" class="btn btn-success btn-sm btn-action" title="Verificar">
                   <i class="bi bi-check2-circle"></i>
+                </button>
+              </form>
+              <!-- Botón para eliminar solicitud -->
+              <form method="POST" action="{{ url_for('admin.admin_delete_pending_user', user_id=user.id) }}" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm btn-action" title="Eliminar Solicitud">
+                  <i class="bi bi-trash"></i>
                 </button>
               </form>
             </td>

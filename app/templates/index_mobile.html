@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Mis Trabajos - Coinpla{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+  <h4 class="mb-3">👷 Mis Trabajos</h4>
+  {% if trabajos %}
+    <div class="row g-3">
+      {% for trabajo in trabajos %}
+      <div class="col-12">
+        <div class="card custom-card shadow-sm border-0 rounded-3">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div>
+                <h5 class="card-title mb-0">{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</h5>
+                <small class="text-muted">{{ trabajo.direccion }}</small>
+              </div>
+              <span class="badge 
+                {% if trabajo.estado == 'Pendiente' %}bg-secondary
+                {% elif trabajo.estado == 'En Proceso' %}bg-warning
+                {% else %}bg-success{% endif %}">
+                {{ trabajo.estado }}
+              </span>
+            </div>
+            <p class="mb-2"><i class="bi bi-calendar-event"></i> {{ trabajo.fecha.strftime('%d/%m/%Y') }} – {{ trabajo.hora }}</p>
+            <div class="d-flex gap-2">
+              <a href="#" class="btn btn-sm btn-outline-primary w-100"><i class="bi bi-eye"></i> Detalles</a>
+              {% if trabajo.estado == 'Completado' %}
+                <a href="#" class="btn btn-sm btn-success w-100"><i class="bi bi-file-earmark-text"></i> Comprobante</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center mt-4">
+      <i class="bi bi-info-circle"></i> No tienes trabajos asignados.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

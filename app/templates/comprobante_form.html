@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Comprobante de Servicio{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+  <h4 class="mb-4 text-center">🧾 Comprobante de Servicio DDD</h4>
+  <form method="POST" action="{{ url_for('jobs.guardar_comprobante', id=trabajo.id) }}" id="comprobanteForm">
+    
+    <!-- A. Datos del Contratante -->
+    <div class="card mb-4">
+      <div class="card-header">A. Contratante del Servicio</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6"><input type="text" class="form-control" name="nombre" placeholder="Nombre" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="actividad" placeholder="Tipo de actividad" required></div>
+        <div class="col-md-6"><input type="date" class="form-control" name="fecha" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="cif_dni" placeholder="CIF / DNI" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="telefono" placeholder="Teléfono" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="direccion" placeholder="Dirección" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="poblacion" placeholder="Población" required></div>
+      </div>
+    </div>
+
+    <!-- B. Riesgo Relativo -->
+    <div class="card mb-4">
+      <div class="card-header">B. Riesgo Relativo</div>
+      <div class="card-body">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="riesgo" value="Alto" required>
+          <label class="form-check-label">Alto</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="riesgo" value="Medio">
+          <label class="form-check-label">Medio</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="riesgo" value="Bajo">
+          <label class="form-check-label">Bajo</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- C. Especies Detectadas -->
+    <div class="card mb-4">
+      <div class="card-header">C. Especies Detectadas</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6">
+          <select class="form-select" name="nombre_cientifico" required>
+            <option value="">Nombre científico...</option>
+            <option value="Blattella germanica">Blattella germanica</option>
+            <option value="Rattus norvegicus">Rattus norvegicus</option>
+            <option value="Mus musculus">Mus musculus</option>
+          </select>
+        </div>
+        <div class="col-md-6"><input type="text" class="form-control" name="nombre_vulgar" placeholder="Nombre vulgar" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="estimacion" placeholder="Estimación poblacional" required></div>
+        <div class="col-md-6"><input type="text" class="form-control" name="ubicacion" placeholder="Ubicación en las instalaciones" required></div>
+      </div>
+    </div>
+
+    <!-- D. Certificado DDD -->
+    <div class="card mb-4">
+      <div class="card-header">D. Certificado de Servicio</div>
+      <div class="card-body row g-3">
+        <div class="col-md-6"><input type="date" class="form-control" name="fecha_servicio" required></div>
+        <div class="col-md-6"><input type="date" class="form-control" name="fecha_diagnostico" required></div>
+      </div>
+    </div>
+
+    <!-- E. Tipo de Servicio -->
+    <div class="card mb-4">
+      <div class="card-header">E. Tipo de Servicio</div>
+      <div class="card-body row">
+        {% for tipo in ['Vigilancia/monitorización','Medidas de control directo','Tratamiento físico','Tratamiento químico','Tratamiento biológico','Desinsectación','Tratamiento físico-químico','Desratización','Desinfección'] %}
+        <div class="col-6 col-md-4">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tipo_servicio" value="{{ tipo }}">
+            <label class="form-check-label">{{ tipo }}</label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- F. Identificación del tratamiento -->
+    <div class="card mb-4">
+      <div class="card-header">F. Identificación del Tratamiento</div>
+      <div class="card-body">
+        <textarea class="form-control" name="identificacion_tratamiento" rows="3" required></textarea>
+      </div>
+    </div>
+
+    <!-- G. Medidas Correctoras -->
+    <div class="card mb-4">
+      <div class="card-header">G. Medidas Correctoras</div>
+      <div class="card-body">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="medida_igual">
+          <label class="form-check-label">Las mismas que en la diagnosis</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" name="medida_nueva">
+          <label class="form-check-label">Nuevas a adoptar después de vigilancia</label>
+        </div>
+        <div class="mt-3">
+          <textarea class="form-control" name="descripcion_medidas" rows="2" placeholder="Descripción detallada…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- H. Productos Utilizados -->
+    <div class="card mb-4">
+      <div class="card-header">H. Productos Utilizados</div>
+      <div class="card-body">
+        <table class="table table-bordered small">
+          <thead>
+            <tr>
+              <th>Especie tratada</th>
+              <th>Área tratada</th>
+              <th>Tipo biocida</th>
+              <th>Nombre comercial</th>
+              <th>Nº registro</th>
+              <th>Método</th>
+              <th>Dosis %</th>
+              <th>Plazo seguridad</th>
+            </tr>
+          </thead>
+          <tbody id="tablaProductos">
+            <tr>
+              <td><input type="text" class="form-control" name="especie[]"></td>
+              <td><input type="text" class="form-control" name="area[]"></td>
+              <td><input type="text" class="form-control" name="biocida[]"></td>
+              <td><input type="text" class="form-control" name="nombre_comercial[]"></td>
+              <td><input type="text" class="form-control" name="registro[]"></td>
+              <td><input type="text" class="form-control" name="metodo[]"></td>
+              <td><input type="text" class="form-control" name="dosis[]"></td>
+              <td><input type="text" class="form-control" name="plazo[]"></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAgregarProducto">➕ Añadir Producto</button>
+      </div>
+    </div>
+
+    <!-- I. Dosis Aplicada -->
+    <div class="card mb-4">
+      <div class="card-header">I. Dosis Aplicada</div>
+      <div class="card-body row g-3">
+        <div class="col-md-4"><label>Hora inicio:</label><input type="time" class="form-control" name="hora_inicio"></div>
+        <div class="col-md-4"><label>Hora fin:</label><input type="time" class="form-control" name="hora_fin"></div>
+        <div class="col-md-4"><label>Acción residual:</label><input type="date" class="form-control" name="fecha_residual"></div>
+      </div>
+    </div>
+
+    <!-- J. Firmas -->
+    <div class="card mb-4">
+      <div class="card-header">J. Firmas</div>
+      <div class="card-body row g-3">
+        <div class="col-md-4"><input type="text" class="form-control" name="cliente_firma" placeholder="Cliente: Nombre, firma, sello" required></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="tecnico_firma" placeholder="Técnico Aplicado" required></div>
+        <div class="col-md-4"><input type="text" class="form-control" name="responsable_firma" placeholder="Responsable Técnico" required></div>
+      </div>
+    </div>
+
+    <!-- K. Observaciones -->
+    <div class="card mb-4">
+      <div class="card-header">K. Observaciones</div>
+      <div class="card-body">
+        <textarea class="form-control" name="observaciones" rows="2" placeholder="Observaciones adicionales…"></textarea>
+      </div>
+    </div>
+
+    <!-- Enviar -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-third px-5">Guardar Comprobante</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

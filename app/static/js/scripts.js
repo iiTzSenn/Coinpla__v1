@@ -1,17 +1,11 @@
-/* ===================== */
-/* 1. UTILS & GLOBAL SETUP */
-/* ===================== */
+/* =====================
+   1. UTILS & GLOBAL SETUP
+===================== */
 
-/**
- * Función para guardar la posición del scroll en sessionStorage.
- */
 function saveScrollPos() {
   sessionStorage.setItem("scrollPos", window.scrollY);
 }
 
-/**
- * Al cargar el DOM, se restaura la posición de scroll si existe.
- */
 document.addEventListener("DOMContentLoaded", function () {
   if (sessionStorage.getItem("scrollPos")) {
     window.scrollTo(0, sessionStorage.getItem("scrollPos"));
@@ -19,9 +13,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-/* ===================== */
-/* 2. ALERTS & MESSAGES */
-/* ===================== */
+/* =====================
+   2. ALERTS & MESSAGES
+===================== */
 
 document.addEventListener('DOMContentLoaded', function () {
   setTimeout(function () {
@@ -35,94 +29,53 @@ document.addEventListener('DOMContentLoaded', function () {
   }, 2000);
 });
 
-/* ===================== */
-/* 3. MODAL HANDLERS: Trabajos & Técnicos */
-/* ===================== */
+/* =====================
+   3. SIDEBAR TOGGLE
+===================== */
 
-document.body.addEventListener('click', function (event) {
-  const editJobButton = event.target.closest('.editar-trabajo');
-  if (editJobButton) {
-    const jobId = editJobButton.getAttribute('data-id');
-    var editJobForm = document.getElementById('editJobForm');
-    if (editJobForm) {
-      editJobForm.action = '/jobs/edit/' + jobId;
-    }
-    document.getElementById('modalNombreCliente').value = editJobButton.getAttribute('data-nombre_cliente') || '';
-    document.getElementById('modalApellidoCliente').value = editJobButton.getAttribute('data-apellido_cliente') || '';
-    document.getElementById('modalDireccion').value = editJobButton.getAttribute('data-direccion') || '';
-    document.getElementById('modalFecha').value = editJobButton.getAttribute('data-fecha') || '';
-    document.getElementById('modalHora').value = editJobButton.getAttribute('data-hora') || '';
-    document.getElementById('modalEstado').value = editJobButton.getAttribute('data-estado') || 'Pendiente';
-    document.getElementById('modalDescripcion').value = editJobButton.getAttribute('data-descripcion') || '';
-    document.getElementById('modalTelefono').value = editJobButton.getAttribute('data-telefono') || '';
-    document.getElementById('modalCodigoPostal').value = editJobButton.getAttribute('data-codigo_postal') || '';
-    document.getElementById('modalTecnicoId').value = editJobButton.getAttribute('data-tecnico-id') || '';
+// Función para abrir/cerrar la sidebar
+function toggleSidebar() {
+  var sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('close');
+  // En este diseño, no aplicamos efecto de "rotate" al botón
+  // Si deseas agregar algún efecto visual adicional, puedes descomentar la siguiente línea:
+  // document.getElementById('toggle-btn').classList.toggle('rotate');
+  closeAllSubMenus();
+}
+
+/* =====================
+   4. SUBMENU TOGGLE
+===================== */
+
+function toggleSubMenu(button) {
+  var subMenu = button.nextElementSibling;
+  if (!subMenu.classList.contains('show')) {
+    closeAllSubMenus();
   }
-});
+  subMenu.classList.toggle('show');
+  button.classList.toggle('rotate');
 
-document.body.addEventListener('click', function (event) {
-  const editTechButton = event.target.closest('.editar-tecnico');
-  if (editTechButton) {
-    const techId = editTechButton.getAttribute('data-id');
-    var editTechForm = document.getElementById('editTecnicoForm');
-    if (editTechForm) {
-      editTechForm.action = '/technicians/edit/' + techId;
-    }
-    document.getElementById('modalFirstName').value = editTechButton.getAttribute('data-first_name') || '';
-    document.getElementById('modalLastName').value = editTechButton.getAttribute('data-last_name') || '';
-    document.getElementById('modalTelefono').value = editTechButton.getAttribute('data-telefono') || '';
+  var sidebar = document.getElementById('sidebar');
+  if (sidebar.classList.contains('close')) {
+    sidebar.classList.remove('close');
+    document.getElementById('toggle-btn').classList.remove('rotate');
   }
-});
+}
 
-/* ===================== */
-/* 4. FORM ACTIONS & TOGGLES */
-/* ===================== */
-
-document.querySelectorAll('.toggle-disponibilidad').forEach(function (btn) {
-  btn.addEventListener('click', function (e) {
-    e.stopPropagation();
-    e.preventDefault();
-    btn.closest('form').submit();
+function closeAllSubMenus() {
+  var subMenus = document.querySelectorAll('#sidebar .sub-menu.show');
+  subMenus.forEach(function (menu) {
+    menu.classList.remove('show');
+    var btn = menu.previousElementSibling;
+    if (btn && btn.classList.contains('rotate')) {
+      btn.classList.remove('rotate');
+    }
   });
-});
+}
 
-document.body.addEventListener('click', function (event) {
-  const deleteJobButton = event.target.closest('.confirm-delete-job');
-  if (deleteJobButton) {
-    const jobId = deleteJobButton.getAttribute('data-job-id');
-    var deleteJobForm = document.getElementById('deleteJobForm');
-    if (deleteJobForm) {
-      deleteJobForm.action = '/jobs/delete/' + jobId;
-    }
-  }
-});
-
-document.body.addEventListener('click', function (event) {
-  const completeJobButton = event.target.closest('.confirm-complete-job');
-  if (completeJobButton) {
-    const jobId = completeJobButton.getAttribute('data-job-id');
-    var completeJobForm = document.getElementById('completeJobForm');
-    if (completeJobForm) {
-      completeJobForm.action = '/jobs/complete/' + jobId;
-    }
-  }
-});
-
-document.body.addEventListener('click', function (event) {
-  const deleteTechButton = event.target.closest('.confirm-delete-tech');
-  if (deleteTechButton) {
-    const techId = deleteTechButton.getAttribute('data-tech-id');
-    console.log("Eliminando técnico con ID:", techId);
-    var deleteTechForm = document.getElementById('deleteTechForm');
-    if (deleteTechForm) {
-      deleteTechForm.action = '/technicians/delete/' + techId;
-    }
-  }
-});
-
-/* ===================== */
-/* 5. PASSWORD VISIBILITY TOGGLES */
-/* ===================== */
+/* =====================
+   5. PASSWORD VISIBILITY TOGGLES
+===================== */
 
 document.addEventListener('DOMContentLoaded', function () {
   var togglePassword = document.getElementById('toggle-password');
@@ -160,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-/* ===================== */
-/* 6. FORM VALIDATION (Registro) */
-/* ===================== */
+/* =====================
+   6. FORM VALIDATION (Registro)
+===================== */
 
 document.addEventListener('DOMContentLoaded', function () {
   var registerForm = document.getElementById('registerForm');
@@ -179,9 +132,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
-/* ===================== */
-/* 7. HISTORIAL MODAL HANDLER */
-/* ===================== */
+/* =====================
+   7. HISTORIAL MODAL HANDLER
+===================== */
 
 document.addEventListener('DOMContentLoaded', function () {
   var detalleButtons = document.querySelectorAll('.ver-detalles');
@@ -216,9 +169,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-/* ===================== */
-/* 8. VALIDACIÓN TELÉFONO EN MODAL EDICIÓN */
-/* ===================== */
+/* =====================
+   8. VALIDACIÓN TELÉFONO EN MODAL EDICIÓN
+===================== */
 
 document.addEventListener("DOMContentLoaded", function () {
   const editJobForm = document.getElementById("editJobForm");
@@ -249,9 +202,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-/* ===================== */
-/* 9. VALIDACIÓN TELÉFONO EN FORMULARIO AÑADIR TRABAJO */
-/* ===================== */
+/* =====================
+   9. VALIDACIÓN TELÉFONO EN FORMULARIO AÑADIR TRABAJO
+===================== */
 
 document.addEventListener("DOMContentLoaded", function () {
   const addJobForm = document.getElementById("addJobForm");
@@ -259,7 +212,6 @@ document.addEventListener("DOMContentLoaded", function () {
     addJobForm.addEventListener("submit", function (e) {
       const telefonoInput = document.getElementById("telefono");
       const telefono = telefonoInput.value.trim();
-      // Usamos la misma expresión regular que el pattern del input
       const telefonoRegex = /^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$/;
       if (telefono && !telefonoRegex.test(telefono)) {
         e.preventDefault();
@@ -278,6 +230,53 @@ document.addEventListener("DOMContentLoaded", function () {
           errorDiv.remove();
         }
       }
+    });
+  }
+});
+
+/* =====================
+   10. OTROS EVENTOS: CALENDAR, SUBMENÚ, ETC.
+===================== */
+
+document.addEventListener("DOMContentLoaded", function() {
+  var calendarEl = document.getElementById('calendar');
+  if (calendarEl) {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      },
+      events: '/api/calendar_events', // Endpoint para obtener eventos
+      eventClick: function(info) {
+        alert('Evento: ' + info.event.title);
+      }
+    });
+    calendar.render();
+  }
+  
+  // Opcional: funciones para submenús (si se usan en tu sidebar)
+  const toggleButton = document.getElementById('toggle-btn');
+  const sidebar = document.getElementById('sidebar');
+
+  function toggleSubMenu(button) {
+    if (!button.nextElementSibling.classList.contains('show')) {
+      closeAllSubMenus();
+    }
+    button.nextElementSibling.classList.toggle('show');
+    button.classList.toggle('rotate');
+
+    if (sidebar.classList.contains('close')) {
+      sidebar.classList.remove('close');
+      toggleButton.classList.remove('rotate');
+    }
+  }
+
+  function closeAllSubMenus() {
+    Array.from(sidebar.getElementsByClassName('show')).forEach(ul => {
+      ul.classList.remove('show');
+      ul.previousElementSibling.classList.remove('rotate');
     });
   }
 });

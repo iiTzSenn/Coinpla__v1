@@ -14,6 +14,9 @@ class User(db.Model, UserMixin):
     verified = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
+    
+    # Relación opcional para usuarios de rol técnico
+    technician_profile = db.relationship('Technician', backref='user', uselist=False)
 
     def __init__(self, username, email, password, role='tecnico'):
         self.username = username
@@ -35,6 +38,9 @@ class Technician(db.Model):
     __tablename__ = 'technicians'
     
     id = db.Column(db.Integer, primary_key=True)
+    # Llave foránea para relacionar con el usuario, opcional inicialmente
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100))
     email = db.Column(db.String(100))

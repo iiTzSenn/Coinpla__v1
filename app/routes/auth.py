@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from sqlalchemy import or_
-from app.models.models import User
+from app.models.models import User  # Ya no importamos Technician aquí
 from app.extensions import db
 
 auth_bp = Blueprint('auth', __name__)
@@ -29,12 +29,15 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        # Verificar que no exista ya el usuario o email
         if User.query.filter(or_(User.username == username, User.email == email)).first():
             flash("El usuario o email ya existe.", "danger")
             return redirect(url_for('auth.register'))
+        # Crear el usuario; por defecto el rol es "tecnico"
         new_user = User(username=username, email=email, password=password)
         db.session.add(new_user)
         db.session.commit()
+        
         flash("Registro exitoso. Espera verificación.", "info")
         return redirect(url_for('auth.login'))
     return render_template('register.html')

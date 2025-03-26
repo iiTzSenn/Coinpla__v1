@@ -1,10 +1,45 @@
 {% extends 'base.html' %}
+{% block title %}Dashboard - Coinpla{% endblock %}
 
 {% block content %}
-<div class="jumbotron">
-  <h1 class="display-4">Bienvenido a Coinpla</h1>
-  <p class="lead">Sistema de Gestión de Trabajos y Técnicos.</p>
-  <hr class="my-4">
-  <p>Utiliza el menú para navegar por las diferentes secciones.</p>
+<div class="container mt-4">
+  <h4 class="mb-4 text-center">Panel General - Todos los Trabajos</h4>
+  {% if trabajos %}
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Dirección</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trabajo in trabajos %}
+          <tr>
+            <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
+            <td>{{ trabajo.direccion }}</td>
+            <td>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
+            <td>{{ trabajo.hora }}</td>
+            <td>{{ trabajo.estado }}</td>
+            <td>
+              <a href="#" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
+              {% if trabajo.estado == 'Completado' %}
+              <a href="#" class="btn btn-sm btn-success">Comprobante</a>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center mt-4">
+      <i class="bi bi-info-circle"></i> No hay trabajos registrados.
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

@@ -1,87 +1,141 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coinpla - Sistema de Gestión</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Coinpla - Sistema de Gestión{% endblock %}</title>
+    <!-- Bootstrap 5 CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+    />
+    <!-- Estilos personalizados (styles.css) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+    <!-- Estilos adicionales de la Navbar (navbar.css) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+      <!-- Header fijo -->
+      <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="#">Coinpla</a>
+          </div>
+        </nav>
+      </header>
 
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" />
-  
-  <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+      <!-- Layout: Sidebar y contenido principal -->
+      <div class="layout">
+        <!-- Sidebar lateral -->
+        <nav id="sidebar">
+          <ul>
+            <!-- Cabecera de la sidebar: logo y botón toggle -->
+            <li class="sidebar-header">
+              <span class="logo">Coinpla</span>
+              <button onclick="toggleSidebar()" id="toggle-btn">
+                <!-- SVG toggle -->
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                  <path d="m313-480 155 156q11 11 11.5 27.5T468-268q-11 11-28 11t-28-11L228-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T468-692q11 11 11 28t-11 28L313-480Zm264 0 155 156q11 11 11.5 27.5T732-268q-11 11-28 11t-28-11L492-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l184-184q11-11 27.5-11.5T732-692q11 11 11 28t-11 28L577-480Z"/>
+                </svg>
+              </button>
+            </li>
+            <!-- Otras opciones de navegación -->
+            <li>
+              <a href="{{ url_for('jobs.index') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                  <path d="M240-200h120v-200q0-17 11.5-28.5T400-440h160q17 0 28.5 11.5T600-400v200h120v-360L480-740 240-560v360Zm-80 0v-360q0-19 8.5-36t23.5-28l240-180q21-16 48-16t48 16l240 180q15 11 23.5 28t8.5 36v360q0 33-23.5 56.5T720-120H560q-17 0-28.5-11.5T520-160v-200h-80v200q0 17-11.5 28.5T400-120H240q-33 0-56.5-23.5T160-200Zm320-270Z"/>
+                </svg>
+                <span>Inicio</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('jobs.listar_trabajos') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                  <path d="M520-640v-160q0-17 11.5-28.5T560-840h240q17 0 28.5 11.5T840-800v160q0 17-11.5 28.5T800-600H560q-17 0-28.5-11.5T520-640ZM120-480v-320q0-17 11.5-28.5T160-840h240q17 0 28.5 11.5T440-800v320q0 17-11.5 28.5T400-440H160q-17 0-28.5-11.5T120-480Zm400 320v-320q0-17 11.5-28.5T560-520h240q17 0 28.5 11.5T840-480v320q0 17-11.5 28.5T800-120H560q-17 0-28.5-11.5T520-160Zm-400 0v-160q0-17 11.5-28.5T160-360h240q17 0 28.5 11.5T440-320v160q0 17-11.5 28.5T400-120H160q-17 0-28.5-11.5T120-160Zm80-360h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/>
+                </svg>
+                <span>Trabajos</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('technicians.listar_tecnicos') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+                </svg>
+                <span>Técnicos</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ url_for('jobs.historial') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed">
+                  <path d="M3 5.67541V3C3 2.44772 2.55228 2 2 2C1.44772 2 1 2.44772 1 3V7C1 8.10457 1.89543 9 3 9H7C7.55229 9 8 8.55229 8 8C8 7.44772 7.55229 7 7 7H4.52186C4.54218 6.97505 4.56157 6.94914 4.57995 6.92229C5.621 5.40094 7.11009 4.22911 8.85191 3.57803C10.9074 2.80968 13.173 2.8196 15.2217 3.6059C17.2704 4.3922 18.9608 5.90061 19.9745 7.8469C20.9881 9.79319 21.2549 12.043 20.7247 14.1724C20.1945 16.3018 18.9039 18.1638 17.0959 19.4075C15.288 20.6513 13.0876 21.1909 10.9094 20.9247C8.73119 20.6586 6.72551 19.605 5.27028 17.9625C4.03713 16.5706 3.27139 14.8374 3.06527 13.0055C3.00352 12.4566 2.55674 12.0079 2.00446 12.0084C1.45217 12.0088 0.995668 12.4579 1.04626 13.0078C1.25994 15.3309 2.2082 17.5356 3.76666 19.2946C5.54703 21.3041 8.00084 22.5931 10.6657 22.9188C13.3306 23.2444 16.0226 22.5842 18.2345 21.0626C20.4464 19.541 22.0254 17.263 22.6741 14.6578C23.3228 12.0526 22.9963 9.30013 21.7562 6.91897C20.5161 4.53782 18.448 2.69239 15.9415 1.73041C13.4351 0.768419 10.6633 0.756291 8.14853 1.69631C6.06062 2.47676 4.26953 3.86881 3 5.67541Z" ></path> <path d="M12 5C11.4477 5 11 5.44771 11 6V12.4667C11 12.4667 11 12.7274 11.1267 12.9235C11.2115 13.0898 11.3437 13.2344 11.5174 13.3346L16.1372 16.0019C16.6155 16.278 17.2271 16.1141 17.5032 15.6358C17.7793 15.1575 17.6155 14.546 17.1372 14.2698L13 11.8812V6C13 5.44772 12.5523 5 12 5Z"></path>
+                </svg>
+                <span>Historial</span>
+              </a>
+            </li>
+            <!-- Puedes agregar más opciones aquí -->
+          </ul>
+        </nav>
+    {% endif %}
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-</head>
-<body>
-  {% if current_user.is_authenticated %}
-  <header class="navbar">
-    <div class="navbar-left">
-      <nav>
-        <ul>
-          <li>
-            <a class="nav-link {% if request.endpoint in ['jobs.listar_trabajos','jobs.crear_trabajo','jobs.editar_trabajo'] %}active{% endif %}" href="{{ url_for('jobs.listar_trabajos') }}">
-              <i class="bi bi-card-checklist me-1"></i>Trabajos
-            </a>
-          </li>
-          <li>
-            <a class="nav-link {% if request.endpoint in ['technicians.listar_tecnicos','technicians.crear_tecnico','technicians.editar_tecnico'] %}active{% endif %}" href="{{ url_for('technicians.listar_tecnicos') }}">
-              <i class="bi bi-people me-1"></i>Técnicos
-            </a>
-          </li>
-          <li>
-            <a class="nav-link {% if request.endpoint == 'jobs.historial' %}active{% endif %}" href="{{ url_for('jobs.historial') }}">
-              <i class="bi bi-clock-history me-1"></i>Historial
-            </a>            
-          </li>
-          {% if current_user.role == 'admin' %}
-          <li>
-            <a class="nav-link {% if request.endpoint.startswith('admin.') %}active{% endif %}" href="{{ url_for('admin.admin_users') }}">
-              <i class="bi bi-person-check me-1"></i>Usuarios
-            </a>
-          </li>
-          {% endif %}
-        </ul>
+    <!-- Contenido principal -->
+    <main class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div id="flash-messages">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if current_user.is_authenticated %}
+      </div> <!-- Cierra layout -->
+      <!-- Menú inferior para dispositivos móviles -->
+      <nav class="navbar navbar-light bg-white border-top fixed-bottom d-md-none justify-content-around py-1">
+        <a href="{{ url_for('jobs.index') }}" class="text-center text-dark small">
+          <img src="{{ url_for('static', filename='img/home.svg') }}" alt="Inicio" class="sidebar-icon">
+          <span>Inicio</span>
+        </a>
+        <a href="{{ url_for('jobs.listar_trabajos') }}" class="text-center text-dark small">
+          <img src="{{ url_for('static', filename='img/checklist.svg') }}" alt="Trabajos" class="sidebar-icon">
+          <span>Trabajos</span>
+        </a>
+        <a href="#" class="text-center text-dark small">
+          <img src="{{ url_for('static', filename='img/calendar.svg') }}" alt="Calendario" class="sidebar-icon">
+          <span>Calendario</span>
+        </a>
+        <a href="#" class="text-center text-dark small">
+          <img src="{{ url_for('static', filename='img/dashboard.svg') }}" alt="Comprobantes" class="sidebar-icon">
+          <span>Comprobantes</span>
+        </a>
+        <a href="#" class="text-center text-dark small">
+          <img src="{{ url_for('static', filename='img/user.svg') }}" alt="Correo" class="sidebar-icon">
+          <span>Correo</span>
+        </a>
       </nav>
-    </div>
-    <div class="navbar-center">
-      <a class="navbar-brand" href="{{ url_for('jobs.index') }}">Coinpla</a>
-    </div>
-    <div class="navbar-right">
-      <a href="{{ url_for('auth.logout') }}" id="logoutButton" class="navbar-btn">
-        <i class="bi bi-box-arrow-right"></i>
-      </a>
-    </div>
-  </header>
-  {% endif %}
+    {% endif %}
 
-  <!-- Contenido Principal -->
-  <div class="main-content">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div id="flash-messages">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-              {{ message }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
-  </div>
+    {% block modals %}{% endblock %}
 
-  {% block modals %}{% endblock %}
-
-  <!-- Bootstrap 5 Bundle JS (incluye Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- JS personalizado -->
-  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-</body>
+    <!-- Bootstrap Bundle JS (incluye Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS personalizado existente -->
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    <!-- Nuevo JS para la navbar -->
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
 </html>
