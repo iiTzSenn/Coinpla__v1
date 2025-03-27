@@ -1,0 +1,75 @@
+<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+  <div class="card-body p-0">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Trabajo</th>
+          <th>Cliente</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Técnico</th>
+          <th>Cantidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for trabajo in trabajos_pendientes_proceso.items %}
+        <tr>
+          <td class="text-center"><a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}">TRB__{{ trabajo.id }}</a></td>
+          <td class="text-center">{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
+          <td class="text-center">{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
+          <td class="text-center">
+            <p class="status 
+              {% if trabajo.estado == 'Pendiente' %}status-pending
+              {% elif trabajo.estado == 'En Proceso' %}status-pending
+              {% else %}status-paid{% endif %}">{{ trabajo.estado }}</p>
+          </td>
+          <td class="text-center">
+            {% if trabajo.technician %}
+              {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
+            {% else %}
+              Sin asignar
+            {% endif %}
+          </td>
+          <td class="text-center">{{ trabajo.costo_estimado or 'N/A' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex justify-content-center" style="border-radius: 0 0 1rem 1rem; background-color: #f9f9f9 !important; border-top: 1px solid #cbc6c6;">
+    <nav aria-label="Paginación">
+      <ul class="pagination m-0" style="gap: 0.5rem;">
+        {% if trabajos_pendientes_proceso.has_prev %}
+        <li class="page-item">
+          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=1) }}" aria-label="Primera página">&laquo;</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.prev_num) }}" aria-label="Página anterior">&lt;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&lt;</span>
+        </li>
+        {% endif %}
+        {% if trabajos_pendientes_proceso.has_next %}
+        <li class="page-item">
+          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.next_num) }}" aria-label="Página siguiente">&gt;</a>
+        </li>
+        <li class="page-item">
+          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.pages) }}" aria-label="Última página">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&gt;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&raquo;</span>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>

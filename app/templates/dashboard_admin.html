@@ -99,6 +99,12 @@
     </div>
   </div>
 
+  <div class="row mb-4">
+    <div class="col-12">
+      {% include 'components/table.html' %}
+    </div>
+  </div>
+
   <!-- PASO DE DATOS A JAVASCRIPT (Variables Globales) -->
   <script>
     var mesesLabels = {{ meses_labels|default([])|tojson }};

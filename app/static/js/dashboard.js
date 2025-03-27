@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+  let trabajosChart; // Variable para almacenar la instancia del gráfico de trabajos
+
   // Crear un degradado para las gráficas
   function createGradient(ctx, height) {
     const gradient = ctx.createLinearGradient(0, 0, height, 0);
@@ -7,12 +9,12 @@ document.addEventListener('DOMContentLoaded', function () {
     return gradient;
   }
 
-  // 1. Gráfico de Trabajos por Mes (Line)
+  // 1. Inicializar el gráfico de Trabajos
   const ctxTrabajos = document.getElementById('trabajosLineChart');
   if (ctxTrabajos) {
     const ctx = ctxTrabajos.getContext('2d');
     const gradient = createGradient(ctx, ctxTrabajos.height);
-    new Chart(ctx, {
+    trabajosChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: mesesLabels,
@@ -50,6 +52,29 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  // Función para filtrar el gráfico de Trabajos
+  window.filterChart = function (days) {
+    const now = new Date();
+    let filteredLabels = [];
+    let filteredData = [];
+
+    // Filtrar los datos según el rango de tiempo seleccionado
+    mesesLabels.forEach((label, index) => {
+      const labelDate = new Date(now.getFullYear(), now.getMonth() - (mesesLabels.length - 1 - index), 1);
+      const diffInDays = (now - labelDate) / (1000 * 60 * 60 * 24);
+
+      if (days === 'max' || diffInDays <= days) {
+        filteredLabels.push(label);
+        filteredData.push(trabajosMes[index]);
+      }
+    });
+
+    // Actualizar los datos del gráfico
+    trabajosChart.data.labels = filteredLabels;
+    trabajosChart.data.datasets[0].data = filteredData;
+    trabajosChart.update();
+  };
 
   // 2. Gráfico de Facturación Mensual (Bar)
   const ctxFacturacionBar = document.getElementById('facturacionBarChart');

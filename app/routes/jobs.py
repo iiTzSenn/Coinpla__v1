@@ -89,6 +89,12 @@ def index():
             facturacion_mes.append(total_facturacion)
         facturacion_mes.reverse()
 
+        page = request.args.get('page', 1, type=int)
+        per_page = 10
+        trabajos_pendientes_proceso = Job.query.filter(Job.estado.in_(['Pendiente', 'En Proceso'])) \
+                                               .order_by(Job.updated_at.desc()) \
+                                               .paginate(page=page, per_page=per_page, error_out=False)
+
         return render_template('dashboard_admin.html',
                                trabajos_recientes=trabajos_recientes,
                                total_usuarios=total_usuarios,
@@ -99,7 +105,8 @@ def index():
                                trabajos_mes=trabajos_mes,
                                trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
                                facturacion_mes=facturacion_mes,  # Enviar al frontend
-                               eventos_calendario=eventos_calendario)
+                               eventos_calendario=eventos_calendario,
+                               trabajos_pendientes_proceso=trabajos_pendientes_proceso)
 
 @jobs_bp.route('/jobs')
 @login_required
