@@ -37,7 +37,7 @@ body {
 /* Layout: Ajuste para dejar espacio al header */
 .layout {
   display: flex;
-  margin-top: 56px; /* Ajusta según la altura de tu navbar */
+  margin-top: 0; /* Asegúrate de que no haya margen superior */
 }
 
 /* Sidebar */
@@ -46,9 +46,13 @@ body {
   background-color: var(--base-bg);
   color: var(--button-text);
   transition: width 0.3s ease;
-  padding: 1em 0.5em; /* Un poco de padding horizontal */
-  min-height: calc(100vh - 56px);
+  padding: 1em 0.5em;
+  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
   overflow: hidden;
+  position: fixed; /* Fijar el sidebar en la parte superior */
+  top: 0; /* Asegurar que comience desde arriba */
+  left: 0;
+  margin-top: 0; /* Elimina cualquier margen superior */
 }
 
 #sidebar.close {
@@ -204,7 +208,15 @@ header.navbar {
   border: 1px solid var(--card-border);
   border-radius: 0.25rem;
   margin-bottom: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra permanente */
 }
+
+.card:hover {
+  transform: translateY(-5px); /* Relieve al pasar el ratón */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Sombra más intensa */
+}
+
 .card-header {
   background-color: var(--header-bg) !important;
   color: var(--button-text) !important;
@@ -387,21 +399,58 @@ select:focus,
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.dashboard-card.trabajos {
+  background: linear-gradient(90deg, #5e63ff, #42d1f5); /* Gradiente para Trabajos Totales */
+}
+
+.dashboard-card.pendientes {
+  background: linear-gradient(90deg, #ff9f43, #ff6f61); /* Gradiente para Pendientes */
+}
+
+.dashboard-card.completados {
+  background: linear-gradient(90deg, #28a745, #85eb3c); /* Gradiente para Completados */
+}
+
+.dashboard-card.facturacion {
+  background: linear-gradient(90deg, #17a2b8, #42d1f5); /* Gradiente para Facturación */
+}
+
 .dashboard-card::before {
-  content: "\2605";
+  content: "\2605"; /* Ícono por defecto */
   font-family: Arial, sans-serif;
   font-size: 100px;
   position: absolute;
   top: -10px;
   right: -10px;
   color: rgba(255, 255, 255, 0.1);
-  transition: color 0.3s ease;
+  transition: transform 0.3s ease, color 0.3s ease;
   z-index: 0;
 }
 
+.dashboard-card.trabajos::before {
+  content: "🛠️"; /* Ícono para Trabajos Totales */
+}
+
+.dashboard-card.pendientes::before {
+  content: "⏰"; /* Ícono para Pendientes */
+}
+
+.dashboard-card.completados::before {
+  content: "✔"; /* Ícono para Completados */
+}
+
+.dashboard-card.facturacion::before {
+  content: "💰"; /* Ícono para Facturación */
+}
+
 .dashboard-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-5px); /* Relieve al pasar el ratón */
   box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.dashboard-card:hover::before {
+  transform: scale(1.2); /* Ícono ligeramente más grande */
+  color: rgba(255, 255, 255, 0.2); /* Ícono más visible */
 }
 
 .dashboard-card .card-body {
@@ -409,15 +458,13 @@ select:focus,
   z-index: 1;
 }
 
-.dashboard-card.usuarios::before {
-  content: "👤";
+#trabajosLineChart {
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  height: 250px; /* Altura aún más reducida */
 }
-.dashboard-card.trabajos::before {
-  content: "🛠️";
-}
-.dashboard-card.pendientes::before {
-  content: "⏰";
-}
-.dashboard-card.completados::before {
-  content: "✔";
+
+#facturacionBarChart,
+#trabajosPendientesBarChart {
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  height: 300px; /* Altura consistente */
 }

@@ -86,7 +86,7 @@
 }
 #toggle-btn{
   margin-left: auto;
-  padding: 1em;
+  padding: 0.85em;
   border: none;
   border-radius: .5em;
   background: none;
@@ -96,6 +96,7 @@
     transition: rotate 150ms ease;
   }
 }
+
 #toggle-btn:hover{
   background-color: var(--hover-clr);
 }
@@ -118,6 +119,11 @@
     border: none;
     padding: 0;
   }
+
+  .sidebar-header{
+    margin-bottom: 0 px;
+  }
+  
   #sidebar{
     height: 60px;
     width: 100%;

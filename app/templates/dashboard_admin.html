@@ -3,18 +3,23 @@
 
 {% block content %}
 <div class="container mt-4">
-  <h2 class="text-center mb-4">Dashboard Administrador</h2>
-  
-  <!-- Tarjetas de resumen -->
+  <!-- =========================================
+       RUTA DE LA PÁGINA
+       ========================================= -->
+  <div class="mb-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
+        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">Inicio</li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- =========================================
+       1. TARJETAS KPI (Indicadores Clave)
+       ========================================= -->
   <div class="row g-3 mb-4">
-    <div class="col-md-3">
-      <div class="card dashboard-card bg-primary usuarios">
-        <div class="card-body">
-          <h5 class="card-title">Usuarios</h5>
-          <p class="card-text fs-4">{{ total_usuarios }}</p>
-        </div>
-      </div>
-    </div>
+    <!-- Trabajos totales -->
     <div class="col-md-3">
       <div class="card dashboard-card bg-success trabajos">
         <div class="card-body">
@@ -23,6 +28,7 @@
         </div>
       </div>
     </div>
+    <!-- Pendientes -->
     <div class="col-md-3">
       <div class="card dashboard-card bg-warning pendientes">
         <div class="card-body">
@@ -31,6 +37,7 @@
         </div>
       </div>
     </div>
+    <!-- Completados -->
     <div class="col-md-3">
       <div class="card dashboard-card bg-danger completados">
         <div class="card-body">
@@ -39,103 +46,79 @@
         </div>
       </div>
     </div>
-  </div>
-  
-  <!-- Gráfico de Trabajos por Mes -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <canvas id="trabajosChart"></canvas>
+    <!-- Facturación -->
+    <div class="col-md-3">
+      <div class="card dashboard-card bg-info facturacion">
+        <div class="card-body">
+          <h5 class="card-title">Facturación</h5>
+          <p class="card-text fs-4">€ {{ facturacion_total|default("0.00") }}</p>
+        </div>
+      </div>
     </div>
   </div>
-  
-  <!-- Calendario de Eventos -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div id="calendar"></div>
-    </div>
-  </div>
-  
-  <!-- Lista de trabajos recientes -->
-  <h4 class="mb-3">Trabajos Recientes</h4>
-  {% if trabajos_recientes %}
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Técnico</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for trabajo in trabajos_recientes %}
-          <tr>
-            <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
-            <td>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
-            <td>{{ trabajo.estado }}</td>
-            <td>
-              {% if trabajo.technician %}
-                {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
-              {% else %}
-                Sin asignar
-              {% endif %}
-            </td>
-            <td>
-              <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  {% else %}
-    <div class="alert alert-info text-center mt-4">
-      <i class="bi bi-info-circle"></i> No hay trabajos recientes.
-    </div>
-  {% endif %}
-</div>
 
-<!-- Incluir Chart.js -->
+  <!-- =========================================
+       2. GRÁFICAS
+       ========================================= -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
+          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos</span>
+        </div>
+        <div class="card-body" style="height: 250px;"> <!-- Altura reducida -->
+          <canvas id="trabajosLineChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+      
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
+          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Facturación Mensual</span>
+        </div>
+        <div class="card-body" style="height: 300px;">
+          <canvas id="facturacionBarChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
+          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Pendientes</span>
+        </div>
+        <div class="card-body" style="height: 300px;">
+          <canvas id="trabajosPendientesBarChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PASO DE DATOS A JAVASCRIPT (Variables Globales) -->
+  <script>
+    var mesesLabels = {{ meses_labels|default([])|tojson }};
+    var trabajosMes = {{ trabajos_mes|default([])|tojson }};
+    var facturacionMes = {{ facturacion_mes|default([])|tojson }};
+    var trabajosPendientesMes = {{ trabajosPendientesMes|default([])|tojson }}; <!-- Corregido -->
+    var trabajosPendientes = {{ trabajos_pendientes|default(0) }};
+    var trabajosEnProceso = {{ trabajos_en_proceso|default(0) }};
+    var trabajosCompletados = {{ trabajos_completados|default(0) }};
+    var eventosCalendario = {{ eventos_calendario|default([])|tojson }};
+  </script>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Incluir FullCalendar -->
+<!-- FullCalendar -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  // Gráfico de Chart.js - Trabajos por Mes
-  const ctx = document.getElementById('trabajosChart').getContext('2d');
-  const trabajosChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ meses_labels|tojson }},
-      datasets: [{
-        label: 'Trabajos',
-        data: {{ trabajos_mes|tojson }},
-        backgroundColor: 'rgba(78, 115, 223, 0.5)',
-        borderColor: 'rgba(78, 115, 223, 1)',
-        borderWidth: 1,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false
-    }
-  });
-
-  // Calendario con FullCalendar
-  var calendarEl = document.getElementById('calendar');
-  var calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: 'dayGridMonth',
-    events: {{ eventos_calendario|tojson }},
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'dayGridMonth,timeGridWeek,timeGridDay'  // ← corregido
-    }
-  });
-  calendar.render();
-});
-</script>
+<!-- Tu archivo JS externo -->
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 {% endblock %}
