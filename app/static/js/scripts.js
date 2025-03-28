@@ -14,22 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* =====================
-   2. ALERTS & MESSAGES
-===================== */
-
-document.addEventListener('DOMContentLoaded', function () {
-  setTimeout(function () {
-    var flashAlerts = document.querySelectorAll(".alert:not(.persistent-alert)");
-    flashAlerts.forEach(function (alert) {
-      alert.classList.add('shrink');
-      alert.addEventListener('transitionend', function () {
-        alert.remove();
-      });
-    });
-  }, 2000);
-});
-
-/* =====================
    3. SIDEBAR TOGGLE
 ===================== */
 
