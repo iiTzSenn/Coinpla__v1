@@ -1,33 +1,34 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container">
-  <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
-    <div class="col-md-5">
-      <div class="card shadow">
-        <div class="card-header d-flex align-items-center justify-content-center" style="height: 60px;">
-          <h4 class="mb-0">Inicio de sesión</h4>
-        </div>
-        <div class="card-body">
-          <form method="POST" action="{{ url_for('auth.login') }}">
-            <div class="mb-3">
-              <label for="username" class="form-label">Usuario</label>
-              <input type="text" class="form-control" id="username" name="username" placeholder="Ingresa tu usuario" required>
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">Contraseña</label>
-              <div class="input-group">
-                <input type="password" class="form-control" id="password" name="password" placeholder="Ingresa tu contraseña" required>
-                <span class="input-group-text" id="toggle-password" style="cursor: pointer;">
-                  <i class="bi bi-eye"></i>
-                </span>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-third w-100">Iniciar sesión</button>
-          </form>
-          <p class="text-center mt-3">¿No tienes cuenta? <a href="{{ url_for('auth.register') }}">Regístrate</a></p>
-        </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de sesión</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/loginregister.css') }}">
+  <script type="text/javascript" src="{{ url_for('static', filename='js/validation.js') }}" defer></script>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Iniciar sesión</h1>
+    <p id="error-message"></p>
+    <form id="form" method="POST" action="{{ url_for('auth.login') }}">
+      <div>
+        <label for="username-input">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+            <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Z"/>
+          </svg> <!-- Ícono actualizado -->
+        </label>
+        <input type="text" name="username" id="username-input" placeholder="Usuario" required>
       </div>
-    </div>
+      <div>
+        <label for="password-input">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M240-80q-33 0-56.5-23.5T160-160v-400q0-33 23.5-56.5T240-640h40v-80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720v80h40q33 0 56.5 23.5T800-560v400q0 33-23.5 56.5T720-80H240Zm240-200q33 0 56.5-23.5T560-360q0-33-23.5-56.5T480-440q-33 0-56.5 23.5T400-360q0 33 23.5 56.5T480-280ZM360-640h240v-80q0-50-35-85t-85-35q-50 0-85 35t-35 85v80Z"/></svg>
+        </label>
+        <input type="password" name="password" id="password-input" placeholder="Contraseña" required>
+      </div>
+      <button type="submit">Continuar</button>
+    </form>
+    <p>¿Nuevo aquí? <a href="{{ url_for('auth.register') }}">Regístrate</a></p>
   </div>
-</div>
-{% endblock %}
+</body>
+</html>

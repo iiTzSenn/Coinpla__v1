@@ -74,65 +74,6 @@ function closeAllSubMenus() {
 }
 
 /* =====================
-   5. PASSWORD VISIBILITY TOGGLES
-===================== */
-
-document.addEventListener('DOMContentLoaded', function () {
-  var togglePassword = document.getElementById('toggle-password');
-  if (togglePassword) {
-    togglePassword.addEventListener('click', function () {
-      var passwordInput = document.getElementById('password');
-      if (passwordInput) {
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-          togglePassword.innerHTML = '<i class="bi bi-eye-slash"></i>';
-        } else {
-          passwordInput.type = 'password';
-          togglePassword.innerHTML = '<i class="bi bi-eye"></i>';
-        }
-      }
-    });
-  }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  var toggleConfirmPassword = document.getElementById('toggle-confirm-password');
-  if (toggleConfirmPassword) {
-    toggleConfirmPassword.addEventListener('click', function () {
-      var confirmPasswordInput = document.getElementById('confirm_password');
-      if (confirmPasswordInput) {
-        if (confirmPasswordInput.type === 'password') {
-          confirmPasswordInput.type = 'text';
-          toggleConfirmPassword.innerHTML = '<i class="bi bi-eye-slash"></i>';
-        } else {
-          confirmPasswordInput.type = 'password';
-          toggleConfirmPassword.innerHTML = '<i class="bi bi-eye"></i>';
-        }
-      }
-    });
-  }
-});
-
-/* =====================
-   6. FORM VALIDATION (Registro)
-===================== */
-
-document.addEventListener('DOMContentLoaded', function () {
-  var registerForm = document.getElementById('registerForm');
-  if (registerForm) {
-    registerForm.addEventListener('submit', function (event) {
-      var password = document.getElementById('password').value;
-      var confirmPassword = document.getElementById('confirm_password').value;
-      if (password !== confirmPassword) {
-        event.preventDefault();
-        var modal = new bootstrap.Modal(document.getElementById('passwordMismatchModal'));
-        modal.show();
-      }
-    });
-  }
-});
-
-/* =====================
    7. HISTORIAL MODAL HANDLER
 ===================== */
 

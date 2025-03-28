@@ -26,9 +26,14 @@ def login():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username')
+        username = request.form.get('username')  # Capturar el username
         email = request.form.get('email')
         password = request.form.get('password')
+        
+        if not username:
+            flash('El nombre de usuario es obligatorio.', 'error')
+            return redirect(url_for('auth.register'))
+        
         # Verificar que no exista ya el usuario o email
         if User.query.filter(or_(User.username == username, User.email == email)).first():
             flash("El usuario o email ya existe.", "danger")
