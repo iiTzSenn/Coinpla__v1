@@ -9,8 +9,12 @@
 }
 #sidebar{
   box-sizing: border-box;
-  height: 100vh;
-  width: 250px;
+  height: 100%; /* Ajustar la altura al 100% del contenedor */
+  max-height: 100vh; /* Asegurar que no exceda la altura de la ventana */
+  overflow: hidden; /* Evitar scroll */
+  width: 250px; /* Ancho predeterminado */
+  min-width: 60px; /* Asegurar un ancho mínimo para evitar cortes */
+  max-width: 100%; /* Asegurar que no exceda el ancho de la pantalla */
   padding: 5px 1em;
   background-color: var(--base-clr);
   border-right: 1px solid var(--line-clr);
@@ -18,17 +22,41 @@
   position: sticky;
   top: 0;
   align-self: start;
-  transition: 300ms ease-in-out;
-  overflow: hidden;
+  transition: width 0.3s ease, 300ms ease-in-out;
   text-wrap: nowrap;
+
+  display: flex;
+  flex-direction: column; /* Asegurar que los elementos se apilen verticalmente */
+  justify-content: space-between; /* Espaciado entre las opciones y el contenedor inferior */
 }
 #sidebar.close{
   padding: 5px;
-  width: 60px;
+  width: 60px; /* Ancho reducido para pantallas pequeñas */
 }
 #sidebar ul{
-  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1; /* Permitir que las opciones ocupen el espacio disponible */
+  display: flex;
+  flex-direction: column; /* Mantener las opciones en columna */
+  justify-content: flex-start; /* Alinear las opciones al inicio */
 }
+#sidebar ul li {
+  flex-shrink: 0; /* Evitar que las opciones se reduzcan */
+}
+#sidebar ul::-webkit-scrollbar {
+  width: 8px; /* Ancho del scrollbar */
+}
+
+#sidebar ul::-webkit-scrollbar-thumb {
+  background-color: var(--line-clr); /* Color del scrollbar */
+  border-radius: 4px; /* Bordes redondeados */
+}
+
+#sidebar ul::-webkit-scrollbar-track {
+  background: transparent; /* Fondo transparente */
+}
+
 #sidebar > ul > li:first-child{
   display: flex;
   justify-content: flex-end;
@@ -114,6 +142,151 @@
   fill: var(--accent-clr); /* Mantén el color del ícono */
 }
 
+#sidebar .bottom-container {
+  display: flex;
+  flex-direction: row; /* Asegurar que el avatar y los textos estén en fila */
+  align-items: center; /* Centrar verticalmente */
+  justify-content: flex-start; /* Alinear a la izquierda */
+  margin: 0; /* Eliminar márgenes */
+  padding: 15px;
+  background-color: var(--base-clr);
+  border: none; /* Eliminar bordes */
+  box-shadow: none; /* Eliminar sombra */
+  width: 100%;
+  color: var(--text-clr);
+  font-size: 1rem;
+  position: sticky; /* Fijar el contenedor inferior */
+  bottom: 0; /* Asegurar que siempre esté visible */
+  cursor: pointer; /* Hacer clic en cualquier parte del contenedor */
+  transition: background-color 0.3s ease, all 0.3s ease; /* Transición para el hover y al abrir/cerrar */
+  gap: 10px; /* Espaciado entre el avatar y los textos */
+  border-radius: 8px; /* Esquinas redondeadas */
+  flex-shrink: 0; /* Evitar que el contenedor inferior se reduzca */
+}
+
+#sidebar.close .bottom-container {
+  background-color: transparent; /* Hacer el fondo transparente */
+  padding: 0; /* Eliminar el padding */
+  justify-content: center; /* Centrar el avatar */
+  border-radius: 0; /* Eliminar esquinas redondeadas */
+}
+
+#sidebar.close .bottom-container .user-info,
+#sidebar.close .bottom-container .dropdown-arrow {
+  opacity: 0; /* Aplicar desvanecimiento */
+  transition: opacity 0.3s ease; /* Transición suave */
+}
+
+#sidebar:not(.close) .bottom-container .user-info,
+#sidebar:not(.close) .bottom-container .dropdown-arrow {
+  opacity: 1; /* Mostrar elementos al abrir el sidebar */
+  transition: opacity 0.3s ease; /* Transición suave */
+}
+
+#sidebar .bottom-container:hover {
+  background-color: var(--hover-clr);
+  border-radius: 8px; /* Asegurar que el hover también tenga esquinas redondeadas */
+}
+
+#sidebar .bottom-container .avatar {
+  width: 35px; /* Ajustar tamaño del avatar en pantallas pequeñas */
+  height: 35px;
+  border-radius: 50%; /* Hacerlo circular */
+  background-color: #7b7f88; /* Color genérico para el avatar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff; /* Color del texto dentro del avatar */
+  flex-shrink: 0; /* Evitar que el avatar se reduzca */
+  opacity: 1; /* Asegurar que el avatar siempre sea visible */
+  transition: none; /* Sin transición para el avatar */
+}
+
+#sidebar .bottom-container .user-info {
+  display: flex;
+  flex-direction: column; /* Apilar nombre y rol */
+  align-items: flex-start; /* Alinear a la izquierda */
+}
+
+#sidebar .bottom-container .username {
+  font-weight: 500;
+}
+
+#sidebar .bottom-container .role {
+  font-size: 0.85rem;
+  color: #7b7f88;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+#sidebar .bottom-container .dropdown-arrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: transform 300ms ease; /* Animación suave */
+  font-size: 1.5rem;
+}
+
+#sidebar .bottom-container.open .dropdown-arrow {
+  transform: translateY(-50%) rotate(180deg); /* Rotar solo cuando el contenedor está abierto */
+}
+
+#sidebar .bottom-container .dropdown-menu {
+  position: absolute;
+  bottom: 100%; /* Abrir hacia arriba */
+  left: 0;
+  background-color: white; /* Fondo blanco */
+  margin-bottom: 10px; /* Separación inferior */
+  border: 1px solid var(--line-clr);
+  border-radius: 5px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  opacity: 0; /* Para animación */
+  transform: scale(0.8) translateY(10px); /* Animación inicial: más pequeño y desplazado hacia abajo */
+  transform-origin: bottom; /* Punto de origen para el zoom */
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Animación smooth */
+  pointer-events: none; /* Deshabilitar clics cuando está oculto */
+}
+
+#sidebar .bottom-container.open .dropdown-menu {
+  transform: scale(1) translateY(0); /* Zoom hacia arriba */
+  opacity: 1; /* Mostrar */
+  pointer-events: auto; /* Habilitar clics */
+}
+
+#sidebar .bottom-container .dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaciado entre el ícono y el texto */
+  padding: 8px;
+  color: black; /* Cambiar el color del texto a negro */
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 200ms ease;
+}
+
+#sidebar .bottom-container .dropdown-menu a:hover {
+  background-color: var(--hover-clr); /* Fondo al pasar el cursor */
+}
+
+#sidebar .bottom-container .dropdown-menu a svg {
+  font-size: 1.2rem; /* Tamaño de los íconos */
+  fill: black; /* Cambiar el color de los íconos a negro */
+}
+
+#sidebar .separator {
+  width: 90%; /* Mantener la línea dentro del contenedor */
+  height: 1px; /* Altura de la línea */
+  background: linear-gradient(to right, transparent, var(--line-clr), transparent); /* Efecto difuminado */
+  margin: 540px auto 10px auto; /* Ajustar altura del separador */
+}
+
 @media(max-width: 800px){
   .container{
     border: none;
@@ -182,5 +355,70 @@
         justify-content: center;
       }
     }
+  }
+}
+
+@media (max-height: 600px) {
+  #sidebar {
+    height: auto; /* Ajustar altura automáticamente en pantallas pequeñas */
+  }
+
+  #sidebar ul {
+    max-height: calc(100vh - 100px); /* Ajustar altura máxima del listado */
+  }
+}
+
+@media (max-width: 1024px) {
+  #sidebar {
+    width: 200px; /* Reducir ancho en pantallas medianas */
+  }
+
+  #sidebar.close {
+    width: 50px; /* Reducir más el ancho en pantallas pequeñas */
+  }
+
+  #sidebar .bottom-container .avatar {
+    width: 30px; /* Reducir tamaño del avatar */
+    height: 30px;
+  }
+
+  #sidebar .bottom-container .user-info {
+    display: none; /* Ocultar información de usuario en pantallas pequeñas */
+  }
+}
+
+@media (max-width: 768px) {
+  #sidebar {
+    width: 100%; /* Usar todo el ancho de la pantalla */
+    height: auto; /* Ajustar altura automáticamente */
+    position: fixed; /* Fijar en la parte superior */
+    top: 0;
+    z-index: 1000; /* Asegurar que esté encima del contenido */
+  }
+
+  #sidebar ul {
+    display: flex;
+    flex-direction: row; /* Cambiar a diseño horizontal */
+    overflow-x: auto; /* Habilitar desplazamiento horizontal */
+  }
+
+  #sidebar .bottom-container {
+    flex-direction: column; /* Cambiar a diseño vertical */
+    align-items: center; /* Centrar elementos */
+  }
+
+  #sidebar .separator {
+    display: none; /* Ocultar la línea de separación en pantallas pequeñas */
+  }
+}
+
+@media (max-width: 480px) {
+  #sidebar .bottom-container .avatar {
+    width: 25px; /* Reducir aún más el tamaño del avatar */
+    height: 25px;
+  }
+
+  #sidebar .bottom-container {
+    padding: 10px; /* Reducir padding en pantallas muy pequeñas */
   }
 }

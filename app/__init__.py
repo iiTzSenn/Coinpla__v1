@@ -34,11 +34,13 @@ def create_app():
     from app.routes.technicians import tech_bp
     from app.routes.admin import admin_bp
     from app.routes.export import export_bp
+    from app.routes.users import users_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(jobs_bp)
     app.register_blueprint(tech_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(export_bp)
+    app.register_blueprint(users_bp, url_prefix='/users')
 
     return app

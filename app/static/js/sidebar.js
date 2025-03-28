@@ -51,3 +51,20 @@ document.querySelectorAll('#sidebar ul li a').forEach(link => {
     this.parentElement.classList.add('active');
   });
 });
+
+function toggleDropdown() {
+  const bottomContainer = document.querySelector('.bottom-container');
+  const dropdownMenu = bottomContainer.querySelector('.dropdown-menu');
+
+  if (bottomContainer.classList.contains('open')) {
+    dropdownMenu.style.display = 'none'; // Ocultar el menú
+    setTimeout(() => {
+      bottomContainer.classList.remove('open'); // Remover la clase después de ocultar
+    }, 300); // Esperar a que termine la animación
+  } else {
+    dropdownMenu.style.display = 'flex'; // Mostrar el menú
+    bottomContainer.classList.add('open'); // Agregar la clase inmediatamente
+  }
+}
+
+document.querySelector('.bottom-container').addEventListener('click', toggleDropdown);

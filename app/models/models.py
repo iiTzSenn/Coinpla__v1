@@ -31,6 +31,12 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    @property
+    def get_role_display(self):
+        if self.role == 'admin':
+            return 'Administrador'
+        return self.role.capitalize()  # Capitalizar otros roles
+
     def __repr__(self):
         return f'<User {self.username}>'
 
