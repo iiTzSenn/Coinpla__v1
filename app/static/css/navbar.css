@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-:root{
+
+:root {
   --base-clr: #11121a;
   --line-clr: #42434a;
   --hover-clr: #222533;
@@ -7,75 +8,84 @@
   --accent-clr: #5e63ff;
   --secondary-text-clr: #b0b3c1;
 }
-#sidebar{
+
+#sidebar {
   box-sizing: border-box;
-  height: 100%; /* Ajustar la altura al 100% del contenedor */
-  max-height: 100vh; /* Asegurar que no exceda la altura de la ventana */
-  overflow: hidden; /* Evitar scroll */
-  width: 250px; /* Ancho predeterminado */
-  min-width: 60px; /* Asegurar un ancho mínimo para evitar cortes */
-  max-width: 100%; /* Asegurar que no exceda el ancho de la pantalla */
+  height: 100vh; /* Asegura que el sidebar ocupe toda la altura de la ventana */
+  max-height: none;
+  overflow: hidden; /* Evita scroll innecesario */
+  width: 250px;
+  min-width: 60px; /* Evita que se corte el contenido */
+  max-width: 100%;
   padding: 5px 1em;
   background-color: var(--base-clr);
   border-right: 1px solid var(--line-clr);
-
   position: sticky;
   top: 0;
   align-self: start;
   transition: width 0.3s ease, 300ms ease-in-out;
   text-wrap: nowrap;
-
   display: flex;
-  flex-direction: column; /* Asegurar que los elementos se apilen verticalmente */
-  justify-content: space-between; /* Espaciado entre las opciones y el contenedor inferior */
+  flex-direction: column;
+  justify-content: space-between;
 }
-#sidebar.close{
+
+#sidebar.close {
   padding: 5px;
-  width: 60px; /* Ancho reducido para pantallas pequeñas */
+  width: 60px; /* Ancho reducido en estado cerrado */
 }
-#sidebar ul{
+
+#sidebar ul {
   padding: 0;
   margin: 0;
-  flex-grow: 1; /* Permitir que las opciones ocupen el espacio disponible */
+  flex-grow: 1;
   display: flex;
-  flex-direction: column; /* Mantener las opciones en columna */
-  justify-content: flex-start; /* Alinear las opciones al inicio */
+  flex-direction: column;
+  justify-content: flex-start;
 }
+
 #sidebar ul li {
-  flex-shrink: 0; /* Evitar que las opciones se reduzcan */
+  flex-shrink: 0;
 }
+
 #sidebar ul::-webkit-scrollbar {
-  width: 8px; /* Ancho del scrollbar */
+  width: 8px;
 }
 
 #sidebar ul::-webkit-scrollbar-thumb {
-  background-color: var(--line-clr); /* Color del scrollbar */
-  border-radius: 4px; /* Bordes redondeados */
+  background-color: var(--line-clr);
+  border-radius: 4px;
 }
 
 #sidebar ul::-webkit-scrollbar-track {
-  background: transparent; /* Fondo transparente */
+  background: transparent;
 }
 
-#sidebar > ul > li:first-child{
+/* Cabecera del sidebar */
+#sidebar > ul > li:first-child {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
-  .logo{
-    font-weight: 600;
-  }
 }
 
-#sidebar a, #sidebar .dropdown-btn, #sidebar .logo{
-  border-radius: .5em;
-  padding: .85em;
+#sidebar > ul > li:first-child .logo {
+  font-weight: 600;
+}
+
+/* Estilos de enlaces y botones */
+#sidebar a,
+#sidebar .dropdown-btn,
+#sidebar .logo {
+  border-radius: 0.5em;
+  padding: 0.85em;
   text-decoration: none;
   color: var(--text-clr);
   display: flex;
   align-items: center;
   gap: 1em;
 }
-.dropdown-btn{
+
+.dropdown-btn {
   width: 100%;
   text-align: left;
   background: none;
@@ -83,131 +93,152 @@
   font: inherit;
   cursor: pointer;
 }
-#sidebar svg{
+
+#sidebar svg {
   flex-shrink: 0;
   fill: var(--text-clr);
 }
-#sidebar a span, #sidebar .dropdown-btn span{
+
+#sidebar a span,
+#sidebar .dropdown-btn span {
   flex-grow: 1;
 }
 
-#sidebar .sub-menu{
+/* Menú desplegable */
+#sidebar .sub-menu {
   display: grid;
   grid-template-rows: 0fr;
   transition: 300ms ease-in-out;
-
-  > div{
-    overflow: hidden;
-  }
 }
-#sidebar .sub-menu.show{
+
+#sidebar .sub-menu > div {
+  overflow: hidden;
+}
+
+#sidebar .sub-menu.show {
   grid-template-rows: 1fr;
 }
-.dropdown-btn svg{
+
+.dropdown-btn svg {
   transition: 200ms ease;
 }
-.rotate svg:last-child{
-  rotate: 180deg;
+
+.rotate svg:last-child {
+  transform: rotate(180deg);
 }
-#sidebar .sub-menu a{
+
+#sidebar .sub-menu a {
   padding-left: 2em;
 }
-#toggle-btn{
+
+/* Botón de toggle */
+#toggle-btn {
   margin-left: auto;
   padding: 0.85em;
   border: none;
-  border-radius: .5em;
+  border-radius: 0.5em;
   background: none;
   cursor: pointer;
-
-  svg{
-    transition: rotate 150ms ease;
-  }
 }
 
-#toggle-btn:hover{
+#toggle-btn svg {
+  transition: transform 150ms ease;
+}
+
+#toggle-btn:hover {
   background-color: var(--hover-clr);
 }
 
+/* Opción activa */
 #sidebar ul li.active a {
-  background-color: transparent; /* Elimina el fondo */
-  color: transparent; /* Hace el texto transparente para aplicar el degradado */
-  font-weight: bold; /* Negrita para destacar */
-  background-image: linear-gradient(90deg, #5e63ff, #42d1f5); /* Degradado */
-  -webkit-background-clip: text; /* Aplica el degradado al texto */
+  background-color: transparent;
+  color: transparent;
+  font-weight: bold;
+  background-image: linear-gradient(90deg, #5e63ff, #42d1f5);
+  -webkit-background-clip: text;
   background-clip: text;
 }
 
 #sidebar ul li.active svg {
-  fill: var(--accent-clr); /* Mantén el color del ícono */
+  fill: var(--accent-clr);
 }
 
+/* Contenedor inferior (datos de usuario y avatar) */
 #sidebar .bottom-container {
   display: flex;
-  flex-direction: row; /* Asegurar que el avatar y los textos estén en fila */
-  align-items: center; /* Centrar verticalmente */
-  justify-content: flex-start; /* Alinear a la izquierda */
-  margin: 0; /* Eliminar márgenes */
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
   padding: 15px;
   background-color: var(--base-clr);
-  border: none; /* Eliminar bordes */
-  box-shadow: none; /* Eliminar sombra */
+  border: none;
+  box-shadow: none;
   width: 100%;
   color: var(--text-clr);
   font-size: 1rem;
-  position: sticky; /* Fijar el contenedor inferior */
-  bottom: 0; /* Asegurar que siempre esté visible */
-  cursor: pointer; /* Hacer clic en cualquier parte del contenedor */
-  transition: background-color 0.3s ease, all 0.3s ease; /* Transición para el hover y al abrir/cerrar */
-  gap: 10px; /* Espaciado entre el avatar y los textos */
-  border-radius: 8px; /* Esquinas redondeadas */
-  flex-shrink: 0; /* Evitar que el contenedor inferior se reduzca */
+  position: sticky;
+  bottom: 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease, all 0.3s ease;
+  gap: 10px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
+#sidebar .separator {
+  width: 90%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--line-clr), transparent);
+  margin: 10px auto;
+}
+
+/* Estilos al cerrar el sidebar: se centra el avatar y se oculta la info adicional */
 #sidebar.close .bottom-container {
-  background-color: transparent; /* Hacer el fondo transparente */
-  padding: 0; /* Eliminar el padding */
-  justify-content: center; /* Centrar el avatar */
-  border-radius: 0; /* Eliminar esquinas redondeadas */
+  background-color: var(--base-clr);
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
 }
 
 #sidebar.close .bottom-container .user-info,
 #sidebar.close .bottom-container .dropdown-arrow {
-  opacity: 0; /* Aplicar desvanecimiento */
-  transition: opacity 0.3s ease; /* Transición suave */
+  display: none;
 }
 
+/* Cuando el sidebar esté abierto se muestra la info */
 #sidebar:not(.close) .bottom-container .user-info,
 #sidebar:not(.close) .bottom-container .dropdown-arrow {
-  opacity: 1; /* Mostrar elementos al abrir el sidebar */
-  transition: opacity 0.3s ease; /* Transición suave */
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 #sidebar .bottom-container:hover {
   background-color: var(--hover-clr);
-  border-radius: 8px; /* Asegurar que el hover también tenga esquinas redondeadas */
+  border-radius: 8px;
 }
 
 #sidebar .bottom-container .avatar {
-  width: 35px; /* Ajustar tamaño del avatar en pantallas pequeñas */
+  width: 35px;
   height: 35px;
-  border-radius: 50%; /* Hacerlo circular */
-  background-color: #7b7f88; /* Color genérico para el avatar */
+  border-radius: 50%;
+  background-color: #7b7f88;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
   font-weight: bold;
-  color: #ffffff; /* Color del texto dentro del avatar */
-  flex-shrink: 0; /* Evitar que el avatar se reduzca */
-  opacity: 1; /* Asegurar que el avatar siempre sea visible */
-  transition: none; /* Sin transición para el avatar */
+  color: #ffffff;
+  flex-shrink: 0;
+  opacity: 1;
+  transition: none;
 }
 
 #sidebar .bottom-container .user-info {
   display: flex;
-  flex-direction: column; /* Apilar nombre y rol */
-  align-items: flex-start; /* Alinear a la izquierda */
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 #sidebar .bottom-container .username {
@@ -227,77 +258,75 @@
   right: 15px;
   transform: translateY(-50%);
   cursor: pointer;
-  transition: transform 300ms ease; /* Animación suave */
+  transition: transform 300ms ease;
   font-size: 1.5rem;
 }
 
 #sidebar .bottom-container.open .dropdown-arrow {
-  transform: translateY(-50%) rotate(180deg); /* Rotar solo cuando el contenedor está abierto */
+  transform: translateY(-50%) rotate(180deg);
 }
 
 #sidebar .bottom-container .dropdown-menu {
   position: absolute;
-  bottom: 100%; /* Abrir hacia arriba */
+  bottom: 100%;
   left: 0;
-  background-color: white; /* Fondo blanco */
-  margin-bottom: 10px; /* Separación inferior */
+  background-color: white;
+  margin-bottom: 10px;
   border: 1px solid var(--line-clr);
   border-radius: 5px;
   padding: 10px;
   display: flex;
   flex-direction: column;
   width: 100%;
-  opacity: 0; /* Para animación */
-  transform: scale(0.8) translateY(10px); /* Animación inicial: más pequeño y desplazado hacia abajo */
-  transform-origin: bottom; /* Punto de origen para el zoom */
-  transition: transform 0.3s ease, opacity 0.3s ease; /* Animación smooth */
-  pointer-events: none; /* Deshabilitar clics cuando está oculto */
+  opacity: 0;
+  transform: scale(0.8) translateY(10px);
+  transform-origin: bottom;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
 }
 
 #sidebar .bottom-container.open .dropdown-menu {
-  transform: scale(1) translateY(0); /* Zoom hacia arriba */
-  opacity: 1; /* Mostrar */
-  pointer-events: auto; /* Habilitar clics */
+  transform: scale(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #sidebar .bottom-container .dropdown-menu a {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espaciado entre el ícono y el texto */
+  gap: 10px;
   padding: 8px;
-  color: black; /* Cambiar el color del texto a negro */
+  color: black;
   text-decoration: none;
   border-radius: 5px;
   transition: background-color 200ms ease;
 }
 
 #sidebar .bottom-container .dropdown-menu a:hover {
-  background-color: var(--hover-clr); /* Fondo al pasar el cursor */
+  background-color: rgba(86, 91, 231, 0.2);
+}
+
+#sidebar .bottom-container .dropdown-menu a:hover svg {
+  fill: #565be7;
 }
 
 #sidebar .bottom-container .dropdown-menu a svg {
-  font-size: 1.2rem; /* Tamaño de los íconos */
-  fill: black; /* Cambiar el color de los íconos a negro */
+  font-size: 1.2rem;
+  fill: black;
 }
 
-#sidebar .separator {
-  width: 90%; /* Mantener la línea dentro del contenedor */
-  height: 1px; /* Altura de la línea */
-  background: linear-gradient(to right, transparent, var(--line-clr), transparent); /* Efecto difuminado */
-  margin: 540px auto 10px auto; /* Ajustar altura del separador */
-}
-
-@media(max-width: 800px){
-  .container{
+/* Media Queries */
+@media (max-width: 800px) {
+  .container {
     border: none;
     padding: 0;
   }
 
-  .sidebar-header{
-    margin-bottom: 0 px;
+  .sidebar-header {
+    margin-bottom: 0;
   }
-  
-  #sidebar{
+
+  #sidebar {
     height: 60px;
     width: 100%;
     border-right: none;
@@ -306,119 +335,124 @@
     position: fixed;
     top: unset;
     bottom: 0;
+  }
 
-    > ul{
-      padding: 0;
-      display: grid;
-      grid-auto-columns: 60px;
-      grid-auto-flow: column;
-      align-items: center;
-      overflow-x: scroll;
-    }
-    ul li{
-      height: 100%;
-    }
-    ul a, ul .dropdown-btn{
-      width: 60px;
-      height: 60px;
-      padding: 0;
-      border-radius: 0;
-      justify-content: center;
-    }
+  #sidebar > ul {
+    padding: 0;
+    display: grid;
+    grid-auto-columns: 60px;
+    grid-auto-flow: column;
+    align-items: center;
+    overflow-x: scroll;
+  }
 
-    ul li span, ul li:first-child, .dropdown-btn svg:last-child{
-      display: none;
-    }
+  #sidebar ul li {
+    height: 100%;
+  }
 
-    ul li .sub-menu.show{
-      position: fixed;
-      bottom: 60px;
-      left: 0;
-      box-sizing: border-box;
-      height: 60px;
-      width: 100%;
-      background-color: var(--hover-clr);
-      border-top: 1px solid var(--line-clr);
-      display: flex;
-      justify-content: center;
+  #sidebar ul a,
+  #sidebar ul .dropdown-btn {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border-radius: 0;
+    justify-content: center;
+  }
 
-      > div{
-        overflow-x: auto;
-      }
-      li{
-        display: inline-flex;
-      }
-      a{
-        box-sizing: border-box;
-        padding: 1em;
-        width: auto;
-        justify-content: center;
-      }
-    }
+  #sidebar ul li span,
+  #sidebar ul li:first-child,
+  .dropdown-btn svg:last-child {
+    display: none;
+  }
+
+  #sidebar ul li .sub-menu.show {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    box-sizing: border-box;
+    height: 60px;
+    width: 100%;
+    background-color: var(--hover-clr);
+    border-top: 1px solid var(--line-clr);
+    display: flex;
+    justify-content: center;
+  }
+  #sidebar ul li .sub-menu.show > div {
+    overflow-x: auto;
+  }
+  #sidebar ul li .sub-menu.show li {
+    display: inline-flex;
+  }
+  #sidebar ul li .sub-menu.show a {
+    box-sizing: border-box;
+    padding: 1em;
+    width: auto;
+    justify-content: center;
   }
 }
 
 @media (max-height: 600px) {
   #sidebar {
-    height: auto; /* Ajustar altura automáticamente en pantallas pequeñas */
+    height: auto;
   }
 
   #sidebar ul {
-    max-height: calc(100vh - 100px); /* Ajustar altura máxima del listado */
+    max-height: calc(100vh - 100px);
   }
 }
 
 @media (max-width: 1024px) {
   #sidebar {
-    width: 200px; /* Reducir ancho en pantallas medianas */
+    width: 200px;
   }
 
   #sidebar.close {
-    width: 50px; /* Reducir más el ancho en pantallas pequeñas */
+    width: 50px;
   }
 
   #sidebar .bottom-container .avatar {
-    width: 30px; /* Reducir tamaño del avatar */
+    width: 30px;
     height: 30px;
   }
 
+  /* En pantallas medianas se oculta la info de usuario */
   #sidebar .bottom-container .user-info {
-    display: none; /* Ocultar información de usuario en pantallas pequeñas */
+    display: none;
   }
 }
 
 @media (max-width: 768px) {
   #sidebar {
-    width: 100%; /* Usar todo el ancho de la pantalla */
-    height: auto; /* Ajustar altura automáticamente */
-    position: fixed; /* Fijar en la parte superior */
+    width: 100%;
+    height: auto;
+    position: fixed;
     top: 0;
-    z-index: 1000; /* Asegurar que esté encima del contenido */
+    z-index: 1000;
   }
 
   #sidebar ul {
     display: flex;
-    flex-direction: row; /* Cambiar a diseño horizontal */
-    overflow-x: auto; /* Habilitar desplazamiento horizontal */
+    flex-direction: row;
+    overflow-x: auto;
   }
 
   #sidebar .bottom-container {
-    flex-direction: column; /* Cambiar a diseño vertical */
-    align-items: center; /* Centrar elementos */
+    flex-direction: column;
+    align-items: center;
   }
 
   #sidebar .separator {
-    display: none; /* Ocultar la línea de separación en pantallas pequeñas */
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
   #sidebar .bottom-container .avatar {
-    width: 25px; /* Reducir aún más el tamaño del avatar */
+    width: 25px;
     height: 25px;
   }
 
   #sidebar .bottom-container {
-    padding: 10px; /* Reducir padding en pantallas muy pequeñas */
+    padding: 10px;
   }
 }
