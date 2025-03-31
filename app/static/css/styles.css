@@ -20,7 +20,7 @@
   --clr-primary-dark: #4fc3f7;
   --clr-gray100: #f9fbff;
   --clr-gray150: #f4f6fb;
-  --clr-gray200: #eef1f6;
+  --clr-gray200: #eef1f6;  /* Este es el color que buscaba */
   --clr-gray300: #e1e5ee;
   --clr-gray400: #767b91;
   --clr-gray500: #4f546c;
@@ -552,13 +552,14 @@ tbody tr:nth-child(even) {
   background-color: #fff; /* Fondo blanco para toda la tabla */
   overflow: hidden;
   width: 100%;
-  border-radius: 1rem; /* Esquinas redondeadas más marcadas */
+  border-radius: 0; /* Eliminadas las esquinas redondeadas */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .custom-table thead {
   background-color: var(--clr-gray200); /* Fondo gris claro para la cabecera */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 0; /* Asegurar que la cabecera tampoco tenga esquinas redondeadas */
 }
 
 .custom-table th {
@@ -568,6 +569,7 @@ tbody tr:nth-child(even) {
   font-size: 0.8rem;
   font-weight: 900;
   text-align: center; /* Centrar texto en la cabecera */
+  border-radius: 0; /* Eliminadas las esquinas redondeadas en los encabezados */
 }
 
 .custom-table td {
