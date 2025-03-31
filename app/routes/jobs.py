@@ -98,7 +98,7 @@ def index():
                            eventos_calendario=eventos_calendario,
                            trabajos_pendientes_proceso=trabajos_pendientes_proceso)
 
-@jobs_bp.route('/jobs')
+@jobs_bp.route('/listar_trabajos')  # Cambiado de '/jobs' a '/listar_trabajos'
 @login_required
 def listar_trabajos():
     trabajos = Job.query.filter(Job.estado != 'Completado').all()
