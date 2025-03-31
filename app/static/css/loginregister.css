@@ -2,9 +2,10 @@
 
 :root {
   --accent-color: #4CAF50; /* Verde principal */
+  --accent-dark: #2e7d32; /* Verde oscuro para hover */
   --base-color: white;
   --text-color: #2E2B41;
-  --input-color: #E8F5E9; /* Verde claro */
+  --input-color: #F5F5F5; /* Color de input cambiado a gris claro */
 }
 
 * {
@@ -22,9 +23,9 @@ html {
 
 body {
   min-height: 100vh;
-  background-image: url('/static/img/background.jpg'); /* Ruta corregida */
+  background-image: url('/static/img/Coinpla_1.webp'); /* Actualizada a la nueva imagen */
   background-size: cover;
-  background-position: right;
+  background-position: calc(100% + 400px) center; /* Movida 400px a la derecha */
   overflow: hidden;
 }
 
@@ -50,7 +51,7 @@ h1 {
 form {
   width: min(400px, 100%);
   margin-top: 20px;
-  margin-bottom: 50px;
+  margin-bottom: 10px; /* Reducido de 50px a 10px */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -88,7 +89,7 @@ form input {
   border-radius: 0 10px 10px 0;
   border: 2px solid var(--input-color);
   border-left: none;
-  background-color: var(--input-color); /* Cambiar a verde claro */
+  background-color: var(--input-color); /* Color de input cambiado a gris claro */
   transition: 150ms ease;
 }
 
@@ -99,10 +100,14 @@ form input:hover {
 form input:focus {
   outline: none;
   border-color: var(--text-color);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 div:has(input:focus) > label {
   background-color: var(--text-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 form input::placeholder {
@@ -110,7 +115,7 @@ form input::placeholder {
 }
 
 form button {
-  margin-top: 10px;
+  margin-top: 0; /* Eliminado el margen superior de 10px */
   border: none;
   border-radius: 1000px;
   padding: .85em 4em;
@@ -121,15 +126,24 @@ form button {
   text-transform: uppercase;
   cursor: pointer;
   transition: 150ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 form button:hover {
-  background-color: var(--text-color);
+  background-color: var(--accent-dark);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 form button:focus {
   outline: none;
-  background-color: var(--text-color);
+  background-color: var(--accent-dark);
+}
+
+form button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background-color: var(--accent-dark);
 }
 
 a {

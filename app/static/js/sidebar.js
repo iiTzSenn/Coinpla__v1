@@ -46,3 +46,25 @@ document.querySelectorAll('#sidebar ul li a').forEach(link => {
     this.parentElement.classList.add('active');
   });
 });
+
+// Función para controlar el menú desplegable del usuario
+function toggleDropdown() {
+  const bottomContainer = document.querySelector('#sidebar .bottom-container');
+  bottomContainer.classList.toggle('open');
+  
+  // Agregar console.log para depuración
+  console.log("Dropdown toggled, open:", bottomContainer.classList.contains('open'));
+}
+
+// Si el usuario hace clic fuera del dropdown, cerrarlo
+document.addEventListener('click', function(event) {
+  const bottomContainer = document.querySelector('#sidebar .bottom-container');
+  const dropdownMenu = document.querySelector('#sidebar .dropdown-menu');
+  
+  if (bottomContainer && bottomContainer.classList.contains('open')) {
+    // Si el clic no fue dentro del contenedor o del menú desplegable
+    if (!event.target.closest('.bottom-container')) {
+      bottomContainer.classList.remove('open');
+    }
+  }
+});

@@ -6,6 +6,40 @@
   <title>Registro</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/loginregister.css') }}">
   <script type="text/javascript" src="{{ url_for('static', filename='js/validation.js') }}" defer></script>
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+  <style>
+    /* Mejoras para sincronizar animaciones */
+    form > div {
+      transition: transform 0.2s ease;
+    }
+    
+    form > div:focus-within {
+      transform: translateY(-2px);
+    }
+    
+    /* Aseguramos que tanto input como label se transformen juntos */
+    form input, form label {
+      transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      transform: translateY(0);
+    }
+    
+    form > div:focus-within input {
+      border-color: var(--accent-dark) !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      outline: none;
+    }
+    
+    form > div:focus-within label {
+      background-color: var(--accent-dark) !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilo para el hover de los enlaces */
+    a:hover {
+      color: var(--accent-dark) !important;
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <div class="wrapper">
