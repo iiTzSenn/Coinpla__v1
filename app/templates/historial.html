@@ -1,121 +1,273 @@
 {% extends 'base.html' %}
-
 {% block content %}
+<!-- Estilos personalizados para los botones -->
+<style>
+  .btn-action {
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: none;
+  }
+  
+  .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .btn-success.btn-action {
+    background-color: #28a745;
+  }
+  .btn-success.btn-action:hover {
+    background-color: #218838;
+  }
+  
+  .btn-danger.btn-action {
+    background-color: #dc3545;
+  }
+  .btn-danger.btn-action:hover {
+    background-color: #c82333;
+  }
+  
+  .btn-warning.btn-action {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  .btn-warning.btn-action:hover {
+    background-color: #e0a800;
+  }
+  
+  .btn-primary.btn-action {
+    background-color: #007bff;
+  }
+  .btn-primary.btn-action:hover {
+    background-color: #0069d9;
+  }
+  
+  .btn-secondary.btn-action {
+    background-color: #6c757d;
+  }
+  .btn-secondary.btn-action:hover {
+    background-color: #5a6268;
+  }
+  
+  .btn-action i {
+    font-size: 1rem;
+  }
+  
+  .action-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+    min-width: 100px;
+  }
+
+  .status-completed {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+
+  .status-pending {
+    background-color: #fff3cd;
+    color: #664d03;
+  }
+
+  .status-cancelled {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+
+  .status-inprogress {
+    background-color: #cfe2ff;
+    color: #084298;
+  }
+
+  .custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed; /* Esto asegura que los anchos definidos se respeten */
+  }
+
+  .custom-table thead th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    padding: 12px 15px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .custom-table thead th:nth-child(1) { /* ID */
+    width: 8%;
+    text-align: center;
+  }
+
+  .custom-table thead th:nth-child(2) { /* Cliente */
+    width: 22%;
+    text-align: center;
+  }
+
+  .custom-table thead th:nth-child(3) { /* Técnico */
+    width: 22%;
+    text-align: center;
+  }
+
+  .custom-table thead th:nth-child(4) { /* Fecha */
+    width: 15%;
+    text-align: center;
+  }
+
+  .custom-table thead th:nth-child(5) { /* Estado */
+    width: 15%;
+    text-align: center;
+  }
+
+  .custom-table thead th:nth-child(6) { /* Acciones */
+    width: 18%;
+    text-align: center;
+  }
+
+  .custom-table tbody tr {
+    transition: all 0.3s ease;
+  }
+
+  .custom-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .custom-table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Alineación de las celdas igual que sus encabezados */
+  .custom-table tbody td:nth-child(1) { /* ID */
+    text-align: center;
+  }
+
+  .custom-table tbody td:nth-child(2) { /* Cliente */
+    text-align: center;
+  }
+
+  .custom-table tbody td:nth-child(3) { /* Técnico */
+    text-align: center;
+  }
+
+  .custom-table tbody td:nth-child(4) { /* Fecha */
+    text-align: center;
+  }
+
+  .custom-table tbody td:nth-child(5) { /* Estado */
+    text-align: center;
+  }
+
+  .custom-table tbody td:nth-child(6) { /* Acciones */
+    text-align: center;
+  }
+</style>
+
 <div class="container mt-4">
-  <h2 class="mb-4">Historial</h2>
-
-  <!-- Caja de Filtro -->
-  <div class="card mb-4">
-    <div class="card-header" style="background-color: var(--header-bg); color: var(--button-text);">
-      Filtrar Historial
-    </div>
-    <div class="card-body">
-      <form class="row g-3" method="GET" action="{{ url_for('jobs.historial') }}">
-        <div class="col-md-3">
-          <input type="text" class="form-control" name="cliente" placeholder="Cliente" value="{{ cliente or '' }}">
-        </div>
-        <div class="col-md-3">
-          <input type="date" class="form-control" name="fecha_inicio" placeholder="Fecha Inicio" value="{{ fecha_inicio or '' }}">
-        </div>
-        <div class="col-md-3">
-          <input type="date" class="form-control" name="fecha_fin" placeholder="Fecha Fin" value="{{ fecha_fin or '' }}">
-        </div>
-        <div class="col-md-3">
-          <input type="text" class="form-control" name="tecnico" placeholder="Técnico" value="{{ tecnico or '' }}">
-        </div>
-        <div class="col-md-12 text-end">
-          <button type="submit" class="btn btn-third btn-sm">Filtrar</button>
-          <a href="{{ url_for('jobs.historial') }}" class="btn btn-secondary btn-sm ms-2">Borrar Filtros</a>
-          <a href="{{ url_for('export.exportar_pdf', cliente=cliente, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, tecnico=tecnico) }}" class="btn btn-danger btn-sm ms-2" target="_blank">
-            <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
-          </a>
-        </div>
-      </form>
-    </div>
+  <!-- =========================================
+       RUTA DE LA PÁGINA
+       ========================================= -->
+  <div class="mb-3">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
+        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">Historial</li>
+      </ol>
+    </nav>
   </div>
 
-  <!-- Tabla de Historial -->
-  <div class="table-responsive">
-    <table class="table table-striped table-hover">
-      <thead class="thead-dark">
-        <tr>
-          <th>Cliente</th>
-          <th>Teléfono</th>
-          <th>Dirección</th>
-          <th>Descripción</th>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Técnico</th>
-          <th>Día Completado</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for trabajo in trabajos %}
-        <tr>
-          <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
-          <td>{{ trabajo.telefono }}</td>
-          <td>{{ trabajo.direccion }}</td>
-          <td>{{ trabajo.descripcion }}</td>
-          <td>{{ trabajo.fecha.strftime('%d-%m-%Y') }}</td>
-          <td>{{ trabajo.hora }}</td>
-          <td>
-            {% if trabajo.technician %}
-              {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
-            {% else %}
-              Sin asignar
-            {% endif %}
-          </td>
-          <td>{{ trabajo.updated_at.strftime('%d-%m-%Y') }}</td>
-          <td class="text-center">
-            <button type="button" class="btn btn-third btn-sm ver-detalles"
-                data-nombre="{{ trabajo.nombre_cliente }}"
-                data-apellido="{{ trabajo.apellido_cliente }}"
-                data-telefono="{{ trabajo.telefono }}"
-                data-direccion="{{ trabajo.direccion }}"
-                data-descripcion="{{ trabajo.descripcion }}"
-                data-codigo_postal="{{ trabajo.codigo_postal }}"
-                data-duracion="{{ trabajo.duracion }}"
-                data-fecha="{{ trabajo.fecha.strftime('%d-%m-%Y') }}"
-                data-hora="{{ trabajo.hora }}"
-                data-tecnico="{% if trabajo.technician %}{{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}{% else %}Sin asignar{% endif %}"
-                data-dia-completado="{{ trabajo.updated_at.strftime('%d-%m-%Y') }}">
-                Ver Detalles
-            </button>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- Modal para ver detalles del trabajo completado -->
-<div class="modal fade" id="detalleTrabajoModal" tabindex="-1" aria-labelledby="detalleTrabajoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content modal-rectangular">
-      <div class="modal-header text-center">
-        <h5 class="modal-title w-100" id="detalleTrabajoModalLabel">Detalles del Trabajo</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+  <!-- Sección de historial de trabajos completados -->
+  <div class="mb-4">
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+        <i class="bi bi-check2-circle" style="font-size: 0.9rem; color: #6c757d;"></i>
+        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Completados</span>
       </div>
-      <div class="modal-body">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item"><strong>Cliente:</strong> <span id="detalleCliente"></span></li>
-          <li class="list-group-item"><strong>Teléfono:</strong> <span id="detalleTelefono"></span></li>
-          <li class="list-group-item"><strong>Dirección:</strong> <span id="detalleDireccion"></span></li>
-          <li class="list-group-item"><strong>Descripción:</strong> <span id="detalleDescripcion"></span></li>
-          <li class="list-group-item"><strong>Código Postal:</strong> <span id="detalleCodigoPostal"></span></li>
-          <li class="list-group-item"><strong>Duración:</strong> <span id="detalleDuracion"></span></li>
-          <li class="list-group-item"><strong>Fecha:</strong> <span id="detalleFecha"></span></li>
-          <li class="list-group-item"><strong>Hora:</strong> <span id="detalleHora"></span></li>
-          <li class="list-group-item"><strong>Técnico:</strong> <span id="detalleTecnico"></span></li>
-          <li class="list-group-item"><strong>Día Completado:</strong> <span id="detalleDiaCompletado"></span></li>
-        </ul>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-secondary btn-modal-close" data-bs-dismiss="modal">Cerrar</button>
+      <div class="card-body p-0">
+        {% if all_jobs %}
+        <table class="custom-table">
+          <thead style="border-radius: 0 !important;">
+            <tr>
+              <th style="border-top-left-radius: 0; border-top-right-radius: 0;">ID</th>
+              <th style="border-radius: 0;">Cliente</th>
+              <th style="border-radius: 0;">Técnico</th>
+              <th style="border-radius: 0;">Fecha</th>
+              <th style="border-radius: 0;">Estado</th>
+              <th style="border-radius: 0;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in all_jobs %}
+            <tr>
+              <td>#{{ job.id }}</td>
+              <td>{{ job.nombre_cliente }} {{ job.apellido_cliente }}</td>
+              <td>
+                {% if job.technician %}
+                  {{ job.technician.nombre }} {% if job.technician.apellido %}{{ job.technician.apellido }}{% endif %}
+                {% else %}
+                  Sin asignar
+                {% endif %}
+              </td>
+              <td>{{ job.fecha.strftime('%d/%m/%Y') }}</td>
+              <td>
+                <p class="status status-completed">Completado</p>
+              </td>
+              <td>
+                <div class="action-buttons-container">
+                  <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button class="btn btn-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir reporte">
+                    <i class="bi bi-printer"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-info text-center m-3">
+          <i class="bi bi-info-circle"></i> No hay trabajos completados en el historial.
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
+
+<!-- Script para activar tooltips de Bootstrap -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  });
+</script>
 {% endblock %}

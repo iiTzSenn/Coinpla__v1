@@ -267,41 +267,12 @@ def completar_trabajo(id):
 @jobs_bp.route('/historial')
 @login_required
 def historial():
-    query = Job.query.filter_by(estado='Completado')
-    cliente = request.args.get('cliente', '').strip()
-    fecha_inicio = request.args.get('fecha_inicio', '').strip()
-    fecha_fin = request.args.get('fecha_fin', '').strip()
-    tecnico = request.args.get('tecnico', '').strip()
-
-    if cliente:
-        query = query.filter(
-            func.concat(Job.nombre_cliente, ' ', Job.apellido_cliente).ilike(f'%{cliente}%')
-        )
-
-    if fecha_inicio:
-        try:
-            fecha_inicio_dt = datetime.strptime(fecha_inicio, '%Y-%m-%d')
-            query = query.filter(Job.fecha >= fecha_inicio_dt)
-        except ValueError:
-            flash("Formato de fecha de inicio inválido", "warning")
-
-    if fecha_fin:
-        try:
-            fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
-            query = query.filter(Job.fecha <= fecha_fin_dt)
-        except ValueError:
-            flash("Formato de fecha de fin inválido", "warning")
-
-    if tecnico:
-        query = query.join(Technician).filter(
-            func.concat(Technician.nombre, ' ', Technician.apellido).ilike(f'%{tecnico}%')
-        )
-
-    trabajos = query.order_by(Job.updated_at.desc()).all()
-
-    return render_template('historial.html',
-                           trabajos=trabajos,
-                           cliente=cliente,
-                           fecha_inicio=fecha_inicio,
-                           fecha_fin=fecha_fin,
-                           tecnico=tecnico)
+    # Obtener solo los trabajos COMPLETADOS para el historial
+    # Si es un técnico, solo muestra sus propios trabajos completados
+    if current_user.role == 'tecnico' and hasattr(current_user, 'technician_profile'):
+        all_jobs = Job.query.filter_by(technician_id=current_user.technician_profile.id, estado='Completado').order_by(Job.fecha.desc()).all()
+    # Si es admin, muestra todos los trabajos completados
+    else:
+        all_jobs = Job.query.filter_by(estado='Completado').order_by(Job.fecha.desc()).all()
+    
+    return render_template('historial.html', all_jobs=all_jobs)
