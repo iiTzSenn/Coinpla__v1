@@ -12,101 +12,91 @@ jobs_bp = Blueprint('jobs', __name__)
 @jobs_bp.route('/')
 @login_required
 def index():
-    # Si el usuario es técnico y se detecta que se accede desde un dispositivo móvil
-    if current_user.role == 'tecnico' and "Mobile" in request.user_agent.string:
-        if current_user.technician_profile:
-            trabajos = Job.query.filter(Job.technician_id == current_user.technician_profile.id).all()
-        else:
-            trabajos = []
-            
-        return render_template('index_mobile.html', trabajos=trabajos)
-    else:
-        # Vista para administradores y técnicos en escritorio
-        trabajos_recientes = Job.query.order_by(Job.updated_at.desc()).limit(10).all()
-        total_usuarios = User.query.count()
-        total_trabajos = Job.query.count()
-        trabajos_pendientes = Job.query.filter_by(estado='Pendiente').count()
-        trabajos_completados = Job.query.filter_by(estado='Completado').count()
-        
-        # Preparar datos para el gráfico: trabajos por mes en los últimos 6 meses
-        current_month = datetime.now().month
-        current_year = datetime.now().year
-        meses_labels = []
-        trabajos_mes = []
-        for i in range(6):
-            month = current_month - i
-            year = current_year
-            if month <= 0:
-                month += 12
-                year -= 1
-            label = datetime(year, month, 1).strftime('%b %Y')
-            meses_labels.append(label)
-            count = Job.query.filter(
-                func.extract('year', Job.fecha) == year,
-                func.extract('month', Job.fecha) == month
-            ).count()
-            trabajos_mes.append(count)
-        meses_labels.reverse()
-        trabajos_mes.reverse()
-        
-        trabajosPendientesMes = []
-        for i in range(6):
-            month = current_month - i
-            year = current_year
-            if month <= 0:
-                month += 12
-                year -= 1
-            count_pendientes = Job.query.filter(
-                func.extract('year', Job.fecha) == year,
-                func.extract('month', Job.fecha) == month,
-                Job.estado == 'Pendiente'
-            ).count()
-            trabajosPendientesMes.append(count_pendientes)
-        trabajosPendientesMes.reverse()
-        
-        # Preparar eventos para el calendario: usar todos los trabajos con fecha definida
-        jobs_for_calendar = Job.query.filter(Job.fecha != None).all()
-        eventos_calendario = []
-        for job in jobs_for_calendar:
-            eventos_calendario.append({
-                'titulo': f"{job.nombre_cliente} {job.apellido_cliente or ''}",
-                'start': job.fecha.strftime('%Y-%m-%d')
-            })
-        
-        # Calcular facturación mensual
-        facturacion_mes = []
-        for i in range(6):
-            month = current_month - i
-            year = current_year
-            if month <= 0:
-                month += 12
-                year -= 1
-            total_facturacion = db.session.query(func.sum(Job.costo_final)).filter(
-                func.extract('year', Job.fecha) == year,
-                func.extract('month', Job.fecha) == month,
-                Job.estado == 'Completado'
-            ).scalar() or 0
-            facturacion_mes.append(total_facturacion)
-        facturacion_mes.reverse()
+    trabajos_recientes = Job.query.order_by(Job.updated_at.desc()).limit(10).all()
+    total_usuarios = User.query.count()
+    total_trabajos = Job.query.count()
+    trabajos_pendientes = Job.query.filter_by(estado='Pendiente').count()
+    trabajos_completados = Job.query.filter_by(estado='Completado').count()
+    
+    # Preparar datos para el gráfico: trabajos por mes en los últimos 6 meses
+    current_month = datetime.now().month
+    current_year = datetime.now().year
+    meses_labels = []
+    trabajos_mes = []
+    for i in range(6):
+        month = current_month - i
+        year = current_year
+        if month <= 0:
+            month += 12
+            year -= 1
+        label = datetime(year, month, 1).strftime('%b %Y')
+        meses_labels.append(label)
+        count = Job.query.filter(
+            func.extract('year', Job.fecha) == year,
+            func.extract('month', Job.fecha) == month
+        ).count()
+        trabajos_mes.append(count)
+    meses_labels.reverse()
+    trabajos_mes.reverse()
+    
+    trabajosPendientesMes = []
+    for i in range(6):
+        month = current_month - i
+        year = current_year
+        if month <= 0:
+            month += 12
+            year -= 1
+        count_pendientes = Job.query.filter(
+            func.extract('year', Job.fecha) == year,
+            func.extract('month', Job.fecha) == month,
+            Job.estado == 'Pendiente'
+        ).count()
+        trabajosPendientesMes.append(count_pendientes)
+    trabajosPendientesMes.reverse()
+    
+    # Preparar eventos para el calendario: usar todos los trabajos con fecha definida
+    jobs_for_calendar = Job.query.filter(Job.fecha != None).all()
+    eventos_calendario = []
+    for job in jobs_for_calendar:
+        eventos_calendario.append({
+            'titulo': f"{job.nombre_cliente} {job.apellido_cliente or ''}",
+            'start': job.fecha.strftime('%Y-%m-%d')
+        })
+    
+    # Calcular facturación mensual
+    facturacion_mes = []
+    for i in range(6):
+        month = current_month - i
+        year = current_year
+        if month <= 0:
+            month += 12
+            year -= 1
+        total_facturacion = db.session.query(func.sum(Job.costo_final)).filter(
+            func.extract('year', Job.fecha) == year,
+            func.extract('month', Job.fecha) == month,
+            Job.estado == 'Completado'
+        ).scalar() or 0
+        facturacion_mes.append(total_facturacion)
+    facturacion_mes.reverse()
 
-        page = request.args.get('page', 1, type=int)
-        per_page = 10
-        trabajos_pendientes_proceso = Job.query.filter(Job.estado.in_(['Pendiente', 'En Proceso'])) \
-                                               .order_by(Job.updated_at.desc()) \
-                                               .paginate(page=page, per_page=per_page, error_out=False)
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    trabajos_pendientes_proceso = Job.query.filter(Job.estado.in_(['Pendiente', 'En Proceso'])) \
+                                           .order_by(Job.updated_at.desc()) \
+                                           .paginate(page=page, per_page=per_page, error_out=False)
 
-        return render_template('dashboard_admin.html',
-                               trabajos_recientes=trabajos_recientes,
-                               total_usuarios=total_usuarios,
-                               total_trabajos=total_trabajos,
-                               trabajos_pendientes=trabajos_pendientes,
-                               trabajos_completados=trabajos_completados,
-                               meses_labels=meses_labels,
-                               trabajos_mes=trabajos_mes,
-                               trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
-                               facturacion_mes=facturacion_mes,  # Enviar al frontend
-                               eventos_calendario=eventos_calendario,
-                               trabajos_pendientes_proceso=trabajos_pendientes_proceso)
+    return render_template('dashboard_admin.html',
+                           trabajos_recientes=trabajos_recientes,
+                           total_usuarios=total_usuarios,
+                           total_trabajos=total_trabajos,
+                           trabajos_pendientes=trabajos_pendientes,
+                           trabajos_completados=trabajos_completados,
+                           meses_labels=meses_labels,
+                           trabajos_mes=trabajos_mes,
+                           trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
+                           facturacion_mes=facturacion_mes,  # Enviar al frontend
+                           eventos_calendario=eventos_calendario,
+                           trabajos_pendientes_proceso=trabajos_pendientes_proceso)
 
 @jobs_bp.route('/jobs')
 @login_required

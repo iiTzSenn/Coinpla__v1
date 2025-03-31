@@ -46,37 +46,3 @@ document.querySelectorAll('#sidebar ul li a').forEach(link => {
     this.parentElement.classList.add('active');
   });
 });
-
-function toggleDropdown() {
-  const bottomContainer = document.querySelector('.bottom-container');
-  const dropdownMenu = bottomContainer.querySelector('.dropdown-menu');
-
-  if (bottomContainer.classList.contains('open')) {
-    dropdownMenu.style.display = 'none';
-    setTimeout(() => {
-      bottomContainer.classList.remove('open');
-    }, 300);
-  } else {
-    dropdownMenu.style.display = 'flex';
-    bottomContainer.classList.add('open');
-  }
-}
-
-// Al hacer clic en el contenedor, mostramos u ocultamos el dropdown
-document.querySelector('.bottom-container').addEventListener('click', function(event) {
-  event.stopPropagation(); // Evitamos que el clic se propague al documento
-  toggleDropdown();
-});
-
-// Listener para cerrar el dropdown al hacer clic fuera del contenedor
-document.addEventListener('click', function(event) {
-  const bottomContainer = document.querySelector('.bottom-container');
-  const dropdownMenu = bottomContainer.querySelector('.dropdown-menu');
-  
-  if (bottomContainer.classList.contains('open') && !bottomContainer.contains(event.target)) {
-    dropdownMenu.style.display = 'none';
-    setTimeout(() => {
-      bottomContainer.classList.remove('open');
-    }, 300);
-  }
-});
