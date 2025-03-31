@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/loginregister.css') }}">
-  <script type="text/javascript" src="{{ url_for('static', filename='js/validation.js') }}" defer></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}">
   <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
   <style>
     /* Mejoras para sincronizar animaciones */
@@ -42,6 +42,11 @@
   </style>
 </head>
 <body>
+  <!-- Importar el componente de notificaciones -->
+  {% from "components/notifications.html" import flash_messages %}
+  <!-- Renderizar notificaciones -->
+  {{ flash_messages() }}
+  
   <div class="wrapper">
     <h1>Registro</h1>
     <p id="error-message"></p>
@@ -80,5 +85,7 @@
     </form>
     <p>¿Ya tienes una cuenta? <a href="{{ url_for('auth.login') }}">Inicia sesión</a></p>
   </div>
+  
+  <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
 </body>
 </html>

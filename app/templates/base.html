@@ -20,8 +20,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}" />
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <!-- CSS para notificaciones -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/notifications.css') }}" />
   </head>
   <body>
+    <!-- Importar el componente de notificaciones -->
+    {% from "components/notifications.html" import flash_messages %}
+    <!-- Renderizar notificaciones -->
+    {{ flash_messages() }}
+
     {% if current_user.is_authenticated %}
       <!-- Layout: Sidebar y contenido principal -->
       <div class="layout">
@@ -155,6 +162,8 @@
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
     <!-- Nuevo JS para el sidebar -->
     <script src="{{ url_for('static', filename='js/sidebar.js') }}" defer></script>
+    <!-- JS para notificaciones -->
+    <script src="{{ url_for('static', filename='js/notifications.js') }}"></script>
     {% block extra_scripts %}{% endblock %}
   </body>
 </html>

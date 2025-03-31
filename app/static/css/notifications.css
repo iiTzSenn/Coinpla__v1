@@ -1,0 +1,115 @@
+.flash-container {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  width: 300px;
+  max-width: 90%;
+}
+
+.flash-message {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-bottom: 10px;
+  overflow: hidden;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.flash-message.show-notification {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.flash-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+}
+
+.flash-icon {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.flash-message-text {
+  flex-grow: 1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.flash-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.flash-close:hover {
+  opacity: 1;
+}
+
+.flash-progress {
+  height: 3px;
+  width: 100%;
+  animation: progress 4s linear forwards;
+}
+
+@keyframes progress {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
+
+/* Estilos específicos por tipo de notificación */
+.flash-success {
+  border-left: 4px solid #43ab01;
+}
+
+.flash-success .flash-icon {
+  color: #43ab01;
+}
+
+.flash-success .flash-progress {
+  background-color: #43ab01;
+}
+
+.flash-danger {
+  border-left: 4px solid #dc3545;
+}
+
+.flash-danger .flash-icon {
+  color: #dc3545;
+}
+
+.flash-danger .flash-progress {
+  background-color: #dc3545;
+}
+
+.flash-warning {
+  border-left: 4px solid #ffc107;
+}
+
+.flash-warning .flash-icon {
+  color: #ffc107;
+}
+
+.flash-warning .flash-progress {
+  background-color: #ffc107;
+}
+
+.flash-info {
+  border-left: 4px solid #17a2b8;
+}
+
+.flash-info .flash-icon {
+  color: #17a2b8;
+}
+
+.flash-info .flash-progress {
+  background-color: #17a2b8;
+}
