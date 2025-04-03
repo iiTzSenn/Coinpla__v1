@@ -1,6 +1,6 @@
 import random
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from sqlalchemy import func
 from app.extensions import db
@@ -24,6 +24,9 @@ def index():
     current_year = datetime.now().year
     meses_labels = []
     trabajos_mes = []
+    facturacion_mes = []  # Lista para almacenar facturación por mes
+    trabajosPendientesMes = []
+    
     for i in range(6):
         month = current_month - i
         year = current_year
@@ -32,27 +35,34 @@ def index():
             year -= 1
         label = datetime(year, month, 1).strftime('%b %Y')
         meses_labels.append(label)
+        
+        # Contar trabajos de este mes
         count = Job.query.filter(
             func.extract('year', Job.fecha) == year,
             func.extract('month', Job.fecha) == month
         ).count()
         trabajos_mes.append(count)
-    meses_labels.reverse()
-    trabajos_mes.reverse()
-    
-    trabajosPendientesMes = []
-    for i in range(6):
-        month = current_month - i
-        year = current_year
-        if month <= 0:
-            month += 12
-            year -= 1
-        count_pendientes = Job.query.filter(
+        
+        # Calcular facturación de trabajos completados para este mes
+        facturacion = db.session.query(func.coalesce(func.sum(Job.cantidad), 0)).filter(
+            func.extract('year', Job.fecha) == year,
+            func.extract('month', Job.fecha) == month,
+            Job.estado == 'Completado'
+        ).scalar() or 0
+        facturacion_mes.append(float(facturacion))
+        
+        # Contar trabajos pendientes de este mes
+        pending_count = Job.query.filter(
             func.extract('year', Job.fecha) == year,
             func.extract('month', Job.fecha) == month,
             Job.estado == 'Pendiente'
         ).count()
-        trabajosPendientesMes.append(count_pendientes)
+        trabajosPendientesMes.append(pending_count)
+    
+    # Invertir las listas para mostrar en orden cronológico
+    meses_labels.reverse()
+    trabajos_mes.reverse()
+    facturacion_mes.reverse()
     trabajosPendientesMes.reverse()
     
     # Preparar eventos para el calendario: usar todos los trabajos con fecha definida
@@ -64,27 +74,43 @@ def index():
             'start': job.fecha.strftime('%Y-%m-%d')
         })
     
-    # Calcular facturación mensual
-    facturacion_mes = []
-    for i in range(6):
-        month = current_month - i
-        year = current_year
-        if month <= 0:
-            month += 12
-            year -= 1
-        total_facturacion = db.session.query(func.sum(Job.costo_final)).filter(
-            func.extract('year', Job.fecha) == year,
-            func.extract('month', Job.fecha) == month,
-            Job.estado == 'Completado'
-        ).scalar() or 0
-        facturacion_mes.append(total_facturacion)
-    facturacion_mes.reverse()
-
     page = request.args.get('page', 1, type=int)
     per_page = 10
     trabajos_pendientes_proceso = Job.query.filter(Job.estado.in_(['Pendiente', 'En Proceso'])) \
                                            .order_by(Job.updated_at.desc()) \
                                            .paginate(page=page, per_page=per_page, error_out=False)
+
+    # Obtener datos de técnicos activos y sus trabajos completados
+    tecnicos_activos = Technician.query.filter_by(available=True).all()
+    datos_tecnicos = []
+    
+    for tecnico in tecnicos_activos:
+        trabajos_tech_completados = Job.query.filter_by(
+            technician_id=tecnico.id, 
+            estado='Completado'
+        ).count()
+        
+        # Incluir todos los técnicos activos, incluso con 0 trabajos para depuración
+        datos_tecnicos.append({
+            'nombre': f"{tecnico.nombre} {tecnico.apellido or ''}".strip(),
+            'trabajos_completados': trabajos_tech_completados
+        })
+    
+    # Ordenar de mayor a menor cantidad de trabajos
+    datos_tecnicos = sorted(datos_tecnicos, key=lambda x: x['trabajos_completados'], reverse=True)
+    
+    # Filtrar solo los que tienen trabajos completados después de ordenar
+    datos_tecnicos = [t for t in datos_tecnicos if t['trabajos_completados'] > 0]
+    
+    # Variables adicionales necesarias
+    num_trabajos = Job.query.count()
+    num_trabajos_pendientes = Job.query.filter_by(estado='Pendiente').count()
+    num_trabajos_completados = Job.query.filter_by(estado='Completado').count()
+    num_trabajos_en_proceso = Job.query.filter_by(estado='En Proceso').count()
+    
+    # Calcular facturación total
+    facturacion_total = db.session.query(func.coalesce(func.sum(Job.cantidad), 0)).scalar() or 0
+    facturacion_total = round(float(facturacion_total), 2)
 
     return render_template('dashboard_admin.html',
                            trabajos_recientes=trabajos_recientes,
@@ -94,11 +120,27 @@ def index():
                            trabajos_completados=trabajos_completados,
                            meses_labels=meses_labels,
                            trabajos_mes=trabajos_mes,
-                           trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
                            facturacion_mes=facturacion_mes,  # Enviar al frontend
+                           trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
                            eventos_calendario=eventos_calendario,
                            trabajos_pendientes_proceso=trabajos_pendientes_proceso,
+                           num_trabajos=num_trabajos,
+                           num_trabajos_pendientes=num_trabajos_pendientes,
+                           num_trabajos_completados=num_trabajos_completados,
+                           num_trabajos_en_proceso=num_trabajos_en_proceso,
+                           facturacion_total=facturacion_total,
+                           datos_tecnicos=datos_tecnicos,  # Añadir los datos de técnicos
                            generate_dashboard_row=generate_dashboard_work_row)
+
+@jobs_bp.route('/api/dashboard_stats')
+@login_required
+def dashboard_stats():
+    stats = {
+        "trabajos": Job.query.count(),
+        "pendientes": Job.query.filter_by(estado="Pendiente").count(),
+        "completados": Job.query.filter_by(estado="Completado").count()
+    }
+    return jsonify(stats)
 
 @jobs_bp.route('/listar_trabajos')  # Cambiado de '/jobs' a '/listar_trabajos'
 @login_required

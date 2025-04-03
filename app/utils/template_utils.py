@@ -12,7 +12,7 @@ def generate_row_html(trabajo):
       <td class="text-center">{trabajo.fecha.strftime("%d/%m/%Y")}</td>
       <td class="text-center"><p class="status {status_class}">{trabajo.estado}</p></td>
       <td class="text-center">{technician_name}</td>
-      <td class="text-center">{trabajo.costo_estimado or 'N/A'}</td>
+      <td class="text-center">{trabajo.cantidad or 'N/A'}</td>
     </tr>
     """
 
@@ -61,7 +61,7 @@ def generate_dashboard_work_row(trabajo):
     """
     technician_name = f"{trabajo.technician.nombre} {trabajo.technician.apellido or ''}" if trabajo.technician else "Sin asignar"
     status_class = "status-pending" if trabajo.estado in ["Pendiente", "En Proceso"] else "status-paid"
-    costo = trabajo.costo_estimado if trabajo.costo_estimado else 'N/A'
+    costo = trabajo.cantidad if trabajo.cantidad else 'N/A'  # Cambiado de costo_estimado a cantidad
     costo_display = f"{costo}€" if costo != 'N/A' else costo
     
     from flask import url_for

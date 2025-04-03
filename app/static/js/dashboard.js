@@ -8,7 +8,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Inicializar contadores con datos del servidor
   fetch('/api/dashboard_stats') // Endpoint para obtener estadísticas
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error al obtener datos del servidor');
+      }
+      return response.json();
+    })
     .then(data => {
       const counters = document.querySelectorAll('.counter');
       counters.forEach(counter => {
@@ -18,13 +23,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const updateCounter = () => {
           const current = +counter.innerText;
-          const increment = target / 100;
+          const increment = Math.ceil(target / 100);
 
           if (current < target) {
-            counter.innerText = Math.ceil(current + increment);
+            counter.innerText = current + increment;
             setTimeout(updateCounter, 15);
           } else {
-            counter.innerText = target;
+            counter.innerText = target.toLocaleString(); // Formato con separadores
           }
         };
         updateCounter();
@@ -93,7 +98,7 @@ function initCharts() {
       data: {
         labels: mesesLabels,
         datasets: [{
-          label: 'Facturación por mes (€)',
+          label: 'Facturación de trabajos completados (€)',
           data: facturacionMes,
           backgroundColor: 'rgba(75, 192, 192, 0.2)',
           borderColor: 'rgba(75, 192, 192, 1)',
@@ -120,21 +125,44 @@ function initCharts() {
   // Gráfico de distribución (pie chart)
   if (document.getElementById('distribucionChart')) {
     const distribucionCtx = document.getElementById('distribucionChart').getContext('2d');
+    
+    // Verificar si hay datos de técnicos
+    if (!datosTecnicos || datosTecnicos.length === 0) {
+      console.warn("No hay datos de técnicos disponibles para el gráfico de distribución");
+      
+      // Mostrar mensaje de no datos disponibles en el canvas
+      const ctx = distribucionCtx;
+      ctx.font = '14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#666';
+      ctx.fillText('No hay técnicos con trabajos completados', 
+                   document.getElementById('distribucionChart').width/2, 
+                   document.getElementById('distribucionChart').height/2);
+      return;
+    }
+    
+    // Limitar a los 5 técnicos con más trabajos si hay más de 5
+    const tecnicosData = datosTecnicos.length > 5 ? datosTecnicos.slice(0, 5) : datosTecnicos;
+    
     const distribucionChart = new Chart(distribucionCtx, {
       type: 'pie',
       data: {
-        labels: ['Pendientes', 'En Proceso', 'Completados'],
+        labels: tecnicosData.map(tecnico => tecnico.nombre),
         datasets: [{
-          data: [trabajosPendientes, trabajosEnProceso, trabajosCompletados],
+          data: tecnicosData.map(tecnico => tecnico.trabajos_completados),
           backgroundColor: [
-            'rgba(255, 159, 64, 0.7)', // Naranja para pendientes
-            'rgba(54, 162, 235, 0.7)', // Azul para en proceso
-            'rgba(75, 192, 192, 0.7)'  // Verde para completados
+            'rgba(255, 99, 132, 0.7)',  // Rojo
+            'rgba(54, 162, 235, 0.7)',  // Azul
+            'rgba(75, 192, 192, 0.7)',  // Verde
+            'rgba(255, 206, 86, 0.7)',  // Amarillo
+            'rgba(153, 102, 255, 0.7)', // Morado
           ],
           borderColor: [
-            'rgba(255, 159, 64, 1)',
+            'rgba(255, 99, 132, 1)',
             'rgba(54, 162, 235, 1)',
-            'rgba(75, 192, 192, 1)'
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
           ],
           borderWidth: 1
         }]
@@ -144,7 +172,24 @@ function initCharts() {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            position: 'right'
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              font: {
+                size: 11
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} trabajos (${percentage}%)`;
+              }
+            }
           }
         }
       }
@@ -222,6 +267,88 @@ function initCharts() {
         }
       }
     });
+  }
+
+  // Gráfico circular de técnicos y trabajos completados
+  if (document.getElementById('tecnicosChart')) {
+    const tecnicosChartCtx = document.getElementById('tecnicosChart').getContext('2d');
+    
+    // Verificar si hay datos
+    if (!datosTecnicos || datosTecnicos.length === 0) {
+      console.warn("No hay datos de técnicos disponibles para el gráfico");
+      
+      // Mostrar mensaje de no datos disponibles en el canvas
+      const ctx = tecnicosChartCtx;
+      ctx.font = '14px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#666';
+      ctx.fillText('No hay datos disponibles', 
+                   document.getElementById('tecnicosChart').width/2, 
+                   document.getElementById('tecnicosChart').height/2);
+      return;
+    }
+    
+    console.log("Creando gráfico con datos:", datosTecnicos);
+    
+    // Limitar a los 5 técnicos con más trabajos si hay más de 5
+    const tecnicosData = datosTecnicos.length > 5 ? datosTecnicos.slice(0, 5) : datosTecnicos;
+    
+    const tecnicosChart = new Chart(tecnicosChartCtx, {
+      type: 'pie',
+      data: {
+        labels: tecnicosData.map(tecnico => tecnico.nombre),
+        datasets: [{
+          data: tecnicosData.map(tecnico => tecnico.trabajos_completados),
+          backgroundColor: [
+            'rgba(255, 99, 132, 0.7)',  // Rojo
+            'rgba(54, 162, 235, 0.7)',  // Azul
+            'rgba(75, 192, 192, 0.7)',  // Verde
+            'rgba(255, 206, 86, 0.7)',  // Amarillo
+            'rgba(153, 102, 255, 0.7)', // Morado
+            'rgba(255, 159, 64, 0.7)',  // Naranja
+            'rgba(201, 203, 207, 0.7)'  // Gris
+          ],
+          borderColor: [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(255, 159, 64, 1)',
+            'rgba(201, 203, 207, 1)'
+          ],
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              font: {
+                size: 11
+              }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ${value} trabajos (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  } else {
+    console.error("No se encontró el elemento canvas #tecnicosChart");
   }
 }
 

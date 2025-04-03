@@ -73,6 +73,10 @@
         <option value="Completado" {% if trabajo.estado == 'Completado' %}selected{% endif %}>Completado</option>
       </select>
     </div>
+    <div class="col-md-4">
+      <label for="cantidad" class="form-label">Cantidad (€):</label>
+      <input type="number" name="cantidad" id="cantidad" class="form-control" value="{{ trabajo.cantidad }}" step="0.01" min="0" required>
+    </div>
   </div>
   <button type="submit" class="btn btn-third">Guardar Cambios</button>
 </form>

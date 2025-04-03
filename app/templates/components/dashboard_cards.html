@@ -1,9 +1,9 @@
-{% macro stats_card(value, label, type) %}
+{% macro stats_card(value, label, type, icon) %}
 <div class="col-md-3 mb-4">
-  <div class="dashboard-card {{ type }}">
+  <div class="dashboard-card {{ type }}" data-icon="{{ icon }}">
     <div class="card-body text-center">
-      <h4 class="counter" data-target="{{ value }}">0</h4> <!-- Contador funcional -->
-      <p class="card-text mb-0">{{ label }}</p>
+      <h4 class="counter" data-target="{{ value }}">0</h4>
+      <p class="card-text">{{ label }}</p>
     </div>
   </div>
 </div>
@@ -26,7 +26,7 @@
 {% macro stats_row(stats) %}
 <div class="row mb-4">
   {% for stat in stats %}
-    {{ stats_card(stat.value, stat.label, stat.type) }}
+    {{ stats_card(stat.value, stat.label, stat.type, stat.icon) }}
   {% endfor %}
 </div>
 {% endmacro %}

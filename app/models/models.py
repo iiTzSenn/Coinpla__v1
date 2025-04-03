@@ -90,8 +90,7 @@ class Job(db.Model):
     estado = db.Column(db.String(20), default='Pendiente')
     categoria_id = db.Column(db.Integer, db.ForeignKey('job_categories.id'), nullable=True)
     prioridad = db.Column(db.String(20), default='Normal')
-    costo_estimado = db.Column(db.Float, default=0)
-    costo_final = db.Column(db.Float)
+    cantidad = db.Column(db.Float, default=0)  # Cambiado de costo_estimado a cantidad
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     history = db.relationship('JobHistory', backref='job', lazy=True, cascade="all, delete-orphan")
