@@ -1,0 +1,118 @@
+/* Botones con estilo original */
+.btn {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25);
+}
+
+/* Botones principales */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #3a9701;
+  border-color: #359001;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-third {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn-third:hover {
+  background-color: #3a9701;
+  border-color: #3a9701;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-fourth {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.btn-fourth:hover {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de acción (pequeños con iconos) */
+.btn-action {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin: 0 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-action:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-action i {
+  font-size: 0.9rem;
+}
+
+/* Botones específicos */
+.btn-success.btn-action {
+  background-color: #28a745;
+}
+.btn-success.btn-action:hover {
+  background-color: #218838;
+}
+
+.btn-danger.btn-action {
+  background-color: #dc3545;
+}
+.btn-danger.btn-action:hover {
+  background-color: #c82333;
+}
+
+.btn-warning.btn-action {
+  background-color: #ffc107;
+}
+.btn-warning.btn-action:hover {
+  background-color: #e0a800;
+}
+
+.btn-info.btn-action {
+  background-color: #17a2b8;
+}
+.btn-info.btn-action:hover {
+  background-color: #138496;
+}
+
+.btn-modal-close:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Botones para ver detalles */
+.ver-detalles {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ver-detalles:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}

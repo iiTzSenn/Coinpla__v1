@@ -1,130 +1,149 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard Administrador - Coinpla{% endblock %}
+{% block title %}Dashboard - Admin{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <!-- =========================================
-       RUTA DE LA PÁGINA
-       ========================================= -->
-  <div class="mb-3">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">Inicio</li>
-      </ol>
-    </nav>
-  </div>
+{% from "components/page_header.html" import page_header %}
+{% from "components/table.html" import paginated_table, data_table %}
+{% from "components/dashboard_cards.html" import stats_card, chart_card, stats_row, chart_row %}
 
-  <!-- =========================================
-       1. TARJETAS KPI (Indicadores Clave)
-       ========================================= -->
-  <div class="row g-3 mb-4">
-    <!-- Trabajos totales -->
-    <div class="col-md-3">
-      <div class="card dashboard-card bg-success trabajos">
-        <div class="card-body">
-          <h5 class="card-title">Trabajos Totales</h5>
-          <p class="card-text fs-4">{{ total_trabajos }}</p>
-        </div>
-      </div>
-    </div>
-    <!-- Pendientes -->
-    <div class="col-md-3">
-      <div class="card dashboard-card bg-warning pendientes">
-        <div class="card-body">
-          <h5 class="card-title">Pendientes</h5>
-          <p class="card-text fs-4">{{ trabajos_pendientes }}</p>
-        </div>
-      </div>
-    </div>
-    <!-- Completados -->
-    <div class="col-md-3">
-      <div class="card dashboard-card bg-danger completados">
-        <div class="card-body">
-          <h5 class="card-title">Completados</h5>
-          <p class="card-text fs-4">{{ trabajos_completados }}</p>
-        </div>
-      </div>
-    </div>
-    <!-- Facturación -->
-    <div class="col-md-3">
-      <div class="card dashboard-card bg-info facturacion">
-        <div class="card-body">
-          <h5 class="card-title">Facturación</h5>
-          <p class="card-text fs-4">€ {{ facturacion_total|default("0.00") }}</p>
-        </div>
-      </div>
-    </div>
-  </div>
+{{ page_header(
+    title="",
+    breadcrumbs=[
+        {"text": "Inicio"}
+    ]
+) }}
 
-  <!-- =========================================
-       2. GRÁFICAS
-       ========================================= -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
-        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
-          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos</span>
-        </div>
-        <div class="card-body" style="height: 250px;"> <!-- Altura reducida -->
-          <canvas id="trabajosLineChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-      
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
-        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
-          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Facturación Mensual</span>
-        </div>
-        <div class="card-body" style="height: 300px;">
-          <canvas id="facturacionBarChart"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-6">
-      <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
-        <div class="card-header d-flex align-items-center gap-2" style="border-radius: 1rem 1rem 0 0; background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-          <i class="bi bi-bar-chart" style="font-size: 0.9rem; color: #6c757d;"></i>
-          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Pendientes</span>
-        </div>
-        <div class="card-body" style="height: 300px;">
-          <canvas id="trabajosPendientesBarChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
+<!-- Estadísticas principales -->
+{{ stats_row([
+    {"value": num_trabajos, "label": "Trabajos Totales", "type": "trabajos"},
+    {"value": num_trabajos_pendientes, "label": "Trabajos Pendientes", "type": "pendientes"},
+    {"value": num_trabajos_completados, "label": "Trabajos Completados", "type": "completados"},
+    {"value": facturacion_total, "label": "Facturación Total", "type": "facturacion"}
+]) }}
 
-  <div class="row mb-4">
-    <div class="col-12">
-      {% include 'components/table.html' %}
+<div class="row mb-4">
+  <div class="col-md-12">
+    <!-- Filtros de tiempo -->
+    <div class="filter-wrapper mb-3 text-end">
+      <div class="btn-group" role="group" aria-label="Filtro de Tiempo">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterChart(7)">Última semana</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterChart(30)">Último mes</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterChart(90)">3 meses</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="filterChart('max')">Todo</button>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- PASO DE DATOS A JAVASCRIPT (Variables Globales) -->
-  <script>
-    var mesesLabels = {{ meses_labels|default([])|tojson }};
-    var trabajosMes = {{ trabajos_mes|default([])|tojson }};
-    var facturacionMes = {{ facturacion_mes|default([])|tojson }};
-    var trabajosPendientesMes = {{ trabajosPendientesMes|default([])|tojson }}; <!-- Corregido -->
-    var trabajosPendientes = {{ trabajos_pendientes|default(0) }};
-    var trabajosEnProceso = {{ trabajos_en_proceso|default(0) }};
-    var trabajosCompletados = {{ trabajos_completados|default(0) }};
-    var eventosCalendario = {{ eventos_calendario|default([])|tojson }};
-  </script>
+<!-- Gráficos principales -->
+{{ chart_row([
+    {"title": "Trabajos", "id": "trabajosLineChart", "icon": "bi-graph-up"},
+    {"title": "Facturación", "id": "facturacionBarChart", "icon": "bi-cash-coin"}
+]) }}
+
+{{ chart_row([
+    {"title": "Distribución", "id": "distribucionChart", "icon": "bi-pie-chart", "height": "300px"},
+    {"title": "Trabajos Pendientes", "id": "trabajosPendientesBarChart", "icon": "bi-hourglass", "height": "300px"}
+]) }}
+
+<!-- Tabla de trabajos pendientes -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+        <i class="bi bi-table" style="font-size: 0.9rem; color: #6c757d;"></i>
+        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Pendientes y En Proceso</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table custom-table">
+            <thead>
+              <tr>
+                <th>Trabajo</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Técnico</th>
+                <th>Cantidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if trabajos_pendientes_proceso.items and trabajos_pendientes_proceso.items|length > 0 %}
+                {% for trabajo in trabajos_pendientes_proceso.items %}
+                  {{ generate_dashboard_row(trabajo)|safe }}
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="6" class="text-center">No hay trabajos pendientes.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer d-flex justify-content-center" style="border-radius: 0 0 1rem 1rem; background-color: #f9f9f9 !important; border-top: 1px solid #cbc6c6;">
+        {% if trabajos_pendientes_proceso.pages > 1 %}
+        <nav aria-label="Paginación">
+          <ul class="pagination m-0" style="gap: 0.5rem;">
+            {% if trabajos_pendientes_proceso.has_prev %}
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=1) }}" aria-label="Primera página">&laquo;</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.prev_num) }}" aria-label="Página anterior">&lt;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&lt;</span>
+            </li>
+            {% endif %}
+
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">{{ trabajos_pendientes_proceso.page }} / {{ trabajos_pendientes_proceso.pages }}</span>
+            </li>
+            
+            {% if trabajos_pendientes_proceso.has_next %}
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.next_num) }}" aria-label="Página siguiente">&gt;</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.pages) }}" aria-label="Última página">&raquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&gt;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&raquo;</span>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Chart.js -->
+<!-- Chart.js para las gráficas -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- FullCalendar -->
-<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
-<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
-<!-- Tu archivo JS externo -->
+<!-- Script personalizado para el dashboard -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<script>
+  // Variables para los gráficos
+  var mesesLabels = {{ meses_labels|default([])|tojson }};
+  var trabajosMes = {{ trabajos_mes|default([])|tojson }};
+  var facturacionMes = {{ facturacion_mes|default([])|tojson }};
+  var trabajosPendientesMes = {{ trabajosPendientesMes|default([])|tojson }};
+  var trabajosPendientes = {{ num_trabajos_pendientes|default(0)|tojson }};
+  var trabajosEnProceso = {{ num_trabajos_en_proceso|default(0)|tojson }};
+  var trabajosCompletados = {{ num_trabajos_completados|default(0)|tojson }};
+  var eventosCalendario = {{ eventos_calendario|default([])|tojson }};
+</script>
 {% endblock %}

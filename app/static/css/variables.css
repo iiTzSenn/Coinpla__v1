@@ -1,0 +1,30 @@
+:root {
+  /* Colores principales - Restauración de la paleta original */
+  --primary: #43ab01;
+  --secondary: #85eb3c;
+  --sidebar-bg: #11121a;  /* Restaurar al color negro original */
+  --background: #f8f9fa;
+  --text: #212529;
+  
+  /* Componentes */
+  --card-bg: #ffffff;
+  --card-border: #dee2e6;
+  --navbar-bg: #43ab01;
+  --button-text: #ffffff;
+  --header-bg: #43ab01;
+  --hover-clr: #222533;  /* Color hover oscuro para sidebar */
+  
+  /* Dimensiones */
+  --radius: 0.75rem;  /* Bordes redondeados más pronunciados como en el diseño original */
+  --sidebar-width: 250px;
+  --sidebar-width-closed: 60px;
+  
+  /* Estados */
+  --clr-pending: #fff0c2;
+  --clr-pending-font: #a68b00;
+  --clr-unpaid: #ffcdd2;
+  --clr-unpaid-font: #c62828;
+  --clr-paid: #c8e6c9;
+  --clr-paid-font: #388e3c;
+  --clr-link: #43ab01;  /* Links del color primario */
+}

@@ -6,6 +6,7 @@ from sqlalchemy import func
 from app.extensions import db
 from app.models.models import User, Job, Technician, JobHistory
 from app.utils.validators import validar_y_normalizar_telefono
+from app.utils.template_utils import generate_dashboard_work_row, generate_history_row
 
 jobs_bp = Blueprint('jobs', __name__)
 
@@ -96,7 +97,8 @@ def index():
                            trabajosPendientesMes=trabajosPendientesMes,  # Enviar al frontend
                            facturacion_mes=facturacion_mes,  # Enviar al frontend
                            eventos_calendario=eventos_calendario,
-                           trabajos_pendientes_proceso=trabajos_pendientes_proceso)
+                           trabajos_pendientes_proceso=trabajos_pendientes_proceso,
+                           generate_dashboard_row=generate_dashboard_work_row)
 
 @jobs_bp.route('/listar_trabajos')  # Cambiado de '/jobs' a '/listar_trabajos'
 @login_required
@@ -267,12 +269,53 @@ def completar_trabajo(id):
 @jobs_bp.route('/historial')
 @login_required
 def historial():
-    # Obtener solo los trabajos COMPLETADOS para el historial
-    # Si es un técnico, solo muestra sus propios trabajos completados
-    if current_user.role == 'tecnico' and hasattr(current_user, 'technician_profile'):
-        all_jobs = Job.query.filter_by(technician_id=current_user.technician_profile.id, estado='Completado').order_by(Job.fecha.desc()).all()
-    # Si es admin, muestra todos los trabajos completados
-    else:
-        all_jobs = Job.query.filter_by(estado='Completado').order_by(Job.fecha.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
     
-    return render_template('historial.html', all_jobs=all_jobs)
+    # Filtros opcionales
+    cliente_filter = request.args.get('cliente', '')
+    tecnico_filter = request.args.get('tecnico', '')
+    fecha_inicio = request.args.get('fecha_inicio', '')
+    fecha_fin = request.args.get('fecha_fin', '')
+    
+    # Construir el query base
+    query = Job.query.filter_by(estado='Completado')
+    
+    # Aplicar filtros si existen
+    if cliente_filter:
+        query = query.filter(
+            (Job.nombre_cliente.ilike(f'%{cliente_filter}%')) |
+            (Job.apellido_cliente.ilike(f'%{cliente_filter}%'))
+        )
+    
+    if tecnico_filter:
+        query = query.filter(Job.technician_id == int(tecnico_filter))
+    
+    if fecha_inicio:
+        try:
+            fecha_inicio_obj = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            query = query.filter(Job.fecha >= fecha_inicio_obj)
+        except ValueError:
+            flash("Formato de fecha inválido", "warning")
+    
+    if fecha_fin:
+        try:
+            fecha_fin_obj = datetime.strptime(fecha_fin, '%Y-%m-%d')
+            query = query.filter(Job.fecha <= fecha_fin_obj)
+        except ValueError:
+            flash("Formato de fecha inválido", "warning")
+    
+    # Paginar resultados
+    trabajos = query.order_by(Job.fecha.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    
+    # Obtener lista de técnicos para el filtro
+    tecnicos = Technician.query.all()
+    
+    return render_template(
+        'historial.html', 
+        trabajos=trabajos, 
+        tecnicos=tecnicos,
+        generate_history_row=generate_history_row
+    )

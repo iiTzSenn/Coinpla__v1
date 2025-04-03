@@ -1,0 +1,47 @@
+{# Modal de confirmación genérico #}
+{% macro confirm_modal(id, title, message, action_url, confirm_text="Confirmar", cancel_text="Cancelar") %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="{{ id }}Form" method="POST" action="{{ action_url }}">
+      <div class="modal-content modal-rectangular">
+        <div class="modal-header">
+          <h5 class="modal-title" id="{{ id }}Label">{{ title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          {{ message }}
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">{{ cancel_text }}</button>
+          <button type="submit" class="btn btn-third btn-sm">{{ confirm_text }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endmacro %}
+
+{# Modal de edición genérico #}
+{% macro edit_modal(id, title, form_fields, action_url, submit_text="Guardar Cambios", cancel_text="Cancelar") %}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}Label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="{{ id }}Form" method="POST" action="{{ action_url }}">
+      <div class="modal-content modal-rectangular">
+        <div class="modal-header">
+          <h5 class="modal-title" id="{{ id }}Label">{{ title }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          {% for field in form_fields %}
+            {{ field|safe }}
+          {% endfor %}
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">{{ cancel_text }}</button>
+          <button type="submit" class="btn btn-third btn-sm">{{ submit_text }}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endmacro %}

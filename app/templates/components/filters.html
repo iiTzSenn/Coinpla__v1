@@ -1,0 +1,31 @@
+{% macro filter_card(title="Filtros", action_url="#", submit_text="Filtrar", reset_text="Limpiar Filtros", reset_url="#") %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h4 class="mb-0">{{ title }}</h4>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="{{ action_url }}" class="row g-3">
+      {{ caller() }}
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-third">{{ submit_text }}</button>
+        <a href="{{ reset_url }}" class="btn btn-fourth">{{ reset_text }}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro date_range_filters(fecha_inicio_name="fecha_inicio", fecha_fin_name="fecha_fin", fecha_inicio_value="", fecha_fin_value="", fecha_inicio_label="Fecha inicio:", fecha_fin_label="Fecha fin:") %}
+<div class="col-md-6">
+  <div class="row">
+    <div class="col-md-6">
+      <label for="{{ fecha_inicio_name }}" class="form-label">{{ fecha_inicio_label }}</label>
+      <input type="date" class="form-control" id="{{ fecha_inicio_name }}" name="{{ fecha_inicio_name }}" value="{{ fecha_inicio_value }}">
+    </div>
+    <div class="col-md-6">
+      <label for="{{ fecha_fin_name }}" class="form-label">{{ fecha_fin_label }}</label>
+      <input type="date" class="form-control" id="{{ fecha_fin_name }}" name="{{ fecha_fin_name }}" value="{{ fecha_fin_value }}">
+    </div>
+  </div>
+</div>
+{% endmacro %}

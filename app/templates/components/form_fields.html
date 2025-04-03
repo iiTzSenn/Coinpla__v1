@@ -1,0 +1,42 @@
+{# Campo de texto genérico #}
+{% macro text_field(name, label, placeholder="", value="", required=false, classes="form-control", max_length=None) %}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <input type="text" class="{{ classes }}" id="{{ name }}" name="{{ name }}" value="{{ value }}"
+         placeholder="{{ placeholder }}" {% if required %}required{% endif %}
+         {% if max_length %}maxlength="{{ max_length }}"{% endif %}>
+</div>
+{% endmacro %}
+
+{# Campo de teléfono con validación #}
+{% macro phone_field(name, label, placeholder="Ingrese el teléfono", value="", required=false) %}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <input type="text" class="form-control trabajo-input" id="{{ name }}" name="{{ name }}"
+         placeholder="{{ placeholder }}" value="{{ value }}" {% if required %}required{% endif %}
+         pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+         title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+         maxlength="15">
+</div>
+{% endmacro %}
+
+{# Campo de selección genérico #}
+{% macro select_field(name, label, options, selected="", required=false) %}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <select class="form-select" id="{{ name }}" name="{{ name }}" {% if required %}required{% endif %}>
+    {% for option in options %}
+      <option value="{{ option.value }}" {% if selected == option.value %}selected{% endif %}>{{ option.text }}</option>
+    {% endfor %}
+  </select>
+</div>
+{% endmacro %}
+
+{# Campo de textarea genérico #}
+{% macro textarea_field(name, label, placeholder="", value="", rows=3, required=false) %}
+<div class="mb-3">
+  <label for="{{ name }}" class="form-label">{{ label }}</label>
+  <textarea class="form-control" id="{{ name }}" name="{{ name }}" rows="{{ rows }}" 
+            placeholder="{{ placeholder }}" {% if required %}required{% endif %}>{{ value }}</textarea>
+</div>
+{% endmacro %}

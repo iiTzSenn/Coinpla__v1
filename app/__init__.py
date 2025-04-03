@@ -22,11 +22,13 @@ def create_app():
     login_manager.login_view = 'auth.login'
     login_manager.login_message = None
 
-    from app.models.models import User
-
-    @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
+    with app.app_context():
+        # Importar modelos aquí para evitar problemas de importación circular
+        from app.models.models import User
+        
+        @login_manager.user_loader
+        def load_user(user_id):
+            return User.query.get(int(user_id))
 
     # Registro de rutas (blueprints)
     from app.routes.auth import auth_bp
@@ -35,6 +37,7 @@ def create_app():
     from app.routes.admin import admin_bp
     from app.routes.export import export_bp
     from app.routes.users import users_bp
+    from .routes.api import api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(jobs_bp)
@@ -42,5 +45,6 @@ def create_app():
     app.register_blueprint(admin_bp)
     app.register_blueprint(export_bp)
     app.register_blueprint(users_bp, url_prefix='/users')
+    app.register_blueprint(api_bp)
 
     return app

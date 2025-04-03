@@ -1,0 +1,34 @@
+{% macro page_header(title, breadcrumbs=[], buttons=[]) %}
+<div class="page-header mb-4">
+  <!-- Breadcrumb -->
+  {% if breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
+      {% for item in breadcrumbs %}
+        {% if loop.last %}
+        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">{{ item.text }}</li>
+        {% else %}
+        <li class="breadcrumb-item"><a href="{{ item.url }}">{{ item.text }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+  {% endif %}
+  
+  <!-- Título y botones opcionales -->
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>{{ title }}</h2>
+    {% if buttons %}
+    <div class="page-actions">
+      {% for button in buttons %}
+      <a href="{{ button.url }}" class="btn {{ button.class }}">
+        {% if button.icon %}<i class="{{ button.icon }} me-1"></i>{% endif %}
+        {{ button.text }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

@@ -1,48 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-:root {
-  --primary: #43ab01;
-  --secondary: #85eb3c;
-  --sidebar-bg: #3a4f41;
-  --background: #f8f9fa;
-  --text: #212529;
-  --card-bg: #ffffff;
-  --card-border: #dee2e6;
-  --navbar-bg: #43ab01;
-  --button-text: #ffffff;
-  --header-bg: #43ab01;
-  /* Colores para el sidebar */
-  --base-bg: #11121a;
-  --hover-clr: #222533;
-  --accent-clr: #5e63ff;
-  --clr-primary: #81d4fa;
-  --clr-primary-light: #e1f5fe;
-  --clr-primary-dark: #4fc3f7;
-  --clr-gray100: #f9fbff;
-  --clr-gray150: #f4f6fb;
-  --clr-gray200: #eef1f6;  /* Este es el color que buscaba */
-  --clr-gray300: #e1e5ee;
-  --clr-gray400: #767b91;
-  --clr-gray500: #4f546c;
-  --clr-gray600: #2a324b;
-  --clr-gray700: #161d34;
-  --clr-pending: #fff0c2;
-  --clr-pending-font: #a68b00;
-  --clr-unpaid: #ffcdd2;
-  --clr-unpaid-font: #c62828;
-  --clr-paid: #c8e6c9;
-  --clr-paid-font: #388e3c;
-  --clr-link: #2962ff;
-  --radius: 0.2rem;
+/* ========== RESET & GLOBAL STYLES ========== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Estilos base */
 body {
   font-family: 'Poppins', sans-serif;
   background-color: var(--background);
   color: var(--text);
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Header fijo */
@@ -56,26 +27,27 @@ body {
 /* Layout: Ajuste para dejar espacio al header */
 .layout {
   display: flex;
-  margin-top: 0; /* Asegúrate de que no haya margen superior */
+  margin-top: 0; /* Restaurar margen cero */
 }
 
-/* Sidebar */
+/* Sidebar - Restauramos estilos originales */
 #sidebar {
-  width: 250px;
-  background-color: var(--base-bg);
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
   color: var(--button-text);
   transition: width 0.3s ease;
   padding: 1em 0.5em;
-  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
+  height: 100vh;
   overflow: hidden;
-  position: fixed; /* Fijar el sidebar en la parte superior */
-  top: 0; /* Asegurar que comience desde arriba */
+  position: fixed;
+  top: 0;
   left: 0;
-  margin-top: 0; /* Elimina cualquier margen superior */
+  margin-top: 0;
+  z-index: 1000; /* Aseguramos que esté por encima del contenido */
 }
 
 #sidebar.close {
-  width: 60px;
+  width: var(--sidebar-width-closed);
 }
 
 /* Parte superior de la sidebar: toggle + logo */
@@ -148,24 +120,20 @@ body {
   transition: opacity 0.3s ease;
 }
 
-/* Contenido principal */
+/* Contenido principal - Restauramos propiedades originales */
 .content {
   flex-grow: 1;
-  padding: 1em;
+  padding: 1.5rem;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease, width 0.3s ease;
+  width: calc(100% - var(--sidebar-width));
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* ========== RESET & GLOBAL STYLES ========== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--background);
-  color: var(--text);
-  transition: background-color 0.3s, color 0.3s;
+#sidebar.close + .content {
+  margin-left: var(--sidebar-width-closed);
+  width: calc(100% - var(--sidebar-width-closed));
 }
 
 /* ========== HEADER & NAVIGATION ========== */
@@ -217,45 +185,7 @@ header.navbar {
   color: #ffffff;
 }
 
-/* ========== COMPONENTES ========== */
-/* Ejemplo de jumbotron, tarjetas, tablas, etc. 
-   Ajusta o elimina según tu proyecto. */
-
-.card {
-  background-color: var(--card-bg);
-  color: var(--text);
-  border: 1px solid var(--card-border);
-  border-radius: 0.25rem;
-  margin-bottom: 20px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra permanente */
-}
-
-.card:hover {
-  transform: translateY(-5px); /* Relieve al pasar el ratón */
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2); /* Sombra más intensa */
-}
-
-.card-header {
-  background-color: var(--header-bg) !important;
-  color: var(--button-text) !important;
-}
-
-.table thead th {
-  background-color: var(--navbar-bg);
-  color: var(--button-text);
-}
-
-/* Alerts */
-.alert {
-  transition: opacity 1s ease-out;
-}
-.alert.shrink {
-  opacity: 0;
-  max-height: 0;
-  margin: 0;
-  padding: 0;
-}
+/* ========== UTILIDADES ========== */
 
 /* Focus styles */
 input:focus,
@@ -268,11 +198,59 @@ select:focus,
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Alineación en tablas */
-.table thead th,
-.table tbody td {
-  vertical-align: initial;
-  text-align: center;
+/* Alerts */
+.alert {
+  transition: opacity 1s ease-out;
+}
+
+.alert.shrink {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Persistent alerts */
+.persistent-alert {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Botones */
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #3a9701;
+  border-color: #3a9701;
+}
+
+.btn-third {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--button-text);
+}
+
+.btn-third:hover {
+  background-color: #3a9701;
+  border-color: #3a9701;
+  color: var(--button-text);
+}
+
+.btn-fourth {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.btn-fourth:hover {
+  background-color: #dee2e6;
+  border-color: #ced4da;
+  color: #212529;
 }
 
 /* Trabajos Page */
@@ -297,6 +275,96 @@ select:focus,
 .btn-modal-close:hover {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Encabezado de página */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header .breadcrumb {
+  margin-bottom: 0.5rem;
+}
+
+.page-header .breadcrumb-item a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.page-header .breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.page-header h2 {
+  margin-bottom: 0;
+  color: var(--text);
+}
+
+.page-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    width: 100%;
+    margin-bottom: 60px; /* Espacio para la barra de navegación inferior */
+  }
+  
+  #sidebar {
+    transform: translateX(-100%);
+    position: fixed;
+    z-index: 1050;
+  }
+  
+  #sidebar.show {
+    transform: translateX(0);
+  }
+  
+  .mobile-menu-toggle {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none;
+  }
+}
+
+/* ========== COMPONENTES ========== */
+/* Ejemplo de jumbotron, tarjetas, tablas, etc. 
+   Ajusta o elimina según tu proyecto. */
+
+.card-header {
+  background-color: var(--header-bg);
+  color: var(--button-text);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-footer {
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--card-border);
+  padding: 0.75rem 1.25rem;
+}
+
+.table thead th {
+  background-color: var(--navbar-bg);
+  color: var(--button-text);
+}
+
+/* Alineación en tablas */
+.table thead th,
+.table tbody td {
+  vertical-align: initial;
+  text-align: center;
 }
 
 /* Export PDF Page */
@@ -488,95 +556,29 @@ select:focus,
   height: 300px; /* Altura consistente */
 }
 
-table {
-  border-collapse: collapse;
-  box-shadow: 0 5px 10px var(--clr-gray300);
-  background-color: #fff;
-  overflow: hidden;
+/* Restauramos estilos de tabla que fueron sobrescritos */
+table.custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
   width: 100%;
+  border: 1px solid var(--card-border);
   border-radius: var(--radius);
+  overflow: hidden;
 }
 
-thead {
-  box-shadow: 0 5px 10px var(--clr-gray300);
-}
-
-th {
-  padding: 1rem 2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  font-size: 0.7rem;
-  font-weight: 900;
-  text-align: left;
-}
-
-td {
-  padding: 1rem 2rem;
-}
-
-a {
-  text-decoration: none;
-  color: var(--clr-link);
-}
-
-.status {
-  border-radius: var(--radius);
-  padding: 0.2rem 1rem;
+.custom-table thead th {
+  background-color: var(--header-bg);
+  color: var(--button-text);
   text-align: center;
-  font-weight: 600;
-  width: fit-content;
+  padding: 0.75rem;
+  border: none;
 }
 
-.status-pending {
-  background-color: var(--clr-pending);
-  color: var(--clr-pending-font);
-}
-
-.status-paid {
-  background-color: var(--clr-paid);
-  color: var(--clr-paid-font);
-}
-
-.status-unpaid {
-  background-color: var(--clr-unpaid);
-  color: var(--clr-unpaid-font);
-}
-
-tbody tr:nth-child(even) {
-  background-color: var(--clr-gray150);
-}
-
-.custom-table {
-  border-collapse: collapse;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  background-color: #fff; /* Fondo blanco para toda la tabla */
-  overflow: hidden;
-  width: 100%;
-  border-radius: 0; /* Eliminadas las esquinas redondeadas */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.custom-table thead {
-  background-color: var(--clr-gray200); /* Fondo gris claro para la cabecera */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 0; /* Asegurar que la cabecera tampoco tenga esquinas redondeadas */
-}
-
-.custom-table th {
-  padding: 1rem 2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1rem;
-  font-size: 0.8rem;
-  font-weight: 900;
-  text-align: center; /* Centrar texto en la cabecera */
-  border-radius: 0; /* Eliminadas las esquinas redondeadas en los encabezados */
-}
-
-.custom-table td {
-  padding: 1rem 2rem;
-  background-color: #fff; /* Fondo blanco para todas las celdas */
-  text-align: center; /* Centrar contenido de las celdas */
-  transition: background-color 0.3s ease;
+.custom-table tbody td {
+  vertical-align: middle;
+  padding: 0.75rem;
+  text-align: center;
+  border-top: 1px solid var(--card-border);
 }
 
 .custom-table tbody tr {

@@ -1,273 +1,106 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- Estilos personalizados para los botones -->
-<style>
-  .btn-action {
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 2px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: none;
-  }
-  
-  .btn-action:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-  }
-  
-  .btn-success.btn-action {
-    background-color: #28a745;
-  }
-  .btn-success.btn-action:hover {
-    background-color: #218838;
-  }
-  
-  .btn-danger.btn-action {
-    background-color: #dc3545;
-  }
-  .btn-danger.btn-action:hover {
-    background-color: #c82333;
-  }
-  
-  .btn-warning.btn-action {
-    background-color: #ffc107;
-    color: #212529;
-  }
-  .btn-warning.btn-action:hover {
-    background-color: #e0a800;
-  }
-  
-  .btn-primary.btn-action {
-    background-color: #007bff;
-  }
-  .btn-primary.btn-action:hover {
-    background-color: #0069d9;
-  }
-  
-  .btn-secondary.btn-action {
-    background-color: #6c757d;
-  }
-  .btn-secondary.btn-action:hover {
-    background-color: #5a6268;
-  }
-  
-  .btn-action i {
-    font-size: 1rem;
-  }
-  
-  .action-buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-  }
+{% from "components/page_header.html" import page_header %}
+{% from "components/alerts.html" import empty_state %}
+{% from "components/form_fields.html" import text_field, select_field %}
+{% from "components/table.html" import paginated_table %}
+{% from "components/filters.html" import filter_card, date_range_filters %}
 
-  .status {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-align: center;
-    min-width: 100px;
-  }
+{{ page_header(
+    title="Historial de Trabajos",
+    breadcrumbs=[
+        {"url": url_for('jobs.index'), "text": "Inicio"},
+        {"text": "Historial"}
+    ],
+    buttons=[
+        {"url": url_for('export.exportar_pdf'), "class": "btn btn-secondary", "icon": "bi bi-file-pdf", "text": "Exportar PDF"}
+    ]
+) }}
 
-  .status-completed {
-    background-color: #d1e7dd;
-    color: #0f5132;
-  }
-
-  .status-pending {
-    background-color: #fff3cd;
-    color: #664d03;
-  }
-
-  .status-cancelled {
-    background-color: #f8d7da;
-    color: #842029;
-  }
-
-  .status-inprogress {
-    background-color: #cfe2ff;
-    color: #084298;
-  }
-
-  .custom-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    table-layout: fixed; /* Esto asegura que los anchos definidos se respeten */
-  }
-
-  .custom-table thead th {
-    background-color: #f8f9fa;
-    color: #6c757d;
-    padding: 12px 15px;
-    font-weight: 500;
-    font-size: 0.9rem;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-  }
-
-  .custom-table thead th:nth-child(1) { /* ID */
-    width: 8%;
-    text-align: center;
-  }
-
-  .custom-table thead th:nth-child(2) { /* Cliente */
-    width: 22%;
-    text-align: center;
-  }
-
-  .custom-table thead th:nth-child(3) { /* Técnico */
-    width: 22%;
-    text-align: center;
-  }
-
-  .custom-table thead th:nth-child(4) { /* Fecha */
-    width: 15%;
-    text-align: center;
-  }
-
-  .custom-table thead th:nth-child(5) { /* Estado */
-    width: 15%;
-    text-align: center;
-  }
-
-  .custom-table thead th:nth-child(6) { /* Acciones */
-    width: 18%;
-    text-align: center;
-  }
-
-  .custom-table tbody tr {
-    transition: all 0.3s ease;
-  }
-
-  .custom-table tbody tr:hover {
-    background-color: #f8f9fa;
-  }
-
-  .custom-table tbody td {
-    padding: 12px 15px;
-    vertical-align: middle;
-    border-bottom: 1px solid #dee2e6;
-    color: #212529;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Alineación de las celdas igual que sus encabezados */
-  .custom-table tbody td:nth-child(1) { /* ID */
-    text-align: center;
-  }
-
-  .custom-table tbody td:nth-child(2) { /* Cliente */
-    text-align: center;
-  }
-
-  .custom-table tbody td:nth-child(3) { /* Técnico */
-    text-align: center;
-  }
-
-  .custom-table tbody td:nth-child(4) { /* Fecha */
-    text-align: center;
-  }
-
-  .custom-table tbody td:nth-child(5) { /* Estado */
-    text-align: center;
-  }
-
-  .custom-table tbody td:nth-child(6) { /* Acciones */
-    text-align: center;
-  }
-</style>
-
-<div class="container mt-4">
-  <!-- =========================================
-       RUTA DE LA PÁGINA
-       ========================================= -->
-  <div class="mb-3">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">Historial</li>
-      </ol>
-    </nav>
+<!-- Filtros de búsqueda -->
+{% call filter_card(
+    title="Filtros de Búsqueda",
+    action_url=url_for('jobs.historial'),
+    reset_url=url_for('jobs.historial')
+) %}
+  <div class="col-md-3">
+    {{ text_field("cliente", "Cliente:", "Ingrese nombre del cliente", value=request.args.get('cliente', '')) }}
   </div>
+  <div class="col-md-3">
+    <label for="tecnico" class="form-label">Técnico:</label>
+    <select class="form-select" id="tecnico" name="tecnico">
+      <option value="">Todos</option>
+      {% for tecnico in tecnicos %}
+        <option value="{{ tecnico.id }}" {% if request.args.get('tecnico')|int == tecnico.id %}selected{% endif %}>
+          {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  {{ date_range_filters(
+    fecha_inicio_value=request.args.get('fecha_inicio', ''),
+    fecha_fin_value=request.args.get('fecha_fin', '')
+  ) }}
+{% endcall %}
 
-  <!-- Sección de historial de trabajos completados -->
-  <div class="mb-4">
-    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-        <i class="bi bi-check2-circle" style="font-size: 0.9rem; color: #6c757d;"></i>
-        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Completados</span>
+<!-- Tabla de trabajos completados -->
+{% if trabajos %}
+  {{ paginated_table(
+    title="Trabajos Completados",
+    columns=["#", "Cliente", "Técnico", "Fecha", "Estado", "Acciones"],
+    data_items=trabajos.items,
+    paginator=trabajos,
+    endpoint="jobs.historial",
+    params=request.args,
+    empty_message="No se encontraron trabajos completados.",
+    row_template=generate_history_row
+  ) }}
+{% else %}
+  {{ empty_state("No se encontraron trabajos completados que coincidan con los filtros.") }}
+{% endif %}
+
+<!-- Modal para ver detalles de trabajo -->
+<div class="modal fade" id="detalleTrabajoModal" tabindex="-1" aria-labelledby="detalleTrabajoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-rectangular">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detalleTrabajoModalLabel">Detalles del Trabajo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
-      <div class="card-body p-0">
-        {% if all_jobs %}
-        <table class="custom-table">
-          <thead style="border-radius: 0 !important;">
-            <tr>
-              <th style="border-top-left-radius: 0; border-top-right-radius: 0;">ID</th>
-              <th style="border-radius: 0;">Cliente</th>
-              <th style="border-radius: 0;">Técnico</th>
-              <th style="border-radius: 0;">Fecha</th>
-              <th style="border-radius: 0;">Estado</th>
-              <th style="border-radius: 0;">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for job in all_jobs %}
-            <tr>
-              <td>#{{ job.id }}</td>
-              <td>{{ job.nombre_cliente }} {{ job.apellido_cliente }}</td>
-              <td>
-                {% if job.technician %}
-                  {{ job.technician.nombre }} {% if job.technician.apellido %}{{ job.technician.apellido }}{% endif %}
-                {% else %}
-                  Sin asignar
-                {% endif %}
-              </td>
-              <td>{{ job.fecha.strftime('%d/%m/%Y') }}</td>
-              <td>
-                <p class="status status-completed">Completado</p>
-              </td>
-              <td>
-                <div class="action-buttons-container">
-                  <button class="btn btn-primary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles">
-                    <i class="bi bi-eye"></i>
-                  </button>
-                  <button class="btn btn-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir reporte">
-                    <i class="bi bi-printer"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% else %}
-        <div class="alert alert-info text-center m-3">
-          <i class="bi bi-info-circle"></i> No hay trabajos completados en el historial.
-        </div>
-        {% endif %}
+      <div class="modal-body">
+        <dl class="row">
+          <dt class="col-sm-4">Cliente:</dt>
+          <dd class="col-sm-8" id="detalleCliente"></dd>
+          
+          <dt class="col-sm-4">Teléfono:</dt>
+          <dd class="col-sm-8" id="detalleTelefono"></dd>
+          
+          <dt class="col-sm-4">Dirección:</dt>
+          <dd class="col-sm-8" id="detalleDireccion"></dd>
+          
+          <dt class="col-sm-4">Código Postal:</dt>
+          <dd class="col-sm-8" id="detalleCodigoPostal"></dd>
+          
+          <dt class="col-sm-4">Descripción:</dt>
+          <dd class="col-sm-8" id="detalleDescripcion"></dd>
+          
+          <dt class="col-sm-4">Duración:</dt>
+          <dd class="col-sm-8" id="detalleDuracion"></dd>
+          
+          <dt class="col-sm-4">Fecha y hora:</dt>
+          <dd class="col-sm-8"><span id="detalleFecha"></span> - <span id="detalleHora"></span></dd>
+          
+          <dt class="col-sm-4">Técnico:</dt>
+          <dd class="col-sm-8" id="detalleTecnico"></dd>
+          
+          <dt class="col-sm-4">Completado el:</dt>
+          <dd class="col-sm-8" id="detalleDiaCompletado"></dd>
+        </dl>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button type="button" class="btn btn-third btn-modal-close" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Script para activar tooltips de Bootstrap -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-  });
-</script>
 {% endblock %}

@@ -1,0 +1,199 @@
+/* Tarjetas con estética original */
+.card {
+  background-color: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius) !important;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  background-color: var(--header-bg) !important;
+  color: var(--button-text) !important;
+  padding: 0.75rem 1.25rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 600;
+}
+
+/* Tarjetas personalizadas con icono de fondo */
+.card.custom-card {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 1rem;
+  background: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card.custom-card::before {
+  content: "\2605";
+  font-family: Arial, sans-serif;
+  font-size: 80px;
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  color: rgba(67, 171, 1, 0.1);
+  transition: color 0.3s ease;
+  z-index: 0;
+}
+
+.card.custom-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 1rem;
+  box-shadow: 0 0 25px 4px rgba(67, 171, 1, 0);
+  transition: box-shadow 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card.custom-card:hover::before {
+  color: rgba(67, 171, 1, 0.2);
+}
+
+.card.custom-card:hover::after {
+  box-shadow: 0 0 35px 6px rgba(67, 171, 1, 0.9);
+}
+
+.card.custom-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Dashboard cards con tamaños uniformes */
+.dashboard-card {
+  padding: 2rem; /* Incrementar el padding para mayor espacio */
+  border-radius: 1rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 160px; /* Altura ajustada */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif; /* Cambiar tipografía */
+}
+
+.dashboard-card .card-body h4 {
+  font-size: 2.5rem; /* Aumentar tamaño de la fuente */
+  font-weight: bold;
+}
+
+.dashboard-card .card-body p {
+  font-size: 1.2rem; /* Ajustar tamaño de la descripción */
+  margin-top: 0.5rem;
+}
+
+/* Añadir animación para el contador */
+.dashboard-card .counter {
+  font-size: 3rem;
+  font-weight: bold;
+  animation: countUp 1.5s ease-out;
+}
+
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dashboard-card.trabajos {
+  background: linear-gradient(90deg, #5e63ff, #42d1f5);
+}
+
+.dashboard-card.pendientes {
+  background: linear-gradient(90deg, #ff9f43, #ff6f61);
+}
+
+.dashboard-card.completados {
+  background: linear-gradient(90deg, #28a745, #85eb3c);
+}
+
+.dashboard-card.facturacion {
+  background: linear-gradient(90deg, #17a2b8, #42d1f5);
+}
+
+.dashboard-card::before {
+  content: "\2605";
+  font-family: Arial, sans-serif;
+  font-size: 100px;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  color: rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease, color 0.3s ease;
+  z-index: 0;
+}
+
+.dashboard-card.trabajos::before {
+  content: "🛠️";
+}
+
+.dashboard-card.pendientes::before {
+  content: "⏰";
+}
+
+.dashboard-card.completados::before {
+  content: "✔";
+}
+
+.dashboard-card.facturacion::before {
+  content: "💰";
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card:hover::before {
+  transform: scale(1.2);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.dashboard-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+/* Tarjetas de gráficos con tamaño uniforme */
+.chart-card {
+  border-radius: 1rem;
+  border: 1px solid #cbc6c6;
+  overflow: hidden;
+  height: 350px; /* Altura fija para tarjetas de gráficos */
+}
+
+.chart-card .card-header {
+  background-color: #f9f9f9 !important;
+  border-bottom: 1px solid #cbc6c6 !important;
+  color: #6c757d !important;
+}
+
+.chart-card .card-body {
+  padding: 1rem;
+  height: calc(100% - 50px); /* Altura ajustada considerando el header */
+}

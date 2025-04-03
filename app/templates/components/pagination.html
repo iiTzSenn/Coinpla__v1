@@ -1,0 +1,46 @@
+{% macro pagination(paginator, endpoint, **kwargs) %}
+{% if paginator.pages > 1 %}
+<nav aria-label="Paginación">
+  <ul class="pagination m-0" style="gap: 0.5rem;">
+    <!-- Primera página y anterior -->
+    {% if paginator.has_prev %}
+    <li class="page-item">
+      <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=1, **kwargs) }}" aria-label="Primera página">&laquo;</a>
+    </li>
+    <li class="page-item">
+      <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.prev_num, **kwargs) }}" aria-label="Página anterior">&lt;</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link minimal-pagination">&laquo;</span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link minimal-pagination">&lt;</span>
+    </li>
+    {% endif %}
+    
+    <!-- Página actual / total de páginas -->
+    <li class="page-item disabled">
+      <span class="page-link minimal-pagination">{{ paginator.page }} / {{ paginator.pages }}</span>
+    </li>
+    
+    <!-- Siguiente y última página -->
+    {% if paginator.has_next %}
+    <li class="page-item">
+      <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.next_num, **kwargs) }}" aria-label="Página siguiente">&gt;</a>
+    </li>
+    <li class="page-item">
+      <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.pages, **kwargs) }}" aria-label="Última página">&raquo;</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link minimal-pagination">&gt;</span>
+    </li>
+    <li class="page-item disabled">
+      <span class="page-link minimal-pagination">&raquo;</span>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% endmacro %}

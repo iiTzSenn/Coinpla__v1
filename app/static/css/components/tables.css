@@ -1,0 +1,105 @@
+/* Tablas con estética original */
+.custom-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.custom-table thead th {
+  background-color: var(--header-bg);
+  color: var(--button-text);
+  text-align: center;
+  padding: 0.85rem 1rem;
+  border: none;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.05rem;
+}
+
+.custom-table tbody td {
+  vertical-align: middle;
+  padding: 0.85rem 1rem;
+  text-align: center;
+  border-top: 1px solid var(--card-border);
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.custom-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  transform: translateY(-2px);
+}
+
+/* Estados de trabajos */
+.status {
+  border-radius: 50px;
+  padding: 0.35rem 0.85rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  width: fit-content;
+  margin: 0 auto;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background-color: var(--clr-pending);
+  color: var(--clr-pending-font);
+}
+
+.status-unpaid {
+  background-color: var(--clr-unpaid);
+  color: var(--clr-unpaid-font);
+}
+
+.status-paid {
+  background-color: var(--clr-paid);
+  color: var(--clr-paid-font);
+}
+
+/* Paginación con estilo original */
+.minimal-pagination {
+  font-size: 0.85rem;
+  color: #6c757d;
+  background-color: transparent;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.minimal-pagination:hover {
+  color: #495057;
+  background-color: #e9ecef;
+  border-radius: 0.25rem;
+}
+
+.page-item.disabled .minimal-pagination {
+  color: #adb5bd;
+  pointer-events: none;
+}
+
+/* Estilos específicos para la tabla en cards */
+.card .table-responsive {
+  margin: 0;
+  padding: 0;
+}
+
+.card .custom-table {
+  margin-bottom: 0;
+  border: none !important;
+  border-radius: 0 !important;
+}
+
+.card .card-body.p-0 .custom-table th:first-child {
+  border-top-left-radius: 0;
+}
+
+.card .card-body.p-0 .custom-table th:last-child {
+  border-top-right-radius: 0;
+}

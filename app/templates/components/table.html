@@ -1,50 +1,61 @@
-<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
-  <div class="card-body p-0">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Trabajo</th>
-          <th>Cliente</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Técnico</th>
-          <th>Cantidad</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for trabajo in trabajos_pendientes_proceso.items %}
-        <tr>
-          <td class="text-center"><a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}">TRB__{{ trabajo.id }}</a></td>
-          <td class="text-center">{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
-          <td class="text-center">{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
-          <td class="text-center">
-            <p class="status 
-              {% if trabajo.estado == 'Pendiente' %}status-pending
-              {% elif trabajo.estado == 'En Proceso' %}status-pending
-              {% else %}status-paid{% endif %}">{{ trabajo.estado }}</p>
-          </td>
-          <td class="text-center">
-            {% if trabajo.technician %}
-              {{ trabajo.technician.nombre }} {% if trabajo.technician.apellido %}{{ trabajo.technician.apellido }}{% endif %}
-            {% else %}
-              Sin asignar
-            {% endif %}
-          </td>
-          <td class="text-center">{{ trabajo.costo_estimado or 'N/A' }}</td>
-        </tr>
+{% macro data_table(columns, data, row_template, empty_message="No hay datos disponibles.", class="custom-table") %}
+<div class="table-responsive">
+  <table class="table {{ class }}">
+    <thead>
+      <tr>
+        {% for column in columns %}
+        <th>{{ column }}</th>
         {% endfor %}
-      </tbody>
-    </table>
+      </tr>
+    </thead>
+    <tbody>
+      {% if data and data|length > 0 %}
+        {% for item in data %}
+          {{ row_template(item)|safe }}
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="{{ columns|length }}" class="text-center">{{ empty_message }}</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{% macro status_badge(value, class_mapping={}) %}
+  {% set class_name = class_mapping.get(value, 'status-pending') %}
+  <p class="status {{ class_name }}">{{ value }}</p>
+{% endmacro %}
+
+{% macro action_button(type, icon, modal_target="", data_attrs={}, title="") %}
+  <!-- Este macro está definido pero no parece usarse en las plantillas actuales -->
+{% endmacro %}
+
+{% macro paginated_table(title, columns, data_items, paginator, endpoint, status_mapping={}, empty_message="No hay datos disponibles.", row_template=None, params={}) %}
+<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+  <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
+    <i class="bi bi-table" style="font-size: 0.9rem; color: #6c757d;"></i>
+    <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">{{ title }}</span>
+  </div>
+  <div class="card-body p-0">
+    {{ data_table(
+      columns,
+      data_items,
+      row_template=row_template,
+      empty_message=empty_message
+    ) }}
   </div>
   <div class="card-footer d-flex justify-content-center" style="border-radius: 0 0 1rem 1rem; background-color: #f9f9f9 !important; border-top: 1px solid #cbc6c6;">
+    {% if paginator.pages > 1 %}
     <nav aria-label="Paginación">
       <ul class="pagination m-0" style="gap: 0.5rem;">
-        {% if trabajos_pendientes_proceso.has_prev %}
+        {% if paginator.has_prev %}
         <li class="page-item">
-          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=1) }}" aria-label="Primera página">&laquo;</a>
+          <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=1, **params) }}" aria-label="Primera página">&laquo;</a>
         </li>
         <li class="page-item">
-          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.prev_num) }}" aria-label="Página anterior">&lt;</a>
+          <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.prev_num, **params) }}" aria-label="Página anterior">&lt;</a>
         </li>
         {% else %}
         <li class="page-item disabled">
@@ -54,12 +65,17 @@
           <span class="page-link minimal-pagination">&lt;</span>
         </li>
         {% endif %}
-        {% if trabajos_pendientes_proceso.has_next %}
+
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">{{ paginator.page }} / {{ paginator.pages }}</span>
+        </li>
+        
+        {% if paginator.has_next %}
         <li class="page-item">
-          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.next_num) }}" aria-label="Página siguiente">&gt;</a>
+          <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.next_num, **params) }}" aria-label="Página siguiente">&gt;</a>
         </li>
         <li class="page-item">
-          <a class="page-link minimal-pagination" href="{{ url_for('jobs.index', page=trabajos_pendientes_proceso.pages) }}" aria-label="Última página">&raquo;</a>
+          <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=paginator.pages, **params) }}" aria-label="Última página">&raquo;</a>
         </li>
         {% else %}
         <li class="page-item disabled">
@@ -71,5 +87,7 @@
         {% endif %}
       </ul>
     </nav>
+    {% endif %}
   </div>
 </div>
+{% endmacro %}

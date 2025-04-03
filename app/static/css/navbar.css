@@ -11,33 +11,31 @@
 
 #sidebar {
   box-sizing: border-box;
-  height: 100vh; /* Asegura que el sidebar ocupe toda la altura de la ventana */
-  max-height: none;
-  overflow: hidden; /* Evita scroll innecesario */
+  height: 100vh; 
   width: 250px;
-  min-width: 60px; /* Evita que se corte el contenido */
-  max-width: 100%;
   padding: 5px 1em;
   background-color: var(--base-clr);
   border-right: 1px solid var(--line-clr);
   position: sticky;
   top: 0;
   align-self: start;
-  transition: width 0.3s ease, 300ms ease-in-out;
+  transition: width 0.3s ease, padding 0.3s ease;
   text-wrap: nowrap;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  overflow: hidden;
 }
 
 #sidebar.close {
   padding: 5px;
-  width: 60px; /* Ancho reducido en estado cerrado */
+  width: 60px;
 }
 
 #sidebar ul {
   padding: 0;
   margin: 0;
+  list-style: none;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -46,19 +44,7 @@
 
 #sidebar ul li {
   flex-shrink: 0;
-}
-
-#sidebar ul::-webkit-scrollbar {
-  width: 8px;
-}
-
-#sidebar ul::-webkit-scrollbar-thumb {
-  background-color: var(--line-clr);
-  border-radius: 4px;
-}
-
-#sidebar ul::-webkit-scrollbar-track {
-  background: transparent;
+  position: relative;
 }
 
 /* Cabecera del sidebar */
@@ -70,9 +56,10 @@
 
 #sidebar > ul > li:first-child .logo {
   font-weight: 600;
+  color: var(--text-clr);
 }
 
-/* Estilos de enlaces y botones */
+/* Estilos de enlaces y botones - Corregido para mantener iconos fijos */
 #sidebar a,
 #sidebar .dropdown-btn,
 #sidebar .logo {
@@ -83,6 +70,7 @@
   display: flex;
   align-items: center;
   gap: 1em;
+  position: relative; /* Añadido para posicionamiento relativo */
 }
 
 .dropdown-btn {
@@ -94,21 +82,33 @@
   cursor: pointer;
 }
 
+/* Corregido: iconos SVG con tamaño fijo y posición estable */
 #sidebar svg {
   flex-shrink: 0;
   fill: var(--text-clr);
+  transition: none; /* Eliminar transiciones para mantenerlos fijos */
+  width: 24px;
+  height: 24px;
+  position: relative; /* Mantiene posición estable */
 }
 
 #sidebar a span,
 #sidebar .dropdown-btn span {
   flex-grow: 1;
+  color: var(--text-clr);
+  transition: opacity 0.2s ease; /* Sólo transición de opacidad, no posición */
 }
 
-/* Menú desplegable */
+#sidebar a:hover, 
+#sidebar .dropdown-btn:hover {
+  background-color: var(--hover-clr);
+}
+
+/* Menú desplegable - CORREGIDO */
 #sidebar .sub-menu {
   display: grid;
   grid-template-rows: 0fr;
-  transition: 300ms ease-in-out;
+  transition: grid-template-rows 0.3s ease-in-out;
 }
 
 #sidebar .sub-menu > div {
@@ -119,16 +119,96 @@
   grid-template-rows: 1fr;
 }
 
-.dropdown-btn svg {
-  transition: 200ms ease;
+/* CORREGIDO: Eliminado duplicado y mejorado el selector para que afecte solo a cada elemento individual */
+#sidebar .sub-menu > div > a {
+  padding-left: 2.5em;
+  transition: background-color 0.2s ease;
+  display: block;
+  width: 100%;
 }
 
-.rotate svg:last-child {
+/* Estilo para marcar solo la opción activa dentro del submenú */
+#sidebar .sub-menu > div > a.active {
+  background-color: var(--hover-clr);
+  color: var(--accent-clr) !important;
+  font-weight: bold;
+}
+
+#sidebar .sub-menu > div > a.active svg {
+  fill: var(--accent-clr) !important;
+}
+
+/* Mantener el color del icono para elementos activos sin importar el estado hover */
+#sidebar .sub-menu > div > a.active:hover {
+  background-color: var(--hover-clr);
+  color: var(--accent-clr) !important;
+}
+
+#sidebar .sub-menu > div > a.active:hover svg {
+  fill: var(--accent-clr) !important;
+}
+
+/* Asegurar que los enlaces activos dentro del submenú conserven su estilo activo */
+#sidebar .sub-menu > div > a.active,
+#sidebar .sub-menu > div > a.active:focus,
+#sidebar .sub-menu > div > a.active:visited {
+  color: var(--accent-clr) !important;
+}
+
+#sidebar .sub-menu > div > a.active svg,
+#sidebar .sub-menu > div > a.active:focus svg,
+#sidebar .sub-menu > div > a.active:visited svg {
+  fill: var(--accent-clr) !important;
+}
+
+/* Eliminar reglas que podrían interferir con el estilo activo */
+#sidebar .sub-menu > div > a:hover svg {
+  fill: var(--accent-clr);
+}
+
+/* Asegurar que el resto de las opciones no se vean afectadas */
+#sidebar .sub-menu > div > a:not(.active):hover {
+  background-color: var(--hover-clr);
+  color: var(--text-clr);
+}
+
+#sidebar .sub-menu > div > a:hover svg {
+  fill: var(--accent-clr);
+}
+
+/* Asegurar que elementos activos dentro del submenú conserven siempre su estilo */
+#sidebar .sub-menu > div > a.active,
+#sidebar .sub-menu > div > a.active:hover,
+#sidebar .sub-menu > div > a.active:focus {
+  color: var(--accent-clr) !important;
+}
+
+#sidebar .sub-menu > div > a.active svg,
+#sidebar .sub-menu > div > a.active:hover svg,
+#sidebar .sub-menu > div > a.active:focus svg {
+  fill: var(--accent-clr) !important;
+}
+
+.dropdown-btn svg {
+  transition: transform 0.2s ease;
+}
+
+rotate svg:last-child {
   transform: rotate(180deg);
 }
 
-#sidebar .sub-menu a {
-  padding-left: 2em;
+/* Usar la misma flecha para el desplegable de usuarios */
+#sidebar ul li .dropdown-btn .dropdown-arrow {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition: transform 0.3s ease; /* Igual que la flecha del avatar */
+}
+
+#sidebar ul li .sub-menu.show .dropdown-arrow {
+  transform: translateY(-50%) rotate(180deg); /* Rotación al abrir */
 }
 
 /* Botón de toggle */
@@ -142,24 +222,67 @@
 }
 
 #toggle-btn svg {
-  transition: transform 150ms ease;
+  transition: transform 0.15s ease;
 }
 
 #toggle-btn:hover {
   background-color: var(--hover-clr);
 }
 
-/* Opción activa */
-#sidebar ul li.active a {
-  background-color: transparent;
-  color: transparent;
-  font-weight: bold;
-  background-image: linear-gradient(90deg, #5e63ff, #42d1f5);
-  -webkit-background-clip: text;
-  background-clip: text;
+/* Opción activa - Modificada para evitar propagación del estado activo */
+#sidebar ul li.active > a {
+  color: var(--accent-clr);
+  font-weight: 500;
 }
 
-#sidebar ul li.active svg {
+#sidebar ul li.active > a svg {
+  fill: var(--accent-clr);
+}
+
+/* Sobrescribir estilos para botones desplegables - siempre mantener color original */
+#sidebar ul li .dropdown-btn {
+  color: var(--text-clr) !important;
+}
+
+#sidebar ul li .dropdown-btn svg:not(:last-child) {
+  fill: var(--text-clr) !important;
+}
+
+/* Estilos para elementos activos dentro del submenú, sin afectar al botón padre */
+#sidebar .sub-menu > div > a.active {
+  background-color: var(--hover-clr);
+  color: var(--accent-clr);
+  font-weight: bold;
+}
+
+#sidebar .sub-menu > div > a.active svg {
+  fill: var(--accent-clr);
+}
+
+/* Impedir que los submenús activos cambien el color del botón desplegable */
+#sidebar ul li:has(.sub-menu .active) > .dropdown-btn {
+  color: var(--text-clr);
+}
+
+#sidebar ul li:has(.sub-menu .active) > .dropdown-btn svg:not(:last-child) {
+  fill: var(--text-clr);
+}
+
+/* Solo aplicar estilo normal al botón desplegable */
+#sidebar ul li .dropdown-btn {
+  color: var(--text-clr);
+}
+
+#sidebar ul li .dropdown-btn svg:not(:last-child) {
+  fill: var(--text-clr);
+}
+
+/* Solo aplicar estilo activo al botón desplegable cuando está explícitamente marcado como activo */
+#sidebar ul li.active > .dropdown-btn {
+  color: var(--accent-clr);
+}
+
+#sidebar ul li.active > .dropdown-btn svg:not(:last-child) {
   fill: var(--accent-clr);
 }
 
@@ -169,21 +292,16 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
-  margin: 0;
   padding: 15px;
   background-color: var(--base-clr);
-  border: none;
-  box-shadow: none;
+  margin-top: auto;
   width: 100%;
   color: var(--text-clr);
-  font-size: 1rem;
-  position: sticky;
-  bottom: 0;
+  position: relative;
   cursor: pointer;
-  transition: background-color 0.3s ease, all 0.3s ease;
+  transition: background-color 0.3s ease;
   gap: 10px;
   border-radius: 8px;
-  flex-shrink: 0;
 }
 
 #sidebar .separator {
@@ -193,12 +311,10 @@
   margin: 10px auto;
 }
 
-/* Estilos al cerrar el sidebar: se centra el avatar y se oculta la info adicional */
+/* Estilos al cerrar el sidebar - Corregido para mantener iconos estáticos */
 #sidebar.close .bottom-container {
-  background-color: var(--base-clr);
-  padding: 10px 0;
   justify-content: center;
-  align-items: center;
+  padding: 10px 0;
 }
 
 #sidebar.close .bottom-container .user-info,
@@ -206,19 +322,11 @@
   display: none;
 }
 
-/* Cuando el sidebar esté abierto se muestra la info */
-#sidebar:not(.close) .bottom-container .user-info,
-#sidebar:not(.close) .bottom-container .dropdown-arrow {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
 #sidebar .bottom-container:hover {
   background-color: var(--hover-clr);
-  border-radius: 8px;
 }
 
+/* Mantener el avatar fijo y visible */
 #sidebar .bottom-container .avatar {
   width: 35px;
   height: 35px;
@@ -230,9 +338,8 @@
   font-size: 1rem;
   font-weight: bold;
   color: #ffffff;
-  flex-shrink: 0;
-  opacity: 1;
-  transition: none;
+  flex-shrink: 0; /* Evitar que cambie de tamaño */
+  transition: none; /* Eliminar transiciones para mantenerlo fijo */
 }
 
 #sidebar .bottom-container .user-info {
@@ -243,77 +350,209 @@
 
 #sidebar .bottom-container .username {
   font-weight: 500;
+  color: var(--text-clr);
 }
 
 #sidebar .bottom-container .role {
   font-size: 0.85rem;
-  color: #7b7f88;
+  color: var(--secondary-text-clr);
   margin-top: 2px;
-  font-weight: 500;
 }
 
-/* Limpiar y mejorar la animación para la flecha del dropdown */
 #sidebar .bottom-container .dropdown-arrow {
   position: absolute;
   top: 50%;
   right: 15px;
   transform: translateY(-50%);
   cursor: pointer;
-  /* Transición más específica y suave */
-  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  font-size: 1.5rem;
+  transition: transform 0.3s ease;
 }
 
-/* Simplificada la regla de transformación para evitar conflictos */
 #sidebar .bottom-container.open .dropdown-arrow {
   transform: translateY(-50%) rotate(180deg);
 }
 
+/* Estilos simplificados para el dropdown */
 #sidebar .bottom-container .dropdown-menu {
   position: absolute;
   bottom: 100%;
   left: 0;
-  background-color: white;
-  margin-bottom: 10px;
+  background-color: #ffffff;
   border: 1px solid var(--line-clr);
   border-radius: 5px;
+  margin-bottom: 10px;
   padding: 10px;
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  opacity: 0;
-  transform: scale(0.8) translateY(10px);
-  transform-origin: bottom;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  pointer-events: none;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  z-index: 1000;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* Mostrar el dropdown cuando el contenedor tiene la clase open */
 #sidebar .bottom-container.open .dropdown-menu {
-  transform: scale(1) translateY(0);
-  opacity: 1;
-  pointer-events: auto;
+  display: flex;
 }
 
+/* Ajuste para cuando el sidebar está cerrado */
+#sidebar.close .bottom-container .dropdown-menu {
+  position: fixed;
+  bottom: 60px;
+  left: 70px;
+  width: 200px;
+}
+
+/* Estilos para las opciones dentro del dropdown */
 #sidebar .bottom-container .dropdown-menu a {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px;
-  color: black;
-  text-decoration: none;
+  padding: 10px;
   border-radius: 5px;
-  transition: background-color 200ms ease;
+  color: var(--base-clr);
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
+/* Estado hover de las opciones */
 #sidebar .bottom-container .dropdown-menu a:hover {
-  background-color: rgba(86, 91, 231, 0.2);
+  background-color: rgba(0, 255, 0, 0.1);
+  color: #00aa00;
 }
 
-#sidebar .bottom-container .dropdown-menu a:hover svg {
-  fill: #565be7;
+/* Estado active de las opciones */
+#sidebar .bottom-container .dropdown-menu a.active {
+  background-color: rgba(0, 255, 0, 0.2);
+  color: #00aa00;
+  font-weight: bold;
 }
 
+/* Iconos dentro de las opciones */
 #sidebar .bottom-container .dropdown-menu a svg {
-  font-size: 1.2rem;
-  fill: black;
+  fill: var(--base-clr);
+  transition: fill 0.2s ease;
+}
+
+/* Iconos en estado hover y active */
+#sidebar .bottom-container .dropdown-menu a:hover svg,
+#sidebar .bottom-container .dropdown-menu a.active svg {
+  fill: #00aa00;
+}
+
+/* Ocultar texto en sidebar cerrado, pero mantener iconos y avatar visibles */
+#sidebar.close a span,
+#sidebar.close .dropdown-btn span,
+#sidebar.close .bottom-container .user-info {
+  display: none;
+}
+
+/* Transición de desvanecimiento para el texto del sidebar */
+#sidebar a span,
+#sidebar .dropdown-btn span,
+#sidebar .bottom-container .user-info {
+  transition: opacity 0.3s ease; /* Añadir transición de opacidad */
+}
+
+/* Ocultar texto con desvanecimiento cuando el sidebar está cerrado */
+#sidebar.close a span,
+#sidebar.close .dropdown-btn span,
+#sidebar.close .bottom-container .user-info {
+  opacity: 0; /* Aplicar opacidad 0 para desvanecer */
+  pointer-events: none; /* Evitar interacción con el texto oculto */
+}
+
+#sidebar.close a, 
+#sidebar.close .dropdown-btn {
+  justify-content: flex-start; /* Cambiado de center a flex-start para mantener posición */
+  padding: 0.85em;
+}
+
+/* Corregido: evitar movimiento de iconos en transición */
+#sidebar.close svg {
+  margin: 0; /* Elimina márgenes que podrían cambiar posición */
+  transform: none; /* Elimina transformaciones que podrían mover elementos */
+}
+
+/* Responsive styles */
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  
+  #sidebar {
+    height: 60px;
+    width: 100%;
+    border-right: none;
+    border-top: 1px solid var(--line-clr);
+    padding: 0;
+    position: fixed;
+    top: unset;
+    bottom: 0;
+    z-index: 1000;
+  }
+  
+  #sidebar > ul {
+    padding: 0;
+    display: grid;
+    grid-auto-columns: 60px;
+    grid-auto-flow: column;
+    align-items: center;
+    overflow-x: auto;
+  }
+  
+  #sidebar ul li {
+    height: 100%;
+  }
+  
+  #sidebar a, 
+  #sidebar .dropdown-btn {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    border-radius: 0;
+    justify-content: center; /* Aquí sí se centra porque es otro diseño completo */
+  }
+  
+  #sidebar ul li span, 
+  #sidebar > ul > li:first-child, 
+  .dropdown-btn svg:last-child,
+  #sidebar .separator,
+  #sidebar .bottom-container {
+    display: none;
+  }
+  
+  #sidebar ul li .sub-menu.show {
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    box-sizing: border-box;
+    height: 60px;
+    width: 100%;
+    background-color: var(--hover-clr);
+    border-top: 1px solid var(--line-clr);
+    display: flex;
+    justify-content: center;
+  }
+  
+  #sidebar ul li .sub-menu.show > div {
+    overflow-x: auto;
+    display: flex;
+    align-items: center;
+  }
+  
+  #sidebar ul li .sub-menu.show li {
+    display: inline-flex;
+  }
+  
+  #sidebar ul li .sub-menu.show a {
+    box-sizing: border-box;
+    padding: 1em;
+    width: auto;
+    justify-content: center;
+  }
+  
+  .content {
+    padding-bottom: 70px;
+  }
 }

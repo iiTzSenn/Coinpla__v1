@@ -1,6 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mt-4">
+{% from "components/page_header.html" import page_header %}
+{% from "components/form_fields.html" import text_field, phone_field, select_field, textarea_field %}
+{% from "components/alerts.html" import empty_state %}
+
+{{ page_header(
+    title="Trabajos",
+    breadcrumbs=[
+        {"url": url_for('jobs.index'), "text": "Inicio"},
+        {"text": "Trabajos"}
+    ]
+) }}
+
+<div class="container">
   <!-- Caja de Añadir Trabajo -->
   <div class="card mb-4">
     <div class="card-header">
@@ -10,41 +22,24 @@
       <form method="POST" action="{{ url_for('jobs.crear_trabajo') }}" id="addJobForm">
         <div class="row g-3 mb-3">
           <div class="col-md-6">
-            <label for="nombre_cliente" class="form-label">Nombre del Cliente:</label>
-            <input type="text" class="form-control trabajo-input" id="nombre_cliente" name="nombre_cliente" placeholder="Ingrese el nombre del cliente" required>
+            {{ text_field("nombre_cliente", "Nombre del Cliente:", "Ingrese el nombre del cliente", required=true) }}
           </div>
           <div class="col-md-6">
-            <label for="apellido_cliente" class="form-label">Apellido del cliente:</label>
-            <input type="text" class="form-control trabajo-input" id="apellido_cliente" name="apellido_cliente" placeholder="Ingrese el apellido del cliente">
+            {{ text_field("apellido_cliente", "Apellido del cliente:", "Ingrese el apellido del cliente") }}
           </div>
         </div>
-        <div class="mb-3">
-          <label for="telefono" class="form-label">Teléfono del cliente:</label>
-          <input type="text" class="form-control trabajo-input" id="telefono" name="telefono" placeholder="Ingrese el teléfono del cliente"
-                 pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
-                 title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
-                 maxlength="15">
-        </div>
-        <div class="mb-3">
-          <label for="direccion" class="form-label">Dirección (Calle, número, etc.):</label>
-          <input type="text" class="form-control trabajo-input" id="direccion" name="direccion" placeholder="Ingrese la dirección" required>
-        </div>
-        <div class="mb-3">
-          <label for="codigo_postal" class="form-label">Código Postal:</label>
-          <input type="text" class="form-control trabajo-input" id="codigo_postal" name="codigo_postal" placeholder="Ingrese el código postal">
-        </div>
-        <div class="mb-3">
-          <label for="descripcion" class="form-label">Descripción del trabajo:</label>
-          <textarea class="form-control" id="descripcion" name="descripcion" rows="2" placeholder="Ingrese una descripción…" required></textarea>
-        </div>
+        {{ phone_field("telefono", "Teléfono del cliente:", "Ingrese el teléfono del cliente") }}
+        {{ text_field("direccion", "Dirección (Calle, número, etc.):", "Ingrese la dirección", required=true) }}
+        {{ text_field("codigo_postal", "Código Postal:", "Ingrese el código postal") }}
+        {{ textarea_field("descripcion", "Descripción del trabajo:", "Ingrese una descripción…", rows=2, required=true) }}
+        
         <div class="row g-3 mb-3">
           <div class="col-md-4">
-            <label for="duracion" class="form-label">Duración:</label>
-            <select class="form-select trabajo-input" id="duracion" name="duracion" required>
-              <option value="corta">Corta (1 hora)</option>
-              <option value="media" selected>Media (2 horas)</option>
-              <option value="larga">Larga (3 horas)</option>
-            </select>
+            {{ select_field("duracion", "Duración:", [
+              {"value": "corta", "text": "Corta (1 hora)"},
+              {"value": "media", "text": "Media (2 horas)"},
+              {"value": "larga", "text": "Larga (3 horas)"}
+            ], selected="media", required=true) }}
           </div>
           <div class="col-md-4">
             <label for="fecha" class="form-label">Fecha:</label>
@@ -55,103 +50,145 @@
             <input type="time" class="form-control trabajo-input" id="hora" name="hora" required>
           </div>
         </div>
-        <button type="submit" class="btn btn-third">Crear trabajo</button>
+        <div class="row g-3 mb-3">
+          <div class="col-md-4">
+            <label for="tecnico_id" class="form-label">Técnico asignado:</label>
+            <select class="form-select trabajo-input" id="tecnico_id" name="tecnico_id">
+              <option value="">Sin asignar</option>
+              {% for tecnico in tecnicos %}
+                {% if tecnico.available %}
+                <option value="{{ tecnico.id }}">
+                  {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+                </option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="costo_estimado" class="form-label">Costo estimado (€):</label>
+            <input type="number" class="form-control trabajo-input" id="costo_estimado" name="costo_estimado" step="0.01" min="0">
+          </div>
+          <div class="col-md-4">
+            {{ select_field("estado", "Estado:", [
+              {"value": "Pendiente", "text": "Pendiente"},
+              {"value": "En Proceso", "text": "En Proceso"},
+              {"value": "Completado", "text": "Completado"}
+            ], selected="Pendiente", required=true) }}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-third">Añadir Trabajo</button>
       </form>
     </div>
   </div>
 
-  <!-- Listado de Trabajos -->
-  {% if trabajos %}
-  <div class="table-responsive">
-    <table class="table table-striped table-hover trabajos-table">
-      <thead class="thead-dark">
-        <tr>
-          <th>Cliente</th>
-          <th class="text-center">Teléfono</th>
-          <th>Dirección</th>
-          <th>Descripción</th>
-          <th>Fecha</th>
-          <th>Hora</th>
-          <th>Técnico</th>
-          <th class="text-center">Estado</th>
-          <th class="text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for trabajo in trabajos %}
-        <tr>
-          <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
-          <td class="text-center">{{ trabajo.telefono }}</td>
-          <td>{{ trabajo.direccion }}</td>
-          <td>{{ trabajo.descripcion }}</td>
-          <td>{{ trabajo.fecha.strftime('%Y-%m-%d') if trabajo.fecha else '' }}</td>
-          <td>{{ trabajo.hora }}</td>
-          <td>
-            {% if trabajo.technician_id %}
-              {% for tecnico in tecnicos %}
-                {% if tecnico.id == trabajo.technician_id %}
-                  {{ tecnico.nombre }}{% if tecnico.apellido %} {{ tecnico.apellido }}{% endif %}
+  <!-- Lista de trabajos -->
+  <div class="card">
+    <div class="card-header">
+      <h4 class="mb-0">Lista de Trabajos</h4>
+    </div>
+    <div class="card-body">
+      {% if trabajos %}
+      <div class="table-responsive">
+        <table class="table custom-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Técnico</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for trabajo in trabajos %}
+            <tr>
+              <td>{{ trabajo.id }}</td>
+              <td>{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente }}</td>
+              <td>{{ trabajo.fecha }}</td>
+              <td>
+                <p class="status {{ 
+                    'status-pending' if trabajo.estado in ['Pendiente', 'En Proceso'] else 
+                    'status-paid' }}">{{ trabajo.estado }}</p>
+              </td>
+              <td>
+                {% if trabajo.technician %}
+                  {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
+                {% else %}
+                  Sin asignar
                 {% endif %}
-              {% endfor %}
-            {% else %}
-              Sin asignar
-            {% endif %}
-          </td>
-          <td class="text-center">
-            {% if trabajo.technician_id and trabajo.estado == 'Pendiente' %}
-              En proceso
-            {% else %}
-              {{ trabajo.estado }}
-            {% endif %}
-          </td>
-          <td class="text-center">
-            <div class="d-flex justify-content-center align-items-center">
-              <button class="btn btn-warning btn-sm btn-action editar-trabajo"
-                      data-bs-toggle="modal"
-                      data-bs-target="#editJobModal"
-                      data-id="{{ trabajo.id }}"
-                      data-nombre_cliente="{{ trabajo.nombre_cliente }}"
-                      data-apellido_cliente="{{ trabajo.apellido_cliente }}"
-                      data-direccion="{{ trabajo.direccion }}"
-                      data-fecha="{{ trabajo.fecha.strftime('%Y-%m-%d') }}"
-                      data-descripcion="{{ trabajo.descripcion }}"
-                      data-telefono="{{ trabajo.telefono }}"
-                      data-codigo_postal="{{ trabajo.codigo_postal }}"
-                      data-hora="{{ trabajo.hora }}"
-                      data-tecnico-id="{{ trabajo.technician_id }}"
-                      data-estado="{{ trabajo.estado }}">
-                <i class="bi bi-pencil-square"></i>
-              </button>
-              <button class="btn btn-danger btn-sm btn-action confirm-delete-job"
-                      data-job-id="{{ trabajo.id }}"
-                      data-bs-toggle="modal"
-                      data-bs-target="#confirmDeleteModal">
-                <i class="bi bi-trash-fill"></i>
-              </button>
-              {% if trabajo.technician_id and trabajo.estado != 'Completado' %}
-              <button class="btn btn-success btn-sm btn-action confirm-complete-job"
-                      data-job-id="{{ trabajo.id }}"
-                      data-bs-toggle="modal"
-                      data-bs-target="#confirmCompleteModal">
-                <i class="bi bi-check-circle"></i>
-              </button>
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+              </td>
+              <td>
+                <div class="d-flex justify-content-center align-items-center">
+                  <button class="btn btn-warning btn-sm btn-action editar-trabajo"
+                          data-bs-toggle="modal"
+                          data-bs-target="#editJobModal"
+                          data-id="{{ trabajo.id }}"
+                          data-nombre_cliente="{{ trabajo.nombre_cliente }}"
+                          data-apellido_cliente="{{ trabajo.apellido_cliente }}"
+                          data-telefono="{{ trabajo.telefono }}"
+                          data-direccion="{{ trabajo.direccion }}"
+                          data-codigo_postal="{{ trabajo.codigo_postal }}"
+                          data-descripcion="{{ trabajo.descripcion }}"
+                          data-duracion="{{ trabajo.duracion }}"
+                          data-fecha="{{ trabajo.fecha }}"
+                          data-hora="{{ trabajo.hora }}"
+                          data-tecnico_id="{{ trabajo.technician_id or '' }}"
+                          data-estado="{{ trabajo.estado }}">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm btn-action confirm-delete-job"
+                          data-id="{{ trabajo.id }}"
+                          data-bs-toggle="modal"
+                          data-bs-target="#confirmDeleteModal">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                  {% if trabajo.technician_id and trabajo.estado != 'Completado' %}
+                  <button class="btn btn-success btn-sm btn-action confirm-complete-job"
+                          data-id="{{ trabajo.id }}"
+                          data-bs-toggle="modal"
+                          data-bs-target="#confirmCompleteModal">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      {{ empty_state("No hay trabajos registrados.") }}
+      {% endif %}
+    </div>
   </div>
-  {% else %}
-  <div class="alert alert-info persistent-alert text-center">
-    <i class="bi bi-info-circle"></i> No hay trabajos registrados.
-  </div>
-  {% endif %}
 </div>
 {% endblock %}
 
 {% block modals %}
+{% from "components/modals.html" import confirm_modal %}
+
+<!-- Modal de eliminación -->
+{{ confirm_modal(
+    id="confirmDeleteModal",
+    title="Confirmar Eliminación",
+    message="¿Estás seguro de que deseas eliminar este trabajo?",
+    action_url="",
+    confirm_text="Eliminar",
+    cancel_text="Cancelar"
+) }}
+
+<!-- Modal de completar trabajo -->
+{{ confirm_modal(
+    id="confirmCompleteModal",
+    title="Marcar como Completado",
+    message="¿Deseas marcar este trabajo como completado?",
+    action_url="",
+    confirm_text="Confirmar",
+    cancel_text="Cancelar"
+) }}
+
 <!-- Modal para editar trabajo -->
 <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -174,8 +211,21 @@
           </div>
           <div class="row g-3 mb-3">
             <div class="col-md-6">
+              <label for="modalTelefono" class="form-label">Teléfono</label>
+              <input type="text" class="form-control" id="modalTelefono" name="telefono"
+                    pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+                    title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+                    maxlength="15">
+            </div>
+            <div class="col-md-6">
               <label for="modalDireccion" class="form-label">Dirección</label>
               <input type="text" class="form-control" id="modalDireccion" name="direccion" required>
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label for="modalCodigoPostal" class="form-label">Código Postal</label>
+              <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal">
             </div>
             <div class="col-md-6">
               <label for="modalFecha" class="form-label">Fecha</label>
@@ -185,22 +235,6 @@
           <div class="mb-3">
             <label for="modalDescripcion" class="form-label">Descripción</label>
             <textarea class="form-control" id="modalDescripcion" name="descripcion" rows="2" required></textarea>
-          </div>
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label for="modalTelefono" class="form-label">Teléfono</label>
-              <input type="text" class="form-control" id="modalTelefono" name="telefono"
-                     pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
-                     title="Formato de teléfono español inválido. Ej: +34 612345678 o 612-345-678"
-                     maxlength="15">
-              {% if error_modal_id is defined and error_telefono is defined and error_modal_id == trabajo.id %}
-              <div class="text-danger mt-1">{{ error_telefono }}</div>
-              {% endif %}
-            </div>
-            <div class="col-md-6">
-              <label for="modalCodigoPostal" class="form-label">Código Postal</label>
-              <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal">
-            </div>
           </div>
           <div class="row g-3 mb-3">
             <div class="col-md-4">
@@ -218,8 +252,11 @@
             <div class="col-md-4">
               <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
               <select class="form-select" id="modalTecnicoId" name="tecnico_id">
+                <option value="">Sin asignar</option>
                 {% for tecnico in tecnicos %}
-                <option value="{{ tecnico.id }}">{{ tecnico.nombre }}{% if tecnico.apellido %} {{ tecnico.apellido }}{% endif %}</option>
+                <option value="{{ tecnico.id }}">
+                  {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+                </option>
                 {% endfor %}
               </select>
             </div>
@@ -236,48 +273,6 @@
         <div class="modal-footer justify-content-center">
           <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
           <button type="submit" class="btn btn-third btn-sm">Guardar Cambios</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal para confirmar eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="deleteJobForm" method="POST" action="">
-      <div class="modal-content modal-rectangular">
-        <div class="modal-header">
-          <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          ¿Estás seguro de que deseas eliminar este trabajo?
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-third btn-sm">Eliminar</button>
-        </div>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- Modal para confirmar completado -->
-<div class="modal fade" id="confirmCompleteModal" tabindex="-1" aria-labelledby="confirmCompleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="completeJobForm" method="POST" action="">
-      <div class="modal-content modal-rectangular">
-        <div class="modal-header">
-          <h5 class="modal-title" id="confirmCompleteModalLabel">Marcar como Completado</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          ¿Deseas marcar este trabajo como completado?
-        </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-third btn-sm">Confirmar</button>
         </div>
       </div>
     </form>
