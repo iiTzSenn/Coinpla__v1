@@ -13,12 +13,41 @@
 ) }}
 
 <!-- Estadísticas principales -->
-{{ stats_row([
-    {"value": num_trabajos, "label": "Trabajos Totales", "type": "trabajos", "icon": "🛠️"},
-    {"value": num_trabajos_pendientes, "label": "Trabajos en Proceso", "type": "pendientes", "icon": "⏰"},
-    {"value": num_trabajos_completados, "label": "Trabajos Completados", "type": "completados", "icon": "✔"},
-    {"value": facturacion_total, "label": "Facturación Total", "type": "facturacion", "icon": "💰"}
-]) }}
+<div class="row mb-4">
+  <div class="col-md-3 mb-4">
+    <div class="dashboard-card trabajos" data-icon="🛠️">
+      <div class="card-body text-center">
+        <h4 class="counter" data-target="{{ num_trabajos }}">0</h4>
+        <p class="card-text">Trabajos Totales</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-4">
+    <div class="dashboard-card pendientes" data-icon="⏰">
+      <div class="card-body text-center">
+        <h4 class="counter" data-target="{{ num_trabajos_pendientes }}">0</h4>
+        <p class="card-text">Trabajos en Proceso</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-4">
+    <div class="dashboard-card completados" data-icon="✔">
+      <div class="card-body text-center">
+        <h4 class="counter" data-target="{{ num_trabajos_completados }}">0</h4>
+        <p class="card-text">Trabajos Completados</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 mb-4">
+    <div class="dashboard-card facturacion" data-icon="💰">
+      <div class="card-body text-center">
+        <!-- Usamos la suma directa de los datos mensuales que ya funcionan -->
+        <h4 id="facturacion-total">Calculando...</h4>
+        <p class="card-text">Facturación Total (€)</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Gráfico principal de líneas -->
 <div class="row" style="margin-bottom: 1.75rem;">
@@ -77,7 +106,19 @@
   var trabajosCompletados = {{ num_trabajos_completados|default(0)|tojson }};
   var datosTecnicos = {{ datos_tecnicos|default([])|tojson }};
   
-  // Para depuración
-  console.log("Datos de técnicos:", datosTecnicos);
+  // Calcular facturación total sumando los datos mensuales
+  document.addEventListener('DOMContentLoaded', function() {
+    // Calcular la suma total de facturación mensual
+    const facturacionTotal = facturacionMes.reduce((total, valor) => total + valor, 0);
+    
+    // Actualizar el elemento visual con formato de 2 decimales
+    const facturacionElement = document.getElementById('facturacion-total');
+    if (facturacionElement) {
+      facturacionElement.innerText = facturacionTotal.toLocaleString(undefined, { 
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2 
+      }) + ' €';
+    }
+  });
 </script>
 {% endblock %}

@@ -484,6 +484,7 @@ select:focus,
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra permanente para todas las tarjetas */
 }
 
 .dashboard-card.trabajos {
@@ -532,7 +533,7 @@ select:focus,
 
 .dashboard-card:hover {
   transform: translateY(-5px); /* Relieve al pasar el ratón */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Sombra más pronunciada al hover */
 }
 
 .dashboard-card:hover::before {
@@ -638,4 +639,31 @@ table.custom-table {
 .page-item.disabled .minimal-pagination {
   color: #adb5bd;
   pointer-events: none;
+}
+
+/* Estilos para tarjetas de gráficos en el dashboard */
+.card[style*="border-radius: 1rem"] {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Sombra uniforme para todas las tarjetas con radio de borde 1rem */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card[style*="border-radius: 1rem"]:hover {
+  transform: translateY(-5px); /* Efecto de elevación */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada al hover */
+}
+
+/* Mantener los estilos existentes para dashboard-card */
+.dashboard-card:hover {
+  transform: translateY(-5px); /* Relieve al pasar el ratón */
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+/* Ajustar específicamente para los gráficos del dashboard */
+#trabajosLineChart,
+#facturacionBarChart,
+#trabajosPendientesBarChart,
+#distribucionChart,
+#tecnicosChart {
+  width: 100%; /* Ocupa todo el ancho del contenedor */
+  height: 250px; /* Altura uniforme */
 }

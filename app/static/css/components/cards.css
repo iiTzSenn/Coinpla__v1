@@ -6,7 +6,7 @@
   border-radius: var(--radius) !important;
   margin-bottom: 1.5rem;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra permanente para todas las tarjetas */
   overflow: hidden;
 }
 
@@ -86,7 +86,7 @@
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   background: linear-gradient(135deg, #6a11cb, #2575fc); /* Gradiente moderno */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra permanente para tarjetas de dashboard */
 }
 
 .dashboard-card:hover {
@@ -125,6 +125,13 @@
   border: 1px solid #cbc6c6;
   overflow: hidden;
   height: 350px; /* Altura fija para tarjetas de gráficos */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra permanente para efecto de relieve */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+  transform: translateY(-5px); /* Efecto de elevación */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al hover */
 }
 
 .chart-card .card-header {

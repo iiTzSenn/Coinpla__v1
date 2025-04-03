@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initCharts();
 
   // Inicializar contadores con datos del servidor
-  fetch('/api/dashboard_stats') // Endpoint para obtener estadísticas
+  fetch('/api/dashboard_stats') 
     .then(response => {
       if (!response.ok) {
         throw new Error('Error al obtener datos del servidor');
@@ -17,10 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       const counters = document.querySelectorAll('.counter');
       counters.forEach(counter => {
-        const type = counter.closest('.dashboard-card').classList[1]; // Obtener tipo de tarjeta
-        const target = data[type] || 0; // Obtener valor del servidor según el tipo
+        const type = counter.closest('.dashboard-card').classList[1]; 
+        const target = data[type] || 0; 
+        
         counter.setAttribute('data-target', target);
-
+        
         const updateCounter = () => {
           const current = +counter.innerText;
           const increment = Math.ceil(target / 100);
@@ -29,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
             counter.innerText = current + increment;
             setTimeout(updateCounter, 15);
           } else {
-            counter.innerText = target.toLocaleString(); // Formato con separadores
+            counter.innerText = target.toLocaleString();
           }
         };
         updateCounter();
@@ -128,9 +129,6 @@ function initCharts() {
     
     // Verificar si hay datos de técnicos
     if (!datosTecnicos || datosTecnicos.length === 0) {
-      console.warn("No hay datos de técnicos disponibles para el gráfico de distribución");
-      
-      // Mostrar mensaje de no datos disponibles en el canvas
       const ctx = distribucionCtx;
       ctx.font = '14px Arial';
       ctx.textAlign = 'center';
@@ -275,9 +273,6 @@ function initCharts() {
     
     // Verificar si hay datos
     if (!datosTecnicos || datosTecnicos.length === 0) {
-      console.warn("No hay datos de técnicos disponibles para el gráfico");
-      
-      // Mostrar mensaje de no datos disponibles en el canvas
       const ctx = tecnicosChartCtx;
       ctx.font = '14px Arial';
       ctx.textAlign = 'center';
@@ -287,8 +282,6 @@ function initCharts() {
                    document.getElementById('tecnicosChart').height/2);
       return;
     }
-    
-    console.log("Creando gráfico con datos:", datosTecnicos);
     
     // Limitar a los 5 técnicos con más trabajos si hay más de 5
     const tecnicosData = datosTecnicos.length > 5 ? datosTecnicos.slice(0, 5) : datosTecnicos;
@@ -347,8 +340,6 @@ function initCharts() {
         }
       }
     });
-  } else {
-    console.error("No se encontró el elemento canvas #tecnicosChart");
   }
 }
 
@@ -357,6 +348,5 @@ function initCharts() {
  * @param {number|string} days - Número de días para filtrar o 'max' para mostrar todo
  */
 function filterChart(days) {
-  // Esta función está referenciada en dashboard_admin.html en los botones de filtro,
-  // pero su implementación es básica y solo recarga la página
+  // Esta función está referenciada en dashboard_admin.html en los botones de filtro
 }
