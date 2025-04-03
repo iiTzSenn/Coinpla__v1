@@ -5,6 +5,13 @@
 document.addEventListener('DOMContentLoaded', function() {
   // Inicializar todas las gráficas
   initCharts();
+  
+  // Aplicar filtro de 3 meses por defecto
+  // Pequeño retraso para asegurar que Chart.js haya terminado de renderizar
+  setTimeout(() => {
+    console.log("Aplicando filtro de 3 meses por defecto");
+    filterChart(90);
+  }, 500);
 
   // Inicializar contadores con datos del servidor
   fetch('/api/dashboard_stats') 
@@ -348,5 +355,85 @@ function initCharts() {
  * @param {number|string} days - Número de días para filtrar o 'max' para mostrar todo
  */
 function filterChart(days) {
-  // Esta función está referenciada en dashboard_admin.html en los botones de filtro
+  console.log(`Filtrando por ${days} días`);
+  
+  // Referencia al gráfico
+  const chartInstance = Chart.getChart("trabajosLineChart");
+  if (!chartInstance) {
+    console.error("No se pudo encontrar la instancia del gráfico");
+    return;
+  }
+  
+  // Si es 'max', mostrar todos los datos
+  if (days === 'max') {
+    console.log("Mostrando todos los datos disponibles");
+    chartInstance.data.labels = mesesLabels;
+    chartInstance.data.datasets[0].data = trabajosMes;
+    chartInstance.update();
+    document.querySelector('#periodoDropdown span').innerText = 'Todo el historial';
+    return;
+  }
+  
+  // Para 3 meses, 6 meses o 1 año, simplificamos mostrando los últimos X meses
+  let monthsToShow;
+  
+  if (days === 90) {
+    monthsToShow = 3;
+    document.querySelector('#periodoDropdown span').innerText = 'Últimos 3 meses';
+  } else if (days === 180) {
+    monthsToShow = 6;
+    document.querySelector('#periodoDropdown span').innerText = 'Últimos 6 meses';
+  } else if (days === 365) {
+    monthsToShow = 12;
+    document.querySelector('#periodoDropdown span').innerText = 'Último año';
+  } else {
+    monthsToShow = 3; // Default a 3 meses
+    document.querySelector('#periodoDropdown span').innerText = 'Últimos 3 meses';
+  }
+  
+  // Obtener los últimos X meses del array
+  const startIndex = Math.max(0, mesesLabels.length - monthsToShow);
+  
+  // Extraer los labels y datos filtrados
+  const filteredLabels = mesesLabels.slice(startIndex);
+  const filteredData = trabajosMes.slice(startIndex);
+  
+  console.log(`Mostrando los últimos ${monthsToShow} meses:`, filteredLabels);
+  
+  // Actualizar el gráfico con los datos filtrados
+  chartInstance.data.labels = filteredLabels;
+  chartInstance.data.datasets[0].data = filteredData;
+  chartInstance.update();
+  
+  // Mostrar un mensaje si no hay datos para mostrar
+  if (filteredLabels.length === 0) {
+    console.warn("No hay datos para mostrar en el período seleccionado");
+    
+    // Mostrar mensaje en el canvas
+    const ctx = chartInstance.ctx;
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText(
+      'No hay datos para mostrar en el período seleccionado',
+      chartInstance.width / 2,
+      chartInstance.height / 2
+    );
+    ctx.restore();
+  }
+}
+
+/**
+ * Convierte el nombre del mes en español a su número (0-11)
+ * @param {string} monthName - Nombre del mes en español
+ * @returns {number} - Número del mes (0-11)
+ */
+function getMonthNumber(monthName) {
+  const months = {
+    'Enero': 0, 'Febrero': 1, 'Marzo': 2, 'Abril': 3, 'Mayo': 4, 'Junio': 5,
+    'Julio': 6, 'Agosto': 7, 'Septiembre': 8, 'Octubre': 9, 'Noviembre': 10, 'Diciembre': 11
+  };
+  return months[monthName] || 0;
 }
