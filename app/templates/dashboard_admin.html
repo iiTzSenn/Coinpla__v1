@@ -39,7 +39,7 @@
     </div>
   </div>
   <div class="col-md-3 mb-4">
-    <div class="dashboard-card facturacion" data-icon="💰">
+    <div class="dashboard-card facturacion" data-icon="💰" id="facturacion-card">
       <div class="card-body text-center">
         <!-- Usamos la suma directa de los datos mensuales que ya funcionan -->
         <h4 id="facturacion-total">Calculando...</h4>
@@ -60,7 +60,7 @@
         </div>
         <div class="dropdown chart-filter-dropdown">
           <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="periodoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <span>Últimos 3 meses</span>
+            <span>Últimos 6 meses</span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="periodoDropdown">
             <li><a class="dropdown-item" href="#" onclick="filterChart(90); return false;"><i class="bi bi-calendar3 me-2"></i>Últimos 3 meses</a></li>
@@ -85,6 +85,48 @@
       <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
         <i class="bi bi-person-check" style="font-size: 0.9rem; color: #6c757d;"></i>
         <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Técnicos y trabajos</span>
+        <div class="dropdown chart-filter-dropdown ms-auto" id="distribucionDropdown">
+          <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="distribucionDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <span>Mes actual</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="distribucionDropdownButton">
+            <li><a class="dropdown-item" href="#" onclick="filterDistribucionChart('current'); return false;"><i class="bi bi-calendar-check me-2"></i>Mes actual</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">Seleccionar período</h6></li>
+            <li>
+              <div class="px-3 py-2">
+                <div class="input-group input-group-sm mb-2">
+                  <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                  <select class="form-select form-select-sm" id="distribucionYear" aria-label="Año">
+                    <option value="">Seleccionar año</option>
+                    <!-- Se llenará dinámicamente con JavaScript -->
+                  </select>
+                </div>
+                <div class="input-group input-group-sm mb-2">
+                  <span class="input-group-text"><i class="bi bi-calendar-month"></i></span>
+                  <select class="form-select form-select-sm" id="distribucionMonth" aria-label="Mes">
+                    <option value="">Ver año completo</option>
+                    <option value="1">Enero</option>
+                    <option value="2">Febrero</option>
+                    <option value="3">Marzo</option>
+                    <option value="4">Abril</option>
+                    <option value="5">Mayo</option>
+                    <option value="6">Junio</option>
+                    <option value="7">Julio</option>
+                    <option value="8">Agosto</option>
+                    <option value="9">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                  </select>
+                </div>
+                <button class="btn btn-sm btn-outline-primary w-100" onclick="filterDistribucionChart('custom'); return false;">
+                  <i class="bi bi-filter me-1"></i>Aplicar filtro
+                </button>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
       <div class="card-body d-flex justify-content-center">
         <div style="width: 100%; height: 200px; position: relative; max-width: 300px;">
@@ -95,9 +137,23 @@
   </div>
   <div class="col-md-8 ps-md-3">
     <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
-      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-        <i class="bi bi-currency-dollar" style="font-size: 0.9rem; color: #6c757d;"></i>
-        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Facturación</span>
+      <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-currency-dollar" style="font-size: 0.9rem; color: #6c757d;"></i>
+          <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Facturación</span>
+        </div>
+        <div class="dropdown chart-filter-dropdown" id="facturacionDropdown">
+          <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="facturacionDropdownButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <span>Últimos 6 meses</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="facturacionDropdownButton">
+            <li><a class="dropdown-item" href="#" onclick="filterFacturacionChart(90); return false;"><i class="bi bi-calendar3 me-2"></i>Últimos 3 meses</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterFacturacionChart(180); return false;"><i class="bi bi-calendar3-range me-2"></i>Últimos 6 meses</a></li>
+            <li><a class="dropdown-item" href="#" onclick="filterFacturacionChart(365); return false;"><i class="bi bi-calendar3-fill me-2"></i>Último año</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#" onclick="filterFacturacionChart('max'); return false;"><i class="bi bi-infinity me-2"></i>Todo el historial</a></li>
+          </ul>
+        </div>
       </div>
       <div class="card-body">
         <canvas id="facturacionBarChart" style="width: 100%; height: 200px;"></canvas>
@@ -110,6 +166,58 @@
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<style>
+  .loading-chart {
+    position: relative;
+  }
+  .loading-chart::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38"><defs><linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a"><stop stop-color="%236c757d" stop-opacity="0" offset="0%"/><stop stop-color="%236c757d" stop-opacity=".631" offset="63.146%"/><stop stop-color="%236c757d" offset="100%"/></linearGradient></defs><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)"><path d="M36 18c0-9.94-8.06-18-18-18" stroke="url(%23a)" stroke-width="2"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite"/></path></g></g></svg>') center center no-repeat;
+    z-index: 10;
+    border-radius: 0.5rem;
+  }
+  
+  /* Estilos para el dropdown del filtro de distribución */
+  #distribucionDropdown .dropdown-menu {
+    box-shadow: 0 5px 15px rgba(0,0,0,.1);
+    border: none;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  /* Cambiar el color del botón a verde */
+  #distribucionDropdown .btn-outline-primary {
+    background-color: #28a745; /* Verde */
+    border-color: #28a745;
+    color: #fff;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  #distribucionDropdown .btn-outline-primary:hover,
+  #distribucionDropdown .btn-outline-primary:focus {
+    background-color: #218838; /* Verde más oscuro para hover */
+    border-color: #1e7e34;
+    color: #fff;
+  }
+  
+  /* Hover para los elementos del dropdown */
+  .dropdown-menu .dropdown-item:hover {
+    background-color: rgba(40, 167, 69, 0.1); /* Verde claro */
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .form-floating>.form-select {
+    padding-bottom: .125rem;
+  }
+</style>
 <script>
   var mesesLabels = {{ meses_labels|default([])|tojson }};
   var trabajosMes = {{ trabajos_mes|default([])|tojson }};
@@ -119,6 +227,8 @@
   var trabajosEnProceso = {{ num_trabajos_en_proceso|default(0)|tojson }};
   var trabajosCompletados = {{ num_trabajos_completados|default(0)|tojson }};
   var datosTecnicos = {{ datos_tecnicos|default([])|tojson }};
+  var datosTecnicosPorFecha = {{ datos_tecnicos_por_fecha|default({})|tojson }};
+  var añosDisponibles = {{ años_disponibles|default([])|tojson }};
   
   // Calcular facturación total sumando los datos mensuales
   document.addEventListener('DOMContentLoaded', function() {
