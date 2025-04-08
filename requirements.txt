@@ -1,0 +1,12 @@
+Flask==2.3.2
+Flask-Login==0.6.2
+Flask-SQLAlchemy==3.0.5
+python-dotenv==1.0.0
+SQLAlchemy==2.0.21
+Flask-Migrate==4.0.4
+Flask-Caching==2.0.2
+Flask-Mail==0.9.1
+psycopg2-binary>=2.9.6
+alembic==1.11.1
+chart.js==4.4.8
+fullcalendar==6.1.15

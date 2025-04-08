@@ -7,7 +7,7 @@ def generate_row_html(trabajo):
     
     return f"""
     <tr>
-      <td class="text-center"><a href="/jobs/{trabajo.id}">TRB__{trabajo.id}</a></td>
+      <td class="text-center"><a href="/jobs/{trabajo.id}">Nº_{trabajo.id}</a></td>
       <td class="text-center">{trabajo.nombre_cliente} {trabajo.apellido_cliente or ''}</td>
       <td class="text-center">{trabajo.fecha.strftime("%d/%m/%Y")}</td>
       <td class="text-center"><p class="status {status_class}">{trabajo.estado}</p></td>
@@ -59,19 +59,33 @@ def generate_dashboard_work_row(trabajo):
     """
     Genera HTML para filas de tabla de trabajos pendientes en el dashboard
     """
+    from datetime import datetime
+    
     technician_name = f"{trabajo.technician.nombre} {trabajo.technician.apellido or ''}" if trabajo.technician else "Sin asignar"
     status_class = "status-pending" if trabajo.estado in ["Pendiente", "En Proceso"] else "status-paid"
     costo = trabajo.cantidad if trabajo.cantidad else 'N/A'  # Cambiado de costo_estimado a cantidad
     costo_display = f"{costo}€" if costo != 'N/A' else costo
+    
+    # Verificar si la fecha ya ha pasado
+    fecha_vencida = ""
+    fecha_actual = datetime.now().date()
+    
+    # Convertir trabajo.fecha a date si es un datetime
+    fecha_trabajo = trabajo.fecha
+    if isinstance(fecha_trabajo, datetime):
+        fecha_trabajo = fecha_trabajo.date()
+    
+    if fecha_trabajo < fecha_actual and trabajo.estado in ["Pendiente", "En Proceso"]:
+        fecha_vencida = "date-expired"
     
     from flask import url_for
     job_url = url_for('jobs.ver_trabajo', id=trabajo.id)
     
     return f"""
     <tr>
-      <td class="text-center"><a href="{job_url}">TRB__{trabajo.id}</a></td>
+      <td class="text-center"><a href="{job_url}">Nº_{trabajo.id}</a></td>
       <td class="text-center">{trabajo.nombre_cliente} {trabajo.apellido_cliente or ''}</td>
-      <td class="text-center">{trabajo.fecha.strftime("%d/%m/%Y")}</td>
+      <td class="text-center {fecha_vencida}">{trabajo.fecha.strftime("%d/%m/%Y")}</td>
       <td class="text-center"><p class="status {status_class}">{trabajo.estado}</p></td>
       <td class="text-center">{technician_name}</td>
       <td class="text-center">{costo_display}</td>

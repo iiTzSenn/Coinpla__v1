@@ -35,7 +35,6 @@ def create_app():
     from app.routes.jobs import jobs_bp
     from app.routes.technicians import tech_bp
     from app.routes.admin import admin_bp
-    from app.routes.export import export_bp
     from app.routes.users import users_bp
     from .routes.api import api_bp
 
@@ -43,7 +42,6 @@ def create_app():
     app.register_blueprint(jobs_bp)
     app.register_blueprint(tech_bp)
     app.register_blueprint(admin_bp)
-    app.register_blueprint(export_bp)
     app.register_blueprint(users_bp, url_prefix='/users')
     app.register_blueprint(api_bp)
 

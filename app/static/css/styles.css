@@ -575,15 +575,34 @@ table.custom-table {
   border: none;
 }
 
-.custom-table tbody td {
-  vertical-align: middle;
-  padding: 0.75rem;
-  text-align: center;
-  border-top: 1px solid var(--card-border);
+/* Estilos actualizados para la tabla del dashboard */
+.custom-table tbody tr {
+  border-top: none; /* Elimina la línea entre filas */
+  transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.custom-table tbody tr {
-  transition: transform 0.2s ease;
+/* Cambiar el color de fondo al hacer hover a un gris más oscuro */
+.custom-table tbody tr:hover {
+  background-color: rgba(0, 255, 0, 0.1); /* Fondo verde claro semitransparente, similar al dropdown */
+  transform: translateY(-2px); /* Efecto sutil de elevación en lugar de escala */
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Ligera sombra para dar profundidad */
+}
+
+.custom-table tbody tr:hover td {
+  color: #00aa00; /* Cambiar el color del texto al pasar el ratón, similar al dropdown */
+}
+
+.custom-table tbody td {
+  transition: color 0.2s ease;
+  padding: 1rem; /* Espaciado más amplio para mejor legibilidad */
+  text-align: center;
+  border-right: none; /* Elimina la línea entre columnas */
+}
+
+/* Asegurar que no haya bordes visibles entre columnas en la tabla */
+.custom-table tbody td {
+  border-right: none !important; /* Forzar eliminación de bordes entre columnas */
+  border-left: none !important; /* Asegurar que no haya bordes laterales */
 }
 
 .custom-table tbody tr:hover {
@@ -606,8 +625,9 @@ table.custom-table {
 }
 
 .custom-table .status-pending {
-  background-color: var(--clr-pending); /* Color amarillo */
-  color: var(--clr-pending-font); /* Texto oscuro */
+  background-color: rgba(255, 193, 7, 0.4); /* Color amarillo con opacidad reducida */
+  color: #8a6d00; /* Tono amarillo oscuro para el texto */
+  font-weight: 600;
 }
 
 .custom-table .status-unpaid {
@@ -618,6 +638,12 @@ table.custom-table {
 .custom-table .status-paid {
   background-color: var(--clr-paid); /* Color verde */
   color: var(--clr-paid-font);
+}
+
+/* Estilo para fechas vencidas en la tabla del dashboard */
+.custom-table .date-expired {
+  color: #dc3545; /* Color rojo */
+  font-weight: bold;
 }
 
 .minimal-pagination {
@@ -666,4 +692,72 @@ table.custom-table {
 #tecnicosChart {
   width: 100%; /* Ocupa todo el ancho del contenedor */
   height: 250px; /* Altura uniforme */
+}
+
+/* Eliminar todas las líneas visibles en la tabla */
+.custom-table {
+  border-collapse: collapse; /* Asegurar que no haya separación entre bordes */
+}
+
+.custom-table td,
+.custom-table th {
+  border: none !important; /* Eliminar cualquier borde */
+}
+
+/* Estilos específicos para la tabla del dashboard */
+.dashboard-table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.dashboard-table thead th {
+  background-color: #f8f9fa;
+  color: #495057;
+  text-align: center; /* Asegurar que el encabezado esté centrado */
+  padding: 12px;
+  font-weight: bold;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.dashboard-table tbody tr {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.1); /* Fondo azul claro semitransparente */
+  transform: translateY(-2px); /* Efecto de elevación */
+}
+
+.dashboard-table tbody td {
+  padding: 12px;
+  text-align: center; /* Cambiar alineación a central para que coincida con el encabezado */
+  border-bottom: 1px solid #dee2e6;
+}
+
+.dashboard-table .status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.dashboard-table .status-unpaid {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.dashboard-table .status-paid {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.dashboard-table .status-pending {
+  background-color: rgba(255, 243, 205, 0.7); /* Reducir opacidad del amarillo */
+  color: #856404;
 }

@@ -55,8 +55,6 @@ class Technician(db.Model):
     available = db.Column(db.Boolean, default=True)
     workload = db.Column(db.Integer, default=0)
     direccion = db.Column(db.String(200))
-    latitud = db.Column(db.Float)
-    longitud = db.Column(db.Float)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     jobs = db.relationship('Job', backref='technician', lazy=True)
 
@@ -91,6 +89,7 @@ class Job(db.Model):
     categoria_id = db.Column(db.Integer, db.ForeignKey('job_categories.id'), nullable=True)
     prioridad = db.Column(db.String(20), default='Normal')
     cantidad = db.Column(db.Float, default=0)  # Cambiado de costo_estimado a cantidad
+    numero_trabajo = db.Column(db.Integer, unique=True, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     history = db.relationship('JobHistory', backref='job', lazy=True, cascade="all, delete-orphan")

@@ -190,7 +190,7 @@ def index():
                            datos_tecnicos=datos_tecnicos,
                            datos_tecnicos_por_fecha=datos_tecnicos_por_fecha,
                            años_disponibles=años_disponibles,
-                           generate_dashboard_row=generate_dashboard_work_row)
+                           generate_dashboard_work_row=generate_dashboard_work_row)
 
 @jobs_bp.route('/api/dashboard_stats')
 @login_required
@@ -257,6 +257,9 @@ def crear_trabajo():
         hora=hora_str,
         estado='Pendiente'
     )
+
+    # Asignar un número de trabajo único e incremental
+    # The numero_trabajo will now be automatically assigned by the database sequence.
 
     tecnicos = Technician.query.filter_by(available=True).all()
     candidatos = []
@@ -416,3 +419,17 @@ def historial():
         tecnicos=tecnicos,
         generate_history_row=generate_history_row
     )
+
+@jobs_bp.route('/asignar_numeros_trabajos', methods=['POST'])
+@login_required
+def asignar_numeros_trabajos():
+    trabajos_sin_numero = Job.query.filter(Job.numero_trabajo == None).order_by(Job.id).all()
+    ultimo_numero = db.session.query(func.max(Job.numero_trabajo)).scalar() or 0
+
+    for trabajo in trabajos_sin_numero:
+        ultimo_numero += 1
+        trabajo.numero_trabajo = ultimo_numero
+
+    db.session.commit()
+    flash("Números de trabajo asignados correctamente", "success")
+    return redirect(url_for('jobs.listar_trabajos'))

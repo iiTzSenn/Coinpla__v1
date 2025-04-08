@@ -93,7 +93,17 @@
 .card .custom-table {
   margin-bottom: 0;
   border: none !important;
-  border-radius: 0 !important;
+}
+
+/* Estilos específicos para tablas en cards con border-radius */
+.card[style*="border-radius: 1rem"] .card-body.p-0 .custom-table {
+  border-bottom-left-radius: 1rem !important;
+  border-bottom-right-radius: 1rem !important;
+  overflow: hidden;
+}
+
+.card[style*="border-radius: 1rem"] .card-body.p-0 .custom-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .card .card-body.p-0 .custom-table th:first-child {
