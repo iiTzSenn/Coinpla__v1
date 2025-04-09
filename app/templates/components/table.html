@@ -1,10 +1,10 @@
 {% macro data_table(columns, data, row_template, empty_message="No hay datos disponibles.", class="custom-table") %}
-<div class="table-responsive">
-  <table class="table {{ class }}">
+<div class="table-responsive" style="margin-bottom: 0;">
+  <table class="table {{ class }}" style="margin-bottom: 0;">
     <thead>
       <tr>
         {% for column in columns %}
-        <th>{{ column }}</th>
+        <th class="text-center">{{ column }}</th>
         {% endfor %}
       </tr>
     </thead>
@@ -28,25 +28,30 @@
   <p class="status {{ class_name }}">{{ value }}</p>
 {% endmacro %}
 
-{% macro action_button(type, icon, modal_target="", data_attrs={}, title="") %}
-  <!-- Este macro está definido pero no parece usarse en las plantillas actuales -->
-{% endmacro %}
-
-{% macro paginated_table(title, columns, data_items, paginator, endpoint, status_mapping={}, empty_message="No hay datos disponibles.", row_template=None, params={}) %}
+{% macro paginated_table(title, columns, data_items, paginator, endpoint, status_mapping={}, empty_message="No hay datos disponibles.", row_template=None, params={}, class="custom-table", inline_style=False) %}
+{% if not inline_style %}
 <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+  {% if title %}
   <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
     <i class="bi bi-table" style="font-size: 0.9rem; color: #6c757d;"></i>
     <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">{{ title }}</span>
   </div>
+  {% endif %}
   <div class="card-body p-0">
+{% endif %}
     {{ data_table(
       columns,
       data_items,
       row_template=row_template,
-      empty_message=empty_message
+      empty_message=empty_message,
+      class=class
     ) }}
+{% if not inline_style %}
   </div>
   <div class="card-footer d-flex justify-content-center" style="border-radius: 0 0 1rem 1rem; background-color: #f9f9f9 !important; border-top: 1px solid #cbc6c6;">
+{% else %}
+  <div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+{% endif %}
     {% if paginator.pages > 1 %}
     <nav aria-label="Paginación">
       <ul class="pagination m-0" style="gap: 0.5rem;">
@@ -87,7 +92,121 @@
         {% endif %}
       </ul>
     </nav>
+    {% else %}
+    <nav aria-label="Paginación">
+      <ul class="pagination m-0" style="gap: 0.5rem;">
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&laquo;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&lt;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">1 / 1</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&gt;</span>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link minimal-pagination">&raquo;</span>
+        </li>
+      </ul>
+    </nav>
     {% endif %}
   </div>
+{% if not inline_style %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro ajax_table(trabajos_pendientes_proceso, generate_dashboard_work_row, endpoint="jobs.index") %}
+<div class="table-responsive" style="margin-bottom: 0;">
+  <table class="table dashboard-table" style="margin-bottom: 0;">
+    <thead>
+      <tr>
+        <th class="text-center">#</th>
+        <th class="text-center">Cliente</th>
+        <th class="text-center">Fecha</th>
+        <th class="text-center">Estado</th>
+        <th class="text-center">Técnico</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if trabajos_pendientes_proceso.items and trabajos_pendientes_proceso.items|length > 0 %}
+        {% for item in trabajos_pendientes_proceso.items %}
+          {{ generate_dashboard_work_row(item)|safe }}
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6" class="text-center">No hay trabajos activos en este momento.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+
+<div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+  {% if trabajos_pendientes_proceso.pages > 1 %}
+  <nav aria-label="Paginación">
+    <ul class="pagination m-0" style="gap: 0.5rem;">
+      {% if trabajos_pendientes_proceso.has_prev %}
+      <li class="page-item">
+        <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=1, ajax=1) }}" aria-label="Primera página">&laquo;</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=trabajos_pendientes_proceso.prev_num, ajax=1) }}" aria-label="Página anterior">&lt;</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&laquo;</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&lt;</span>
+      </li>
+      {% endif %}
+
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">{{ trabajos_pendientes_proceso.page }} / {{ trabajos_pendientes_proceso.pages }}</span>
+      </li>
+      
+      {% if trabajos_pendientes_proceso.has_next %}
+      <li class="page-item">
+        <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=trabajos_pendientes_proceso.next_num, ajax=1) }}" aria-label="Página siguiente">&gt;</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link minimal-pagination" href="{{ url_for(endpoint, page=trabajos_pendientes_proceso.pages, ajax=1) }}" aria-label="Última página">&raquo;</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&gt;</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&raquo;</span>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% else %}
+  <nav aria-label="Paginación">
+    <ul class="pagination m-0" style="gap: 0.5rem;">
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&laquo;</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&lt;</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">1 / 1</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&gt;</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link minimal-pagination">&raquo;</span>
+      </li>
+    </ul>
+  </nav>
+  {% endif %}
 </div>
 {% endmacro %}

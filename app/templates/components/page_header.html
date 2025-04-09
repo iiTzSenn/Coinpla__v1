@@ -1,15 +1,20 @@
-{% macro page_header(title, breadcrumbs=[], buttons=[]) %}
+{% macro page_header(title, breadcrumbs=[], buttons=[], separator_bold=false) %}
 <div class="page-header mb-4">
   <!-- Breadcrumb -->
   {% if breadcrumbs %}
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
       {% for item in breadcrumbs %}
         {% if loop.last %}
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">{{ item.text }}</li>
+        <li class="breadcrumb-item active" aria-current="page" {% if item.bold %}style="font-weight: bold;"{% endif %}>{{ item.text }}</li>
+        {% elif item.url is defined and item.url %}
+        <li class="breadcrumb-item" {% if item.bold %}style="font-weight: bold;"{% endif %}><a href="{{ item.url }}">{{ item.text }}</a></li>
         {% else %}
-        <li class="breadcrumb-item"><a href="{{ item.url }}">{{ item.text }}</a></li>
+        <li class="breadcrumb-item" {% if item.bold %}style="font-weight: bold;"{% endif %}>{{ item.text }}</li>
+        {% endif %}
+        
+        {% if not loop.last %}
+        <li class="breadcrumb-item-separator" {% if separator_bold %}style="font-weight: bold;"{% endif %}>/</li>
         {% endif %}
       {% endfor %}
     </ol>
@@ -31,4 +36,33 @@
     {% endif %}
   </div>
 </div>
+
+<style>
+  .breadcrumb {
+    margin-bottom: 0.5rem;
+  }
+  
+  .breadcrumb-item {
+    display: inline-block;
+  }
+  
+  .breadcrumb-item-separator {
+    display: inline-block;
+    margin: 0 0.5rem;
+    color: #6c757d;
+  }
+  
+  .breadcrumb-item a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  
+  .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
+  
+  .breadcrumb-item.active {
+    color: #6c757d;
+  }
+</style>
 {% endmacro %}

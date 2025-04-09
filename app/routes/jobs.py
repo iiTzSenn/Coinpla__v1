@@ -170,6 +170,17 @@ def index():
                     } for r in resultados
                 ]
 
+    # Si es una solicitud AJAX, devolver solo la tabla paginada
+    if request.args.get('ajax') == '1':
+        from flask import render_template_string
+        html = render_template('components/table.html')
+        return render_template_string(
+            "{% from 'components/table.html' import ajax_table %}"
+            "{{ ajax_table(trabajos_pendientes_proceso, generate_dashboard_work_row) }}",
+            trabajos_pendientes_proceso=trabajos_pendientes_proceso,
+            generate_dashboard_work_row=generate_dashboard_work_row
+        )
+
     return render_template('dashboard_admin.html',
                            trabajos_recientes=trabajos_recientes,
                            total_usuarios=total_usuarios,

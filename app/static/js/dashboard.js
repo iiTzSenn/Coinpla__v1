@@ -46,15 +46,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Aplicar filtro del mes actual para el gráfico de distribución
   filterDistribucionChart('current');
 
-  // Agregar evento para alternar desenfoque en el número de facturación total
-  const facturacionCard = document.getElementById('facturacion-card');
-  const facturacionTotal = document.getElementById('facturacion-total');
-
-  facturacionCard.addEventListener('click', () => {
-    if (facturacionTotal.style.filter === 'blur(5px)') {
-      facturacionTotal.style.filter = 'none';
-    } else {
-      facturacionTotal.style.filter = 'blur(5px)';
+  // Aplicar efecto de blur a todas las tarjetas dashboard al hacer clic
+  const dashboardCards = document.querySelectorAll('.dashboard-card');
+  dashboardCards.forEach(card => {
+    const cardValue = card.querySelector('h4');
+    if (cardValue) {
+      card.addEventListener('click', () => {
+        if (cardValue.style.filter === 'blur(5px)') {
+          cardValue.style.filter = 'none';
+        } else {
+          cardValue.style.filter = 'blur(5px)';
+        }
+      });
     }
   });
 });

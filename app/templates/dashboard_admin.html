@@ -4,7 +4,7 @@
 {% block content %}
 {% from "components/page_header.html" import page_header %}
 {% from "components/dashboard_cards.html" import stats_row, chart_card %}
-{% from "components/table.html" import data_table %}
+{% from "components/table.html" import data_table, paginated_table %}
 
 {{ page_header(
     title="",
@@ -164,18 +164,23 @@
 </div>
 
 <!-- Tabla de trabajos activos -->
-<div class="card mt-4" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+<div class="card mt-4" style="margin-top: 1.75rem !important; border-radius: 1rem; border: 1px solid #cbc6c6;">
   <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
     <i class="bi bi-list-task" style="font-size: 0.9rem; color: #6c757d;"></i>
     <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Trabajos Activos</span>
   </div>
-  <div class="card-body p-0">
-    {{ data_table(
-      columns=["#", "Cliente", "Fecha", "Estado", "Técnico", "Acciones"],
-      data=trabajos_pendientes_proceso.items,
-      row_template=generate_dashboard_work_row,
+  <div class="card-body p-0" id="trabajos-activos-container" style="border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem; overflow: hidden;">
+    {{ paginated_table(
+      title="",
+      columns=["#", "Cliente", "Fecha", "Estado", "Técnico", "Cantidad"],
+      data_items=trabajos_pendientes_proceso.items,
+      paginator=trabajos_pendientes_proceso,
+      endpoint="jobs.index",
+      params=request.args,
       empty_message="No hay trabajos activos en este momento.",
-      class="dashboard-table"
+      row_template=generate_dashboard_work_row,
+      class="dashboard-table",
+      inline_style=True
     ) }}
   </div>
 </div>
@@ -198,6 +203,32 @@
     background: rgba(255, 255, 255, 0.7) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38"><defs><linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a"><stop stop-color="%236c757d" stop-opacity="0" offset="0%"/><stop stop-color="%236c757d" stop-opacity=".631" offset="63.146%"/><stop stop-color="%236c757d" offset="100%"/></linearGradient></defs><g fill="none" fill-rule="evenodd"><g transform="translate(1 1)"><path d="M36 18c0-9.94-8.06-18-18-18" stroke="url(%23a)" stroke-width="2"><animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="0.9s" repeatCount="indefinite"/></path></g></g></svg>') center center no-repeat;
     z-index: 10;
     border-radius: 0.5rem;
+  }
+  
+  /* Estilos para las tablas */
+  .table td {
+    text-align: center;
+    vertical-align: middle;
+    padding-top: 0.5rem; /* Reducir el padding vertical */
+    padding-bottom: 0.5rem;
+    height: 3rem; /* Altura fija para todas las celdas */
+    display: table-cell; /* Asegurar que se comporte como celda de tabla */
+  }
+  
+  .table th {
+    text-align: center;
+    vertical-align: middle;
+    height: 2.5rem; /* Altura fija para los encabezados */
+  }
+  
+  /* Asegurar que todos los elementos dentro de las celdas estén centrados */
+  .table td * {
+    vertical-align: middle;
+  }
+  
+  /* Reducir el alto de las filas de la tabla */
+  .dashboard-table tr {
+    line-height: 1.2;
   }
   
   /* Estilos para el dropdown del filtro de distribución */
@@ -261,6 +292,38 @@
         maximumFractionDigits: 2 
       }) + ' €';
     }
+    
+    // Configurar paginación AJAX para trabajos activos
+    setupAjaxPagination();
   });
+  
+  // Función para configurar la paginación AJAX
+  function setupAjaxPagination() {
+    const container = document.getElementById('trabajos-activos-container');
+    if (!container) return;
+    
+    // Delegación de eventos para los enlaces de paginación
+    container.addEventListener('click', function(e) {
+      // Verificar si el click fue en un enlace de paginación
+      if (e.target.classList.contains('page-link') || e.target.parentElement.classList.contains('page-link')) {
+        e.preventDefault();
+        const link = e.target.closest('a');
+        if (!link) return;
+        
+        const url = link.getAttribute('href');
+        if (!url) return;
+        
+        // Obtener solo la parte de los trabajos activos mediante AJAX
+        fetch(url + '&ajax=1')
+          .then(response => response.text())
+          .then(html => {
+            container.innerHTML = html;
+          })
+          .catch(error => {
+            console.error('Error cargando datos de paginación:', error);
+          });
+      }
+    });
+  }
 </script>
 {% endblock %}
