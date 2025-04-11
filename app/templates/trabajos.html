@@ -1,291 +1,943 @@
 {% extends 'base.html' %}
+{% block title %}Gestión de Trabajos{% endblock %}
+
 {% block content %}
 {% from "components/page_header.html" import page_header %}
 {% from "components/form_fields.html" import text_field, phone_field, select_field, textarea_field %}
-{% from "components/alerts.html" import empty_state %}
+{% from "components/table.html" import paginated_table %}
 
 {{ page_header(
-    title="Trabajos",
+    title="",
     breadcrumbs=[
-        {"url": url_for('jobs.index'), "text": "Inicio"},
-        {"text": "Trabajos"}
+        {"text": "Inicio", "bold": true},
+        {"text": "Trabajos", "bold": true}
     ]
 ) }}
 
-<div class="container">
-  <!-- Caja de Añadir Trabajo -->
-  <div class="card mb-4">
-    <div class="card-header">
-      <h4 class="mb-0">Añadir Trabajo</h4>
-    </div>
-    <div class="card-body">
-      <form method="POST" action="{{ url_for('jobs.crear_trabajo') }}" id="addJobForm">
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            {{ text_field("nombre_cliente", "Nombre del Cliente:", "Ingrese el nombre del cliente", required=true) }}
-          </div>
-          <div class="col-md-6">
-            {{ text_field("apellido_cliente", "Apellido del cliente:", "Ingrese el apellido del cliente") }}
-          </div>
-        </div>
-        {{ phone_field("telefono", "Teléfono del cliente:", "Ingrese el teléfono del cliente") }}
-        {{ text_field("direccion", "Dirección (Calle, número, etc.):", "Ingrese la dirección", required=true) }}
-        {{ text_field("codigo_postal", "Código Postal:", "Ingrese el código postal") }}
-        {{ textarea_field("descripcion", "Descripción del trabajo:", "Ingrese una descripción…", rows=2, required=true) }}
-        
-        <div class="row g-3 mb-3">
-          <div class="col-md-4">
-            {{ select_field("duracion", "Duración:", [
-              {"value": "corta", "text": "Corta (1 hora)"},
-              {"value": "media", "text": "Media (2 horas)"},
-              {"value": "larga", "text": "Larga (3 horas)"}
-            ], selected="media", required=true) }}
-          </div>
-          <div class="col-md-4">
-            <label for="fecha" class="form-label">Fecha:</label>
-            <input type="date" class="form-control trabajo-input" id="fecha" name="fecha" required>
-          </div>
-          <div class="col-md-4">
-            <label for="hora" class="form-label">Hora:</label>
-            <input type="time" class="form-control trabajo-input" id="hora" name="hora" required>
-          </div>
-        </div>
-        <div class="row g-3 mb-3">
-          <div class="col-md-4">
-            <label for="tecnico_id" class="form-label">Técnico asignado:</label>
-            <select class="form-select trabajo-input" id="tecnico_id" name="tecnico_id">
-              <option value="">Sin asignar</option>
-              {% for tecnico in tecnicos %}
-                {% if tecnico.available %}
-                <option value="{{ tecnico.id }}">
-                  {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
-                </option>
-                {% endif %}
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label for="costo_estimado" class="form-label">Costo estimado (€):</label>
-            <input type="number" class="form-control trabajo-input" id="costo_estimado" name="costo_estimado" step="0.01" min="0">
-          </div>
-          <div class="col-md-4">
-            <label for="cantidad" class="form-label">Cantidad (€):</label>
-            <input type="number" class="form-control trabajo-input" id="cantidad" name="cantidad" step="0.01" min="0" required>
-          </div>
-          <div class="col-md-4">
-            {{ select_field("estado", "Estado:", [
-              {"value": "Pendiente", "text": "Pendiente"},
-              {"value": "En Proceso", "text": "En Proceso"},
-              {"value": "Completado", "text": "Completado"}
-            ], selected="Pendiente", required=true) }}
-          </div>
-        </div>
-        <button type="submit" class="btn btn-third">Añadir Trabajo</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Lista de trabajos -->
-  <div class="card">
-    <div class="card-header">
-      <h4 class="mb-0">Lista de Trabajos</h4>
-    </div>
-    <div class="card-body">
-      {% if trabajos %}
-      <div class="table-responsive">
-        <table class="table custom-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Cliente</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              <th>Técnico</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for trabajo in trabajos %}
-            <tr>
-              <td>{{ trabajo.id }}</td>
-              <td>{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente }}</td>
-              <td>{{ trabajo.fecha }}</td>
-              <td>
-                <p class="status {{ 
-                    'status-pending' if trabajo.estado in ['Pendiente', 'En Proceso'] else 
-                    'status-paid' }}">{{ trabajo.estado }}</p>
-              </td>
-              <td>
-                {% if trabajo.technician %}
-                  {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
-                {% else %}
-                  Sin asignar
-                {% endif %}
-              </td>
-              <td>
-                <div class="d-flex justify-content-center align-items-center">
-                  <button class="btn btn-warning btn-sm btn-action editar-trabajo"
-                          data-bs-toggle="modal"
-                          data-bs-target="#editJobModal"
-                          data-id="{{ trabajo.id }}"
-                          data-nombre_cliente="{{ trabajo.nombre_cliente }}"
-                          data-apellido_cliente="{{ trabajo.apellido_cliente }}"
-                          data-telefono="{{ trabajo.telefono }}"
-                          data-direccion="{{ trabajo.direccion }}"
-                          data-codigo_postal="{{ trabajo.codigo_postal }}"
-                          data-descripcion="{{ trabajo.descripcion }}"
-                          data-duracion="{{ trabajo.duracion }}"
-                          data-fecha="{{ trabajo.fecha }}"
-                          data-hora="{{ trabajo.hora }}"
-                          data-tecnico_id="{{ trabajo.technician_id or '' }}"
-                          data-estado="{{ trabajo.estado }}">
-                    <i class="bi bi-pencil-square"></i>
-                  </button>
-                  <button class="btn btn-danger btn-sm btn-action confirm-delete-job"
-                          data-id="{{ trabajo.id }}"
-                          data-bs-toggle="modal"
-                          data-bs-target="#confirmDeleteModal">
-                    <i class="bi bi-trash-fill"></i>
-                  </button>
-                  {% if trabajo.technician_id and trabajo.estado != 'Completado' %}
-                  <button class="btn btn-success btn-sm btn-action confirm-complete-job"
-                          data-id="{{ trabajo.id }}"
-                          data-bs-toggle="modal"
-                          data-bs-target="#confirmCompleteModal">
-                    <i class="bi bi-check-circle"></i>
-                  </button>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-      {% else %}
-      {{ empty_state("No hay trabajos registrados.") }}
-      {% endif %}
+<!-- Botones de acción principales -->
+<div class="d-flex gap-2 mb-4">
+  <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#newPresupuestoModal" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
+    <i class="bi bi-file-earmark-plus me-1"></i> Nuevo Presupuesto
+  </button>
+  <a href="{{ url_for('jobs.historial') }}" class="btn btn-outline-secondary" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
+    <i class="bi bi-clock-history me-1"></i> Ver Historial
+  </a>
+  <div class="ms-auto">
+    <div class="input-group" style="border-radius: 1rem; overflow: hidden; border: 1px solid #cbc6c6;">
+      <input type="text" class="form-control" placeholder="Buscar trabajo..." id="searchInput" style="border: none; border-radius: 1rem 0 0 1rem;">
+      <button class="btn btn-outline-secondary" type="button" id="searchButton" style="border: none; background-color: #f8f9fa; border-radius: 0 1rem 1rem 0;">
+        <i class="bi bi-search"></i>
+      </button>
     </div>
   </div>
 </div>
-{% endblock %}
 
-{% block modals %}
-{% from "components/modals.html" import confirm_modal %}
+<!-- Tarjeta de trabajos -->
+<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-list-task" style="font-size: 0.9rem; color: #6c757d;"></i>
+      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Trabajos Activos</span>
+    </div>
+    <div class="dropdown chart-filter-dropdown">
+      <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroEstadoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <span>Todos los trabajos</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="filtroEstadoDropdown">
+        <li><a class="dropdown-item" href="#" data-filter="all"><i class="bi bi-list-stars me-2"></i>Todos los trabajos</a></li>
+        <li><a class="dropdown-item" href="#" data-filter="Presupuesto"><i class="bi bi-file-earmark-text me-2"></i>Presupuestos</a></li>
+        <li><a class="dropdown-item" href="#" data-filter="Pendiente"><i class="bi bi-hourglass me-2"></i>Pendientes</a></li>
+        <li><a class="dropdown-item" href="#" data-filter="En Proceso"><i class="bi bi-gear-wide-connected me-2"></i>En Proceso</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    {% if trabajos %}
+    <div class="table-responsive">
+      <table class="table mb-0 dashboard-table" id="trabajosTable">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Estado</th>
+            <th>Técnico</th>
+            <th>Descripción</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for trabajo in trabajos %}
+          <tr data-estado="{{ trabajo.estado }}">
+            <td class="text-center">
+              <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="text-decoration-none">
+                Nº_{{ trabajo.id }}
+              </a>
+            </td>
+            <td>{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }}</td>
+            <td>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
+            <td>{{ trabajo.hora }}</td>
+            <td>
+              <span class="badge rounded-pill 
+                {% if trabajo.estado == 'Presupuesto' %}bg-secondary
+                {% elif trabajo.estado == 'Pendiente' %}bg-warning
+                {% elif trabajo.estado == 'En Proceso' %}bg-primary
+                {% elif trabajo.estado == 'Completado' %}bg-success
+                {% else %}bg-secondary{% endif %}">
+                {{ trabajo.estado }}
+              </span>
+            </td>
+            <td>
+              {% if trabajo.technician %}
+                {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
+              {% else %}
+                <span class="text-muted">Sin asignar</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="text-truncate" style="max-width: 150px;" title="{{ trabajo.descripcion }}">
+                {{ trabajo.descripcion }}
+              </div>
+            </td>
+            <td>
+              <div class="d-flex gap-1 justify-content-center">
+                <!-- Botón para ver detalles -->
+                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                  <i class="bi bi-eye"></i>
+                </a>
+                
+                <!-- Botón para aprobar presupuesto (solo si está en estado Presupuesto) -->
+                {% if trabajo.estado == 'Presupuesto' %}
+                <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}">
+                  <button type="submit" class="btn btn-sm btn-success" title="Aprobar presupuesto">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                </form>
+                {% endif %}
+                
+                <!-- Botón para completar comprobante (solo si está En Proceso) -->
+                {% if trabajo.estado == 'En Proceso' %}
+                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info" title="Completar comprobante">
+                  <i class="bi bi-file-earmark-text"></i>
+                </a>
+                {% endif %}
+                
+                <!-- Botón para editar -->
+                <button class="btn btn-sm btn-warning editar-trabajo" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#editJobModal"
+                        data-id="{{ trabajo.id }}"
+                        data-nombre_cliente="{{ trabajo.nombre_cliente }}"
+                        data-apellido_cliente="{{ trabajo.apellido_cliente }}"
+                        data-telefono="{{ trabajo.telefono }}"
+                        data-direccion="{{ trabajo.direccion }}"
+                        data-codigo_postal="{{ trabajo.codigo_postal }}"
+                        data-descripcion="{{ trabajo.descripcion }}"
+                        data-duracion="{{ trabajo.duracion }}"
+                        data-fecha="{{ trabajo.fecha.strftime('%Y-%m-%d') }}"
+                        data-hora="{{ trabajo.hora }}"
+                        data-tecnico_id="{{ trabajo.technician_id or '' }}"
+                        data-estado="{{ trabajo.estado }}"
+                        data-cantidad="{{ trabajo.cantidad or '' }}"
+                        title="Editar trabajo">
+                  <i class="bi bi-pencil-square"></i>
+                </button>
+                
+                <!-- Botón para eliminar -->
+                <button class="btn btn-sm btn-danger confirm-delete-job"
+                        data-id="{{ trabajo.id }}"
+                        data-bs-toggle="modal"
+                        data-bs-target="#confirmDeleteModal"
+                        title="Eliminar trabajo">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Paginación -->
+    <div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+      <nav aria-label="Paginación de trabajos">
+        <ul class="pagination m-0" style="gap: 0.5rem;">
+          <li class="page-item disabled">
+            <span class="page-link minimal-pagination">&laquo;</span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link minimal-pagination">&lt;</span>
+          </li>
+          <li class="page-item disabled">
+            <span class="page-link minimal-pagination">1 / 3</span>
+          </li>
+          <li class="page-item">
+            <a class="page-link minimal-pagination" href="#">&gt;</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link minimal-pagination" href="#">&raquo;</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    
+    {% else %}
+    <div class="alert alert-info m-3 text-center">
+      <i class="bi bi-info-circle me-2"></i> No hay trabajos registrados.
+    </div>
+    {% endif %}
+  </div>
+</div>
 
-<!-- Modal de eliminación -->
-{{ confirm_modal(
-    id="confirmDeleteModal",
-    title="Confirmar Eliminación",
-    message="¿Estás seguro de que deseas eliminar este trabajo?",
-    action_url="",
-    confirm_text="Eliminar",
-    cancel_text="Cancelar"
-) }}
-
-<!-- Modal de completar trabajo -->
-{{ confirm_modal(
-    id="confirmCompleteModal",
-    title="Marcar como Completado",
-    message="¿Deseas marcar este trabajo como completado?",
-    action_url="",
-    confirm_text="Confirmar",
-    cancel_text="Cancelar"
-) }}
+<!-- Modal para nuevo presupuesto -->
+<div class="modal fade" id="newPresupuestoModal" tabindex="-1" aria-labelledby="newPresupuestoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xxl modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 1rem; overflow: hidden;">
+      <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+        <h5 class="modal-title" id="newPresupuestoModalLabel">
+          <i class="bi bi-file-earmark-plus me-2 text-green"></i>Crear Nuevo Presupuesto
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{{ url_for('jobs.crear_presupuesto') }}" id="addBudgetForm">
+        <div class="modal-body">
+          <!-- Sección de Datos de Cliente -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-green mb-3"><i class="bi bi-person me-2"></i>Datos del Cliente</h6>
+            <div class="row g-3 mb-3">
+              <div class="col-md-3">
+                {{ text_field("nombre_cliente", "Nombre:", "Ingrese el nombre del cliente", required=true) }}
+              </div>
+              <div class="col-md-3">
+                {{ text_field("apellido_cliente", "Apellido:", "Ingrese el apellido del cliente", required=true) }}
+              </div>
+              <div class="col-md-3">
+                {{ phone_field("telefono", "Teléfono:", "Ingrese el teléfono del cliente", required=true) }}
+              </div>
+              <div class="col-md-3">
+                {{ text_field("email", "Correo Electrónico:", "Ingrese el correo electrónico", required=true) }}
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-1">
+              <div class="col-md-3">
+                <label for="dni_cif" class="form-label">DNI/NIE/CIF:</label>
+                <input type="text" class="form-control" id="dni_cif" name="dni_cif" placeholder="Para facturación" style="border-radius: 0.5rem;">
+                <div class="form-text small">
+                  <i class="bi bi-info-circle me-1 text-green"></i>Necesario para facturación
+                </div>
+              </div>
+              <div class="col-md-2">
+                <label for="tipo_documento" class="form-label">Tipo de documento:</label>
+                <select class="form-select" id="tipo_documento" name="tipo_documento" style="border-radius: 0.5rem;">
+                  <option value="dni">DNI</option>
+                  <option value="nie">NIE</option>
+                  <option value="cif">CIF</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ingrese la dirección" style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-2">
+                <label for="codigo_postal" class="form-label">Código Postal:</label>
+                <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" placeholder="C.P." style="border-radius: 0.5rem;">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sección de Detalles del Trabajo -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-green mb-3"><i class="bi bi-tools me-2"></i>Detalles del Trabajo</h6>
+            <div class="row mb-3">
+              <div class="col-md-8">
+                {{ textarea_field("descripcion", "Descripción del Trabajo:", "Ingrese una descripción detallada del trabajo a realizar...", rows=3, required=true) }}
+              </div>
+              <div class="col-md-4">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="fecha" class="form-label">Fecha Programada:</label>
+                    <input type="date" class="form-control" id="fecha" name="fecha" style="border-radius: 0.5rem;">
+                    <div class="form-text small">
+                      <i class="bi bi-calendar3 me-1 text-green"></i>Opcional
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="hora" class="form-label">Hora:</label>
+                    <input type="time" class="form-control" id="hora" name="hora" style="border-radius: 0.5rem;">
+                    <div class="form-text small">
+                      <i class="bi bi-clock me-1 text-green"></i>Opcional
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <label for="duracion" class="form-label">Duración Estimada:</label>
+                    <select class="form-select" id="duracion" name="duracion" style="border-radius: 0.5rem;" required>
+                      <option value="corta">Corta (1 hora)</option>
+                      <option value="media" selected>Media (2 horas)</option>
+                      <option value="larga">Larga (3 horas)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-12">
+                    <label for="cantidad" class="form-label">Importe Total (€):</label>
+                    <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
+                      <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" placeholder="0.00" required style="border-radius: 0.5rem 0 0 0.5rem;">
+                      <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 1rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-green" id="submitPresupuesto" style="border-radius: 1rem; border: 1px solid #28a745; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+            <i class="bi bi-file-earmark-plus me-1"></i><span id="submitText">Generar y Enviar Presupuesto</span>
+            <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-1" role="status" style="display: none;"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Modal para editar trabajo -->
 <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="editJobForm" method="POST" action="">
-      <div class="modal-content modal-rectangular">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editJobModalLabel">Editar Trabajo</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <form id="editJobForm" method="POST" action="" class="needs-validation" novalidate>
+      <div class="modal-content" style="border-radius: 1rem; overflow: hidden;">
+        <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+          <h5 class="modal-title" id="editJobModalLabel">
+            <i class="bi bi-pencil-square me-2"></i>Editar Trabajo
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label for="modalNombreCliente" class="form-label">Nombre del Cliente</label>
-              <input type="text" class="form-control" id="modalNombreCliente" name="nombre_cliente" required>
+          <!-- Datos del Cliente -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person me-2"></i>Datos del Cliente</h6>
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label for="modalNombreCliente" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="modalNombreCliente" name="nombre_cliente" required style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-4">
+                <label for="modalApellidoCliente" class="form-label">Apellido</label>
+                <input type="text" class="form-control" id="modalApellidoCliente" name="apellido_cliente" style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-4">
+                <label for="modalTelefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="modalTelefono" name="telefono"
+                      pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+                      title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+                      maxlength="15" style="border-radius: 0.5rem;">
+                <div id="telefono-error" class="invalid-feedback">
+                  Formato de teléfono inválido
+                </div>
+              </div>
             </div>
-            <div class="col-md-6">
-              <label for="modalApellidoCliente" class="form-label">Apellido del Cliente</label>
-              <input type="text" class="form-control" id="modalApellidoCliente" name="apellido_cliente">
-            </div>
-          </div>
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label for="modalTelefono" class="form-label">Teléfono</label>
-              <input type="text" class="form-control" id="modalTelefono" name="telefono"
-                    pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
-                    title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
-                    maxlength="15">
-            </div>
-            <div class="col-md-6">
-              <label for="modalDireccion" class="form-label">Dirección</label>
-              <input type="text" class="form-control" id="modalDireccion" name="direccion" required>
-            </div>
-          </div>
-          <div class="row g-3 mb-3">
-            <div class="col-md-6">
-              <label for="modalCodigoPostal" class="form-label">Código Postal</label>
-              <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal">
-            </div>
-            <div class="col-md-6">
-              <label for="modalFecha" class="form-label">Fecha</label>
-              <input type="date" class="form-control" id="modalFecha" name="fecha" required>
-            </div>
-          </div>
-          <div class="mb-3">
-            <label for="modalDescripcion" class="form-label">Descripción</label>
-            <textarea class="form-control" id="modalDescripcion" name="descripcion" rows="2" required></textarea>
-          </div>
-          <div class="row g-3 mb-3">
-            <div class="col-md-4">
-              <label for="modalDuracion" class="form-label">Duración</label>
-              <select class="form-select" id="modalDuracion" name="duracion">
-                <option value="corta">Corta</option>
-                <option value="media">Media</option>
-                <option value="larga">Larga</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <label for="modalHora" class="form-label">Hora</label>
-              <input type="time" class="form-control" id="modalHora" name="hora" required>
-            </div>
-            <div class="col-md-4">
-              <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
-              <select class="form-select" id="modalTecnicoId" name="tecnico_id">
-                <option value="">Sin asignar</option>
-                {% for tecnico in tecnicos %}
-                <option value="{{ tecnico.id }}">
-                  {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
-                </option>
-                {% endfor %}
-              </select>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-md-8">
+                <label for="modalDireccion" class="form-label">Dirección</label>
+                <input type="text" class="form-control" id="modalDireccion" name="direccion" required style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-4">
+                <label for="modalCodigoPostal" class="form-label">Código Postal</label>
+                <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal" style="border-radius: 0.5rem;">
+              </div>
             </div>
           </div>
-          <div class="row g-3 mb-3">
-            <div class="col-md-4">
-              <label for="modalCantidad" class="form-label">Cantidad (€)</label>
-              <input type="number" class="form-control" id="modalCantidad" name="cantidad" step="0.01" min="0" required>
+          
+          <!-- Detalles del Trabajo -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-tools me-2"></i>Detalles del Trabajo</h6>
+            <div class="mb-3">
+              <label for="modalDescripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="modalDescripcion" name="descripcion" rows="3" required style="border-radius: 0.5rem;"></textarea>
+            </div>
+          
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label for="modalFecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" id="modalFecha" name="fecha" required style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-4">
+                <label for="modalHora" class="form-label">Hora</label>
+                <input type="time" class="form-control" id="modalHora" name="hora" required style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-md-4">
+                <label for="modalDuracion" class="form-label">Duración Estimada</label>
+                <select class="form-select" id="modalDuracion" name="duracion" style="border-radius: 0.5rem;">
+                  <option value="corta">Corta (1 hora)</option>
+                  <option value="media">Media (2 horas)</option>
+                  <option value="larga">Larga (3 horas)</option>
+                </select>
+              </div>
+            </div>
+  
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
+                <select class="form-select" id="modalTecnicoId" name="tecnico_id" style="border-radius: 0.5rem;">
+                  <option value="">Sin asignar</option>
+                  {% for tecnico in tecnicos %}
+                  <option value="{{ tecnico.id }}">
+                    {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="modalEstado" class="form-label">Estado del Trabajo</label>
+                <select class="form-select" id="modalEstado" name="estado" style="border-radius: 0.5rem;">
+                  <option value="Presupuesto">Presupuesto</option>
+                  <option value="Pendiente">Pendiente</option>
+                  <option value="En Proceso">En Proceso</option>
+                  <option value="Completado">Completado</option>
+                </select>
+              </div>
             </div>
           </div>
-          <div class="mb-3">
-            <label for="modalEstado" class="form-label">Estado</label>
-            <select class="form-select" id="modalEstado" name="estado">
-              <option value="Pendiente">Pendiente</option>
-              <option value="En Proceso">En Proceso</option>
-              <option value="Completado">Completado</option>
-            </select>
+          
+          <!-- Importe -->
+          <div class="mb-4">
+            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-currency-euro me-2"></i>Importe</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <label for="modalCantidad" class="form-label">Importe (€)</label>
+                <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
+                  <input type="number" class="form-control" id="modalCantidad" name="cantidad" step="0.01" min="0" style="border-radius: 0.5rem 0 0 0.5rem;">
+                  <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="modal-footer justify-content-center">
-          <button type="button" class="btn btn-fourth btn-sm" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-third btn-sm">Guardar Cambios</button>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 1rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
+            <i class="bi bi-x-circle me-1"></i>Cancelar
+          </button>
+          <button type="submit" class="btn btn-third" id="editJobSubmit" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+            <i class="bi bi-save me-1"></i><span>Guardar Cambios</span>
+            <span id="editLoadingSpinner" class="spinner-border spinner-border-sm ms-1" role="status" style="display: none;"></span>
+          </button>
         </div>
       </div>
     </form>
   </div>
 </div>
+
+<!-- Modal para confirmar eliminación de trabajo -->
+{% from "components/modals.html" import confirm_modal %}
+
+{{ confirm_modal(
+    id="confirmDeleteModal",
+    title="Confirmar Eliminación",
+    message="¿Estás seguro de que deseas eliminar este trabajo? Esta acción no se puede deshacer.",
+    action_url="",
+    confirm_text="Eliminar",
+    cancel_text="Cancelar"
+) }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configuración del formulario de presupuesto
+    const addBudgetForm = document.getElementById('addBudgetForm');
+    if (addBudgetForm) {
+      addBudgetForm.addEventListener('submit', function(e) {
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+        
+        // Si uno está lleno y el otro vacío, solicitar completar ambos
+        if ((fechaInput.value && !horaInput.value) || (!fechaInput.value && horaInput.value)) {
+          e.preventDefault();
+          alert('Por favor, complete tanto la fecha como la hora, o deje ambos campos vacíos para asignación automática.');
+          return;
+        }
+        
+        // Mostrar animación de carga
+        const submitButton = document.getElementById('submitPresupuesto');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const submitText = document.getElementById('submitText');
+        
+        if (submitButton && loadingSpinner && submitText) {
+          submitButton.disabled = true;
+          loadingSpinner.style.display = 'inline-block';
+          submitText.textContent = 'Procesando...';
+        }
+      });
+    }
+    
+    // Configuración del formulario de edición de trabajo
+    const editJobForm = document.getElementById('editJobForm');
+    if (editJobForm) {
+      editJobForm.addEventListener('submit', function(e) {
+        const submitButton = document.getElementById('editJobSubmit');
+        const loadingSpinner = document.getElementById('editLoadingSpinner');
+        
+        if (submitButton && loadingSpinner) {
+          submitButton.disabled = true;
+          loadingSpinner.style.display = 'inline-block';
+          submitButton.querySelector('span').textContent = 'Guardando...';
+        }
+      });
+    }
+    
+    // Configurar modal de eliminación
+    const deleteButtons = document.querySelectorAll('.confirm-delete-job');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const jobId = this.getAttribute('data-id');
+        const form = document.querySelector('#confirmDeleteModal form');
+        form.action = `{{ url_for('jobs.eliminar_trabajo', id=0) }}`.replace('0', jobId);
+      });
+    });
+    
+    // Filtrado de trabajos por estado
+    const filterLinks = document.querySelectorAll('[data-filter]');
+    filterLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const filter = this.getAttribute('data-filter');
+        const rows = document.querySelectorAll('#trabajosTable tbody tr');
+        
+        rows.forEach(row => {
+          if (filter === 'all' || row.getAttribute('data-estado') === filter) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+        
+        // Actualizar el texto del botón del dropdown
+        const dropdownButton = document.getElementById('filtroEstadoDropdown');
+        if (dropdownButton) {
+          dropdownButton.querySelector('span').textContent = this.textContent.trim();
+        }
+      });
+    });
+    
+    // Función de búsqueda
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const rows = document.querySelectorAll('#trabajosTable tbody tr');
+      
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+    
+    if (searchButton && searchInput) {
+      searchButton.addEventListener('click', performSearch);
+      searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    }
+    
+    // Inicializar paginación
+    // Código para paginar la tabla (15 trabajos por página)
+    const table = document.getElementById('trabajosTable');
+    if (table) {
+      const rowsPerPage = 15;
+      const rows = table.querySelectorAll('tbody tr');
+      const pageCount = Math.ceil(rows.length / rowsPerPage);
+      
+      // Función para mostrar una página específica
+      function showPage(pageNumber) {
+        // Ocultar todas las filas
+        rows.forEach(row => {
+          row.style.display = 'none';
+        });
+        
+        // Mostrar las filas de la página actual
+        const start = (pageNumber - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        
+        for (let i = start; i < end && i < rows.length; i++) {
+          rows[i].style.display = '';
+        }
+        
+        // Actualizar navegación de paginación
+        updatePagination(pageNumber);
+      }
+      
+      // Función para actualizar los controles de paginación
+      function updatePagination(currentPage) {
+        const pagination = document.querySelector('.pagination');
+        if (!pagination) return;
+        
+        // Limpiar paginación actual
+        pagination.innerHTML = '';
+        
+        // Crear controles de paginación minimalista al estilo dashboard
+        
+        // Botón para primera página
+        const firstPageLi = document.createElement('li');
+        firstPageLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        const firstPageLink = document.createElement('a');
+        firstPageLink.className = 'page-link minimal-pagination';
+        firstPageLink.href = '#';
+        firstPageLink.innerHTML = '&laquo;';
+        firstPageLink.setAttribute('aria-label', 'Primera página');
+        if (currentPage > 1) {
+          firstPageLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage(1);
+          });
+        }
+        firstPageLi.appendChild(firstPageLink);
+        pagination.appendChild(firstPageLi);
+        
+        // Botón para página anterior
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        const prevLink = document.createElement('a');
+        prevLink.className = 'page-link minimal-pagination';
+        prevLink.href = '#';
+        prevLink.innerHTML = '&lt;';
+        prevLink.setAttribute('aria-label', 'Página anterior');
+        if (currentPage > 1) {
+          prevLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage(currentPage - 1);
+          });
+        }
+        prevLi.appendChild(prevLink);
+        pagination.appendChild(prevLi);
+        
+        // Indicador de página actual / total
+        const currentPageLi = document.createElement('li');
+        currentPageLi.className = 'page-item disabled';
+        const currentPageSpan = document.createElement('span');
+        currentPageSpan.className = 'page-link minimal-pagination';
+        currentPageSpan.textContent = `${currentPage} / ${pageCount}`;
+        currentPageLi.appendChild(currentPageSpan);
+        pagination.appendChild(currentPageLi);
+        
+        // Botón para página siguiente
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
+        const nextLink = document.createElement('a');
+        nextLink.className = 'page-link minimal-pagination';
+        nextLink.href = '#';
+        nextLink.innerHTML = '&gt;';
+        nextLink.setAttribute('aria-label', 'Página siguiente');
+        if (currentPage < pageCount) {
+          nextLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage(currentPage + 1);
+          });
+        }
+        nextLi.appendChild(nextLink);
+        pagination.appendChild(nextLi);
+        
+        // Botón para última página
+        const lastPageLi = document.createElement('li');
+        lastPageLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
+        const lastPageLink = document.createElement('a');
+        lastPageLink.className = 'page-link minimal-pagination';
+        lastPageLink.href = '#';
+        lastPageLink.innerHTML = '&raquo;';
+        lastPageLink.setAttribute('aria-label', 'Última página');
+        if (currentPage < pageCount) {
+          lastPageLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            showPage(pageCount);
+          });
+        }
+        lastPageLi.appendChild(lastPageLink);
+        pagination.appendChild(lastPageLi);
+      }
+      
+      // Mostrar la primera página al cargar
+      if (rows.length > 0) {
+        showPage(1);
+      }
+    }
+    
+    // Añadir efectos de hover a los botones
+    const btnThird = document.querySelectorAll('.btn-third');
+    btnThird.forEach(btn => {
+      btn.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#4b6cb7';
+        this.style.color = 'white';
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      btn.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '';
+        this.style.color = '';
+        this.style.transform = 'translateY(0)';
+      });
+    });
+    
+    // Añadir efectos de hover al botón de historial
+    const btnHistorial = document.querySelector('.btn-outline-secondary[href*="historial"]');
+    if (btnHistorial) {
+      btnHistorial.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#6c757d';
+        this.style.color = 'white';
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      btnHistorial.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '';
+        this.style.color = '';
+        this.style.transform = 'translateY(0)';
+      });
+    }
+  });
+</script>
+
+<style>
+  /* Estilo para los inputs y selects */
+  .form-control, .form-select {
+    border-radius: 0.5rem !important;
+    border: 1px solid #cbc6c6;
+  }
+  
+  /* Estilo para los botones con clase btn-third */
+  .btn-third {
+    background-color: #6772E5;
+    color: white;
+    transition: all 0.3s ease;
+  }
+  
+  /* Estilo para las esquinas de elementos de formulario con clase form-control y form-select */
+  .input-group .form-control:first-child {
+    border-top-left-radius: 0.5rem !important;
+    border-bottom-left-radius: 0.5rem !important;
+  }
+  
+  .input-group .input-group-text:last-child {
+    border-top-right-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+  }
+  
+  /* Mejoras visuales para los modales */
+  .modal-content {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+  
+  .modal-header {
+    border-bottom-color: #f0f0f0;
+  }
+  
+  .modal-footer {
+    border-top-color: #f0f0f0;
+  }
+  
+  /* Estilo para la barra de búsqueda */
+  .input-group {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  /* Eliminar el borde verde al seleccionar la caja de búsqueda */
+  #searchInput:focus {
+    box-shadow: none !important;
+    border-color: #cbc6c6 !important;
+    outline: none !important;
+  }
+  
+  /* Estilo hover para el botón de búsqueda */
+  #searchButton:hover {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+    color: #28a745 !important;
+    transition: all 0.2s ease;
+  }
+  
+  #searchButton:hover i.bi-search {
+    transform: scale(1.1);
+    color: #28a745;
+    transition: all 0.2s ease;
+  }
+  
+  /* Asegurar que las migas de pan estén en negrita */
+  .breadcrumb-item {
+    font-weight: bold !important;
+  }
+  
+  /* Estilos para el dropdown del filtro de trabajos */
+  .chart-filter-dropdown {
+    position: relative;
+  }
+
+  .chart-filter-dropdown .dropdown-menu {
+    box-shadow: 0 5px 15px rgba(0,0,0,.1);
+    border: none;
+    animation: fadeIn 0.3s ease-in-out;
+    padding: 0.5rem 0;
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: 100%;
+    transform: none !important;
+    margin-top: 0.5rem;
+    min-width: 200px;
+  }
+  
+  .chart-period-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem !important;
+    color: #6c757d;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+  }
+  
+  .chart-period-btn:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .chart-period-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .chart-period-menu .dropdown-item:hover {
+    background-color: rgba(40, 167, 69, 0.1); /* Verde claro igual que en dashboard */
+    color: #495057;
+  }
+  
+  .chart-period-menu .dropdown-item:active {
+    background-color: #28a745; /* Verde para estado activo */
+    color: white;
+  }
+  
+  .chart-period-menu .dropdown-item i {
+    color: #28a745; /* Verde para los iconos */
+    width: 1.2rem;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  
+  .chart-period-menu .dropdown-item:hover i {
+    transform: scale(1.1);
+  }
+  
+  /* Estilos para la paginación minimalista como en el dashboard */
+  .minimal-pagination {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem !important;
+    border: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 0.85rem;
+    background-color: #f8f9fa;
+    min-width: 32px;
+    text-align: center;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+  
+  .minimal-pagination:hover:not(.disabled) {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: #28a745;
+    transform: translateY(-1px);
+  }
+  
+  .pagination {
+    gap: 0.35rem;
+  }
+  
+  .page-item.disabled .minimal-pagination {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  /* Estilo para los botones principales de acción */
+  .btn-outline-secondary:hover {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+    color: #28a745 !important;
+    border-color: #28a745 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+  }
+  
+  /* Estilos para el modal con tema verde */
+  .text-green {
+    color: #28a745 !important;
+  }
+  
+  .btn-green {
+    background-color: #28a745 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-green:hover {
+    background-color: #218838 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  }
+  
+  /* Definición de modal extra grande */
+  .modal-xxl {
+    max-width: 95%;
+    width: 1400px;
+    margin-left: 125px; /* Desplazar a la derecha para centrarlo en el área de contenido */
+  }
+  
+  /* Ajuste para centrar el modal en la zona de contenido */
+  @media (min-width: 992px) {
+    .modal-dialog.modal-xxl {
+      margin-right: auto;
+      margin-left: 255px; /* Ajustar para compensar el ancho del sidebar */
+      max-width: calc(95% - 130px); /* Reducir un poco el ancho para compensar el espacio del sidebar */
+    }
+  }
+  
+  /* Ajuste para pantallas muy grandes */
+  @media (min-width: 1400px) {
+    .modal-dialog.modal-xxl {
+      margin-left: 275px; /* Ajuste para pantallas grandes */
+      max-width: calc(95% - 150px);
+    }
+  }
+  
+  /* Ajuste para pantallas pequeñas */
+  @media (max-width: 991.98px) {
+    .modal-dialog.modal-xxl {
+      margin-left: auto; /* En pantallas pequeñas, centrado normal */
+      margin-right: auto;
+      max-width: 95%;
+    }
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
 {% endblock %}

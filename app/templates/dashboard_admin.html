@@ -231,11 +231,24 @@
     line-height: 1.2;
   }
   
-  /* Estilos para el dropdown del filtro de distribución */
-  #distribucionDropdown .dropdown-menu {
+  /* Estilos para los dropdowns de filtros de gráficas */
+  .chart-filter-dropdown {
+    position: relative;
+  }
+
+  #distribucionDropdown .dropdown-menu,
+  #facturacionDropdown .dropdown-menu,
+  #periodoDropdown .dropdown-menu {
     box-shadow: 0 5px 15px rgba(0,0,0,.1);
     border: none;
     animation: fadeIn 0.3s ease-in-out;
+    padding: 0.5rem 0;
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: 100%;
+    transform: none !important;
+    margin-top: 0.5rem;
   }
   
   /* Cambiar el color del botón a verde */

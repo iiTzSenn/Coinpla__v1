@@ -193,7 +193,8 @@
   transition: transform 0.2s ease;
 }
 
-rotate svg:last-child {
+/* Corregir la clase .rotate para que funcione la animación */
+.rotate svg:last-child, #toggle-btn.rotate svg {
   transform: rotate(180deg);
 }
 
@@ -222,7 +223,11 @@ rotate svg:last-child {
 }
 
 #toggle-btn svg {
-  transition: transform 0.15s ease;
+  transition: transform 0.3s ease;
+}
+
+#toggle-btn.rotate svg {
+  transform: rotate(180deg);
 }
 
 #toggle-btn:hover {

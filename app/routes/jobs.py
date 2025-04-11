@@ -226,85 +226,11 @@ def ver_trabajo(id):
     trabajo = Job.query.get_or_404(id)
     return render_template('detalle_trabajo.html', trabajo=trabajo)
 
+# Se eliminó la ruta para añadir trabajo, ya que la lógica se ha movido a la creación de presupuestos.
 @jobs_bp.route('/jobs/create', methods=['POST'])
 @login_required
 def crear_trabajo():
-    DURACION_MAP = {"corta": 1, "media": 2, "larga": 3}
-
-    nombre = request.form.get('nombre_cliente')
-    apellido = request.form.get('apellido_cliente')
-    direccion = request.form.get('direccion')
-    descripcion = request.form.get('descripcion')
-    telefono_raw = request.form.get('telefono')
-
-    try:
-        telefono = validar_y_normalizar_telefono(telefono_raw) if telefono_raw else None
-    except ValueError as e:
-        flash(str(e), "danger")
-        return redirect(url_for('jobs.listar_trabajos'))
-
-    duracion = request.form.get('duracion') or 'media'
-    fecha_str = request.form.get('fecha')
-    hora_str = request.form.get('hora')
-
-    try:
-        fecha = datetime.strptime(fecha_str, '%Y-%m-%d')
-        hora = datetime.strptime(hora_str, '%H:%M').time()
-    except ValueError:
-        flash("Fecha u hora con formato inválido.", "danger")
-        return redirect(url_for('jobs.listar_trabajos'))
-
-    inicio = datetime.combine(fecha.date(), hora)
-    fin = inicio + timedelta(hours=DURACION_MAP.get(duracion, 2))
-
-    trabajo = Job(
-        nombre_cliente=nombre,
-        apellido_cliente=apellido,
-        direccion=direccion,
-        descripcion=descripcion,
-        telefono=telefono,
-        duracion=duracion,
-        fecha=fecha,
-        hora=hora_str,
-        estado='Pendiente'
-    )
-
-    # Asignar un número de trabajo único e incremental
-    # The numero_trabajo will now be automatically assigned by the database sequence.
-
-    tecnicos = Technician.query.filter_by(available=True).all()
-    candidatos = []
-    for tecnico in tecnicos:
-        trabajos_asignados = Job.query.filter_by(technician_id=tecnico.id).all()
-        conflicto = False
-        for t in trabajos_asignados:
-            t_inicio = datetime.combine(t.fecha.date(), datetime.strptime(t.hora, '%H:%M').time())
-            t_duracion = DURACION_MAP.get(t.duracion, 2)
-            t_fin = t_inicio + timedelta(hours=t_duracion)
-            if inicio < t_fin and fin > t_inicio:
-                conflicto = True
-                break
-        if not conflicto:
-            candidatos.append(tecnico)
-
-    if candidatos:
-        min_workload = min(t.workload for t in candidatos)
-        disponibles = [t for t in candidatos if t.workload == min_workload]
-        asignado = random.choice(disponibles)
-        trabajo.technician_id = asignado.id
-        asignado.workload += 1
-    else:
-        flash("No hay técnicos disponibles en ese horario", "warning")
-
-    db.session.add(trabajo)
-    db.session.commit()
-
-    historial = JobHistory(job_id=trabajo.id, action="Creación", details=f"Trabajo creado por {current_user.username}")
-    db.session.add(historial)
-    db.session.commit()
-
-    flash("Trabajo creado correctamente", "success")
-    return redirect(url_for('jobs.listar_trabajos'))
+    pass  # Esta función ya no es necesaria y se ha eliminado.
 
 @jobs_bp.route('/jobs/edit/<int:id>', methods=['POST'])
 @login_required
@@ -443,4 +369,277 @@ def asignar_numeros_trabajos():
 
     db.session.commit()
     flash("Números de trabajo asignados correctamente", "success")
+    return redirect(url_for('jobs.listar_trabajos'))
+
+@jobs_bp.route('/crear_presupuesto', methods=['POST'])
+@login_required
+def crear_presupuesto():
+    from app.models.presupuesto import Presupuesto
+    from app.extensions import db
+    from datetime import datetime, timedelta
+
+    # Obtener datos del formulario
+    nombre_cliente = request.form.get('nombre_cliente')
+    apellido_cliente = request.form.get('apellido_cliente')
+    telefono = request.form.get('telefono')
+    email = request.form.get('email')
+    descripcion = request.form.get('descripcion')
+    fecha_str = request.form.get('fecha')
+    hora_str = request.form.get('hora')
+    duracion = request.form.get('duracion') or 'media'
+
+    # Validar y procesar fecha y hora
+    fecha_manual = bool(fecha_str)
+    hora_manual = bool(hora_str)
+    
+    # Si el usuario dejó ambos campos vacíos, asignar automáticamente
+    if not fecha_manual and not hora_manual:
+        # Obtener fecha y hora actual, y añadir 1 día para el trabajo
+        fecha = datetime.now() + timedelta(days=1)
+        # Configurar la hora de inicio en 10:00 AM por defecto
+        hora = datetime.strptime('10:00', '%H:%M').time()
+    # Si el usuario completó un campo pero dejó el otro vacío, ya se ha validado en el frontend
+    else:
+        try:
+            fecha = datetime.strptime(fecha_str, '%Y-%m-%d')
+            hora = datetime.strptime(hora_str, '%H:%M').time()
+        except ValueError:
+            flash("Fecha u hora con formato inválido.", "danger")
+            return redirect(url_for('jobs.listar_trabajos'))
+
+    inicio = datetime.combine(fecha.date(), hora)
+    DURACION_MAP = {"corta": 1, "media": 2, "larga": 3}
+    fin = inicio + timedelta(hours=DURACION_MAP.get(duracion, 2))
+
+    # Asignar técnico disponible
+    tecnicos = Technician.query.filter_by(available=True).all()
+    candidato = None
+    for tecnico in tecnicos:
+        trabajos_asignados = Job.query.filter_by(technician_id=tecnico.id).all()
+        conflicto = False
+        for t in trabajos_asignados:
+            # Convertir a datetime para comparaciones
+            t_inicio = datetime.combine(t.fecha.date(), datetime.strptime(t.hora, '%H:%M').time())
+            t_duracion = DURACION_MAP.get(t.duracion, 2)
+            t_fin = t_inicio + timedelta(hours=t_duracion)
+            
+            # Comprobar si hay solapamiento
+            if inicio < t_fin and fin > t_inicio:
+                conflicto = True
+                break
+        
+        if not conflicto:
+            candidato = tecnico
+            break
+
+    if not candidato:
+        # Si no hay técnicos disponibles, intentar otro día u hora
+        if not fecha_manual or not hora_manual:
+            # Solo reajustar si el usuario no especificó explícitamente fecha/hora
+            for hora_intento in ['10:00', '14:00', '16:00']:
+                hora = datetime.strptime(hora_intento, '%H:%M').time()
+                inicio = datetime.combine(fecha.date(), hora)
+                fin = inicio + timedelta(hours=DURACION_MAP.get(duracion, 2))
+                
+                # Intentar de nuevo con esta hora
+                for tecnico in tecnicos:
+                    trabajos_asignados = Job.query.filter_by(technician_id=tecnico.id).all()
+                    conflicto = False
+                    for t in trabajos_asignados:
+                        t_inicio = datetime.combine(t.fecha.date(), datetime.strptime(t.hora, '%H:%M').time())
+                        t_duracion = DURACION_MAP.get(t.duracion, 2)
+                        t_fin = t_inicio + timedelta(hours=t_duracion)
+                        if inicio < t_fin and fin > t_inicio:
+                            conflicto = True
+                            break
+                    if not conflicto:
+                        candidato = tecnico
+                        break
+                
+                if candidato:
+                    break
+            
+            # Si aún no hay candidato, probar el siguiente día
+            if not candidato:
+                fecha = fecha + timedelta(days=1)
+                hora = datetime.strptime('10:00', '%H:%M').time()
+                inicio = datetime.combine(fecha.date(), hora)
+                fin = inicio + timedelta(hours=DURACION_MAP.get(duracion, 2))
+                
+                # Intentar de nuevo con el siguiente día
+                for tecnico in tecnicos:
+                    trabajos_asignados = Job.query.filter_by(technician_id=tecnico.id).all()
+                    conflicto = False
+                    for t in trabajos_asignados:
+                        t_inicio = datetime.combine(t.fecha.date(), datetime.strptime(t.hora, '%H:%M').time())
+                        t_duracion = DURACION_MAP.get(t.duracion, 2)
+                        t_fin = t_inicio + timedelta(hours=t_duracion)
+                        if inicio < t_fin and fin > t_inicio:
+                            conflicto = True
+                            break
+                    if not conflicto:
+                        candidato = tecnico
+                        break
+        
+        # Si todavía no hay candidato, informar al usuario
+        if not candidato:
+            flash("No hay técnicos disponibles en ese horario. Por favor, seleccione otra fecha u hora.", "warning")
+            return redirect(url_for('jobs.listar_trabajos'))
+
+    # Convertir hora a string
+    hora_str = hora.strftime('%H:%M')
+    
+    # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
+    nuevo_presupuesto = Presupuesto.crear(
+        nombre_cliente=nombre_cliente,
+        apellido_cliente=apellido_cliente,
+        telefono=telefono,
+        email=email,
+        descripcion=descripcion,
+        fecha=fecha,
+        hora=hora_str,
+        duracion=duracion,
+        tecnico_id=candidato.id
+    )
+    
+    # Generar y enviar el presupuesto por correo electrónico
+    from app.services.pdf_generator import generar_pdf
+    from app.services.email_service import enviar_email
+
+    try:
+        # Generar PDF del presupuesto
+        presupuesto_pdf_path = generar_pdf('presupuestos/presupuesto_template.html', {
+            'presupuesto': {
+                'id': nuevo_presupuesto.id,
+                'nombre_cliente': nombre_cliente,
+                'apellido_cliente': apellido_cliente,
+                'fecha': fecha.strftime('%d/%m/%Y'),
+                'hora': hora_str,
+                'descripcion': descripcion,
+                'tecnico': f"{candidato.nombre} {candidato.apellido or ''}",
+                'duracion': duracion
+            }
+        })
+
+        # Enviar por correo electrónico
+        enviar_email(
+            destinatario=email,
+            asunto='Presupuesto para su Trabajo',
+            cuerpo=f'''Estimado/a {nombre_cliente} {apellido_cliente},
+
+Adjuntamos el presupuesto para el trabajo solicitado. Por favor, revíselo y háganoslo saber si lo aprueba.
+
+Detalles del trabajo:
+- Fecha: {fecha.strftime('%d/%m/%Y')}
+- Hora: {hora_str}
+- Técnico asignado: {candidato.nombre} {candidato.apellido or ''}
+
+Gracias por confiar en nuestros servicios.
+''',
+            adjuntos=[presupuesto_pdf_path]
+        )
+
+        flash('Presupuesto creado exitosamente, técnico asignado y enviado por correo electrónico.', 'success')
+    except Exception as e:
+        flash(f'Presupuesto creado pero hubo un error al enviar el correo: {str(e)}', 'warning')
+    
+    return redirect(url_for('jobs.listar_trabajos'))
+
+@jobs_bp.route('/completar_comprobante/<int:id>', methods=['GET', 'POST'])
+@login_required
+def completar_comprobante(id):
+    from app.models.comprobante import Comprobante
+    from app.models.factura import Factura
+    from app.models.presupuesto import Presupuesto
+    from app.services.email_service import enviar_email
+    from app.services.pdf_generator import generar_pdf
+    from app.extensions import db
+
+    trabajo = Job.query.get_or_404(id)
+
+    if request.method == 'POST':
+        # Obtener datos del formulario
+        detalles = request.form.get('detalles')
+
+        # Generar comprobante
+        comprobante = Comprobante(
+            trabajo_id=trabajo.id,
+            detalles=detalles
+        )
+        db.session.add(comprobante)
+
+        # Generar factura
+        factura = Factura(
+            trabajo_id=trabajo.id,
+            monto=trabajo.cantidad
+        )
+        db.session.add(factura)
+
+        # Guardar en la base de datos
+        db.session.commit()
+
+        # Extraer el email del campo descripción si existe
+        email_cliente = Presupuesto.extraer_email(trabajo)
+        descripcion_sin_email = Presupuesto.extraer_descripcion_sin_email(trabajo)
+
+        # Generar PDFs y guardar en el sistema
+        comprobante_pdf_path = generar_pdf('comprobantes/comprobante_template.html', {
+            'comprobante': {
+                'nombre_cliente': trabajo.nombre_cliente,
+                'apellido_cliente': trabajo.apellido_cliente,
+                'fecha': trabajo.fecha.strftime('%Y-%m-%d'),
+                'detalles': detalles
+            }
+        })
+
+        factura_pdf_path = generar_pdf('facturas/factura_template.html', {
+            'factura': {
+                'nombre_cliente': trabajo.nombre_cliente,
+                'apellido_cliente': trabajo.apellido_cliente,
+                'fecha': trabajo.fecha.strftime('%Y-%m-%d'),
+                'monto': trabajo.cantidad
+            }
+        })
+
+        # Enviar por correo si hay un email disponible
+        if email_cliente:
+            try:
+                enviar_email(
+                    destinatario=email_cliente,
+                    asunto='Comprobante y Factura de su Trabajo',
+                    cuerpo='Adjuntamos el comprobante y la factura de su trabajo.',
+                    adjuntos=[comprobante_pdf_path, factura_pdf_path]
+                )
+                flash('Comprobante y factura generados, guardados y enviados correctamente.', 'success')
+            except Exception as e:
+                flash(f'Comprobante y factura generados, pero hubo un error al enviar el correo: {str(e)}', 'warning')
+        else:
+            flash('Comprobante y factura generados y guardados correctamente. No se pudo enviar por correo porque no hay email registrado.', 'info')
+            
+        return redirect(url_for('jobs.listar_trabajos'))
+
+    return render_template('comprobante_form.html', trabajo=trabajo)
+
+@jobs_bp.route('/aprobar_presupuesto/<int:id>', methods=['POST'])
+@login_required
+def aprobar_presupuesto(id):
+    trabajo = Job.query.get_or_404(id)
+
+    if trabajo.estado != 'Pendiente':
+        flash('El trabajo no está en estado pendiente.', 'warning')
+        return redirect(url_for('jobs.listar_trabajos'))
+
+    trabajo.estado = 'En Proceso'
+    db.session.commit()
+
+    # Registrar la aprobación en el historial
+    historial = JobHistory(
+        job_id=trabajo.id, 
+        action="Presupuesto aprobado", 
+        details=f"Presupuesto aprobado por {current_user.username} y trabajo marcado como 'En Proceso'"
+    )
+    db.session.add(historial)
+    db.session.commit()
+
+    flash('Presupuesto aprobado y trabajo marcado como "En Proceso".', 'success')
     return redirect(url_for('jobs.listar_trabajos'))

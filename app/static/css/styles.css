@@ -220,13 +220,14 @@ select:focus,
 
 /* Botones */
 .btn-primary {
-  background-color: var(--primary);
-  border-color: var(--primary);
+  background-color: #007bff; /* Azul visible */
+  color: #fff; /* Texto blanco */
+  border-color: #007bff;
 }
 
 .btn-primary:hover {
-  background-color: #3a9701;
-  border-color: #3a9701;
+  background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+  border-color: #0056b3;
 }
 
 .btn-third {
@@ -251,6 +252,93 @@ select:focus,
   background-color: #dee2e6;
   border-color: #ced4da;
   color: #212529;
+}
+
+/* Estilos para botones mejorados */
+.btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones de acción con iconos */
+.btn i {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.btn-sm {
+  border-radius: 0.4rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Botones primarios */
+.btn-primary {
+  background: linear-gradient(90deg, var(--primary), #3a9701);
+  border-color: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(90deg, #3a9701, var(--primary));
+  border-color: #3a9701;
+}
+
+/* Botones de acción en tablas */
+.table .btn-sm {
+  opacity: 1;  /* Siempre visible */
+  visibility: visible;
+  color: #555;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.table .btn-sm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  color: white; /* Texto blanco al pasar sobre los botones */
+}
+
+.table .btn-sm.btn-outline-secondary:hover {
+  background-color: #6c757d;
+}
+
+.table .btn-sm.btn-success:hover {
+  background-color: #28a745;
+}
+
+.table .btn-sm.btn-info:hover {
+  background-color: #17a2b8;
+}
+
+.table .btn-sm.btn-warning:hover {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.table .btn-sm.btn-danger:hover {
+  background-color: #dc3545;
 }
 
 /* Trabajos Page */
@@ -782,4 +870,99 @@ table.custom-table {
   padding: 0.5rem 1.5rem;
   font-size: 0.9rem;
   border-radius: 0.5rem;
+}
+
+/* Estilos para modales mejorados */
+.modal-content {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.modal-header {
+  background-color: var(--header-bg);
+  color: var(--button-text);
+  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  padding: 1.25rem 1.5rem;
+  justify-content: space-between;
+}
+
+.modal-lg {
+  max-width: 600px; /* Ancho más razonable */
+}
+
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 1rem);
+}
+
+/* Estilos para formularios en modales */
+.modal .form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.modal .form-control,
+.modal .form-select {
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  transition: all 0.3s ease;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25);
+}
+
+.modal .form-text {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+.modal-cantidad {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.modal-cantidad .form-label {
+  font-weight: 600;
+}
+
+.modal-cantidad .form-control {
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  text-align: right;
+}
+
+.modal-cantidad .input-group-text {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  border-radius: 0 0.5rem 0.5rem 0;
 }
