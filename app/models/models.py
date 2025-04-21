@@ -26,10 +26,15 @@ class User(db.Model, UserMixin):
         self.verified = False
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        # Usar pbkdf2:sha256 para garantizar compatibilidad
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        try:
+            return check_password_hash(self.password_hash, password)
+        except ValueError:
+            # Manejar hashes incompatibles
+            return False
 
     @property
     def get_role_display(self):

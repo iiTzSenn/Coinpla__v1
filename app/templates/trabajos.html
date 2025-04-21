@@ -6,13 +6,12 @@
 {% from "components/form_fields.html" import text_field, phone_field, select_field, textarea_field %}
 {% from "components/table.html" import paginated_table %}
 
-{{ page_header(
-    title="",
-    breadcrumbs=[
-        {"text": "Inicio", "bold": true},
-        {"text": "Trabajos", "bold": true}
-    ]
-) }}
+<!-- Breadcrumb estilizado según la imagen -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Trabajos</span>
+</div>
 
 <!-- Botones de acción principales -->
 <div class="d-flex gap-2 mb-4">

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<div class="container mb-5 mt-4">
+  <div class="card shadow-sm" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+    <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+      <i class="bi bi-person-circle me-2" style="font-size: 1.2rem; color: #6c757d;"></i>
+      <h4 class="mb-0">Mi Perfil</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('users.profile') }}">
+        <div class="mb-3">
+          <label for="username" class="form-label">Usuario</label>
+          <input type="text" class="form-control" id="username" name="username" required value="{{ current_user.username }}">
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo Electrónico</label>
+          <input type="email" class="form-control" id="email" name="email" required value="{{ current_user.email }}">
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Nueva Contraseña</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
+            <button class="btn btn-outline-secondary" type="button" id="toggle-password"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
+          <div class="input-group">
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
+            <button class="btn btn-outline-secondary" type="button" id="toggle-confirm-password"><i class="bi bi-eye"></i></button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.getElementById('toggle-password')?.addEventListener('click', function() {
+    const pwd = document.getElementById('password');
+    if (pwd.type === 'password') {
+      pwd.type = 'text'; this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      pwd.type = 'password'; this.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  });
+  document.getElementById('toggle-confirm-password')?.addEventListener('click', function() {
+    const pwd = document.getElementById('confirm_password');
+    if (pwd.type === 'password') {
+      pwd.type = 'text'; this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      pwd.type = 'password'; this.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  });
+</script>
+{% endblock %}

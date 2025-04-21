@@ -6,101 +6,287 @@
 {% from "components/table.html" import paginated_table %}
 {% from "components/filters.html" import filter_card, date_range_filters %}
 
-{{ page_header(
-    title="Historial de Trabajos",
-    breadcrumbs=[
-        {"url": url_for('jobs.index'), "text": "Inicio"},
-        {"text": "Historial"}
-    ],
-    buttons=[
-        {"url": url_for('export.exportar_pdf'), "class": "btn btn-secondary", "icon": "bi bi-file-pdf", "text": "Exportar PDF"}
-    ]
-) }}
+<!-- Breadcrumb estilizado según la imagen -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Historial</span>
+</div>
 
 <!-- Filtros de búsqueda -->
-{% call filter_card(
-    title="Filtros de Búsqueda",
-    action_url=url_for('jobs.historial'),
-    reset_url=url_for('jobs.historial')
-) %}
-  <div class="col-md-3">
-    {{ text_field("cliente", "Cliente:", "Ingrese nombre del cliente", value=request.args.get('cliente', '')) }}
-  </div>
-  <div class="col-md-3">
-    <label for="tecnico" class="form-label">Técnico:</label>
-    <select class="form-select" id="tecnico" name="tecnico">
-      <option value="">Todos</option>
-      {% for tecnico in tecnicos %}
-        <option value="{{ tecnico.id }}" {% if request.args.get('tecnico')|int == tecnico.id %}selected{% endif %}>
-          {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
-        </option>
-      {% endfor %}
-    </select>
-  </div>
-  {{ date_range_filters(
-    fecha_inicio_value=request.args.get('fecha_inicio', ''),
-    fecha_fin_value=request.args.get('fecha_fin', '')
-  ) }}
-{% endcall %}
-
-<!-- Tabla de trabajos completados -->
-{% if trabajos %}
-  {{ paginated_table(
-    title="Trabajos Completados",
-    columns=["#", "Cliente", "Técnico", "Fecha", "Estado", "Acciones"],
-    data_items=trabajos.items,
-    paginator=trabajos,
-    endpoint="jobs.historial",
-    params=request.args,
-    empty_message="No se encontraron trabajos completados.",
-    row_template=generate_history_row
-  ) }}
-{% else %}
-  {{ empty_state("No se encontraron trabajos completados que coincidan con los filtros.") }}
-{% endif %}
-
-<!-- Modal para ver detalles de trabajo -->
-<div class="modal fade" id="detalleTrabajoModal" tabindex="-1" aria-labelledby="detalleTrabajoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content modal-rectangular">
-      <div class="modal-header">
-        <h5 class="modal-title" id="detalleTrabajoModalLabel">Detalles del Trabajo</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        <dl class="row">
-          <dt class="col-sm-4">Cliente:</dt>
-          <dd class="col-sm-8" id="detalleCliente"></dd>
-          
-          <dt class="col-sm-4">Teléfono:</dt>
-          <dd class="col-sm-8" id="detalleTelefono"></dd>
-          
-          <dt class="col-sm-4">Dirección:</dt>
-          <dd class="col-sm-8" id="detalleDireccion"></dd>
-          
-          <dt class="col-sm-4">Código Postal:</dt>
-          <dd class="col-sm-8" id="detalleCodigoPostal"></dd>
-          
-          <dt class="col-sm-4">Descripción:</dt>
-          <dd class="col-sm-8" id="detalleDescripcion"></dd>
-          
-          <dt class="col-sm-4">Duración:</dt>
-          <dd class="col-sm-8" id="detalleDuracion"></dd>
-          
-          <dt class="col-sm-4">Fecha y hora:</dt>
-          <dd class="col-sm-8"><span id="detalleFecha"></span> - <span id="detalleHora"></span></dd>
-          
-          <dt class="col-sm-4">Técnico:</dt>
-          <dd class="col-sm-8" id="detalleTecnico"></dd>
-          
-          <dt class="col-sm-4">Completado el:</dt>
-          <dd class="col-sm-8" id="detalleDiaCompletado"></dd>
-        </dl>
-      </div>
-      <div class="modal-footer justify-content-center">
-        <button type="button" class="btn btn-third btn-modal-close" data-bs-dismiss="modal">Cerrar</button>
-      </div>
+<div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-funnel" style="font-size: 0.9rem; color: #6c757d;"></i>
+      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtros de Búsqueda</span>
     </div>
   </div>
+  <div class="card-body">
+    <form action="{{ url_for('jobs.historial') }}" method="GET" class="row g-3">
+      <div class="col-md-3">
+        {{ text_field("cliente", "Cliente:", "Ingrese nombre del cliente", value=request.args.get('cliente', '')) }}
+      </div>
+      <div class="col-md-3">
+        <label for="tecnico" class="form-label">Técnico:</label>
+        <select class="form-select" id="tecnico" name="tecnico">
+          <option value="">Todos los técnicos</option>
+          {% for tecnico in tecnicos %}
+            <option value="{{ tecnico.id }}" {% if request.args.get('tecnico')|int == tecnico.id %}selected{% endif %}>
+              {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      {{ date_range_filters(
+        fecha_inicio_value=request.args.get('fecha_inicio', ''),
+        fecha_fin_value=request.args.get('fecha_fin', '')
+      ) }}
+      <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+        <a href="{{ url_for('jobs.historial') }}" class="btn btn-outline-secondary" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
+          <i class="bi bi-x-circle me-1"></i>Limpiar
+        </a>
+        <button type="submit" class="btn btn-filter" style="background-color: #28a745; color: white; border-radius: 1rem; padding: 0.5rem 1.25rem; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
+
+<!-- Tabla de trabajos completados -->
+<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-check-circle" style="font-size: 0.9rem; color: #6c757d;"></i>
+      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Trabajos Completados</span>
+    </div>
+  </div>
+  <div class="card-body p-0">
+    {% if trabajos.items %}
+      <div class="table-responsive">
+        <table class="table mb-0 dashboard-table" id="historialTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Técnico</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for trabajo in trabajos.items %}
+              {{ generate_history_row(trabajo)|safe }}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Paginación -->
+      <div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+        <nav aria-label="Paginación de trabajos">
+          <ul class="pagination m-0" style="gap: 0.5rem;">
+            {% set args = dict(request.args) %}
+            {% set _ = args.pop('page', None) %}
+            <li class="page-item {% if not trabajos.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.historial', page=1, **args) if trabajos.has_prev else '#' }}">&laquo;</a>
+            </li>
+            <li class="page-item {% if not trabajos.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.historial', page=trabajos.prev_num, **args) if trabajos.has_prev else '#' }}">&lt;</a>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">{{ trabajos.page }} / {{ trabajos.pages or 1 }}</span>
+            </li>
+            <li class="page-item {% if not trabajos.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.historial', page=trabajos.next_num, **args) if trabajos.has_next else '#' }}">&gt;</a>
+            </li>
+            <li class="page-item {% if not trabajos.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('jobs.historial', page=trabajos.pages, **args) if trabajos.has_next else '#' }}">&raquo;</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    {% else %}
+      <div class="alert alert-info m-3 text-center">
+        <i class="bi bi-info-circle me-2"></i> No se encontraron trabajos completados que coincidan con los filtros.
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Efectos para botones de búsqueda
+    const btnOutlineSecondary = document.querySelectorAll('.btn-outline-secondary');
+    btnOutlineSecondary.forEach(btn => {
+      btn.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#6c757d';
+        this.style.color = 'white';
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      btn.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '';
+        this.style.color = '';
+        this.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Efectos para botones de filtrado
+    const btnFilter = document.querySelectorAll('.btn-filter');
+    btnFilter.forEach(btn => {
+      btn.addEventListener('mouseover', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
+        this.style.backgroundColor = '#218838';
+      });
+      
+      btn.addEventListener('mouseout', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 2px 5px rgba(0,0,0,0.15)';
+        this.style.backgroundColor = '#28a745';
+      });
+    });
+  });
+</script>
+
+<style>
+  /* Estilo para los inputs y selects */
+  .form-control, .form-select {
+    border-radius: 0.5rem !important;
+    border: 1px solid #cbc6c6;
+  }
+  
+  /* Estilos para el desplegable de técnicos como en dashboard */
+  .chart-period-select {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem !important;
+    color: #6c757d;
+    padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    position: relative;
+    height: calc(2.25rem + 2px);
+    width: 100%;
+  }
+  
+  .chart-period-select:hover {
+    background-color: rgba(40, 167, 69, 0.05);
+    border-color: rgba(40, 167, 69, 0.2);
+    color: #495057;
+  }
+  
+  .chart-period-select:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+    outline: none;
+  }
+  
+  .select-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+  }
+  
+  .select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+  }
+  
+  .select-container:hover .select-icon {
+    color: #28a745;
+  }
+  
+  /* Botón de filtrar con estilo verde */
+  .btn-filter {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    font-weight: 500;
+  }
+  
+  .btn-filter:hover, .btn-filter:focus {
+    background-color: #218838;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  }
+  
+  /* Estilos para la paginación minimalista como en el dashboard */
+  .minimal-pagination {
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem !important;
+    border: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 0.85rem;
+    background-color: #f8f9fa;
+    min-width: 32px;
+    text-align: center;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+  
+  .minimal-pagination:hover:not(.disabled) {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-color: #28a745;
+    transform: translateY(-1px);
+  }
+  
+  .pagination {
+    gap: 0.35rem;
+  }
+  
+  .page-item.disabled .minimal-pagination {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  
+  /* Estilos para las filas de tabla */
+  .dashboard-table {
+    margin: 0;
+  }
+  
+  .dashboard-table thead th {
+    border-top: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fa;
+  }
+  
+  .dashboard-table tbody td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+  }
+  
+  .dashboard-table tbody tr:hover {
+    background-color: rgba(40, 167, 69, 0.05);
+  }
+  
+  /* Asegurar que las migas de pan estén en negrita */
+  .breadcrumb-item {
+    font-weight: bold !important;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+  }
+</style>
 {% endblock %}

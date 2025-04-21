@@ -6,12 +6,12 @@
 {% from "components/dashboard_cards.html" import stats_row, chart_card %}
 {% from "components/table.html" import data_table, paginated_table %}
 
-{{ page_header(
-    title="",
-    breadcrumbs=[
-        {"text": "Inicio"}
-    ]
-) }}
+<!-- Breadcrumb estilizado según la imagen -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Dashboard</span>
+</div>
 
 <!-- Estadísticas principales -->
 <div class="row mb-4">

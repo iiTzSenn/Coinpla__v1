@@ -100,30 +100,10 @@ def generate_history_row(trabajo):
     
     return f"""
     <tr>
-      <td>{trabajo.id}</td>
+      <td class="text-center"><a href="/jobs/{trabajo.id}" class="text-decoration-none">Nº_{trabajo.id}</a></td>
       <td>{trabajo.nombre_cliente} {trabajo.apellido_cliente or ''}</td>
       <td>{technician_name}</td>
       <td>{trabajo.fecha.strftime("%d/%m/%Y")}</td>
       <td><p class="status status-paid">Completado</p></td>
-      <td>
-        <div class="d-flex justify-content-center align-items-center">
-          <button class="btn btn-info btn-sm btn-action ver-detalles"
-            data-bs-toggle="modal" 
-            data-bs-target="#detalleTrabajoModal"
-            data-nombre="{trabajo.nombre_cliente}"
-            data-apellido="{trabajo.apellido_cliente or ''}"
-            data-telefono="{trabajo.telefono or ''}"
-            data-direccion="{trabajo.direccion or ''}"
-            data-codigo_postal="{trabajo.codigo_postal or ''}"
-            data-descripcion="{trabajo.descripcion}"
-            data-duracion="{trabajo.duracion}"
-            data-fecha="{trabajo.fecha.strftime('%d/%m/%Y')}"
-            data-hora="{trabajo.hora}"
-            data-tecnico="{technician_name}"
-            data-dia-completado="{trabajo.fecha_completado.strftime('%d/%m/%Y') if hasattr(trabajo, 'fecha_completado') and trabajo.fecha_completado else 'N/A'}">
-            <i class="bi bi-eye"></i>
-          </button>
-        </div>
-      </td>
     </tr>
     """

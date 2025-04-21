@@ -312,7 +312,7 @@ def completar_trabajo(id):
 @login_required
 def historial():
     page = request.args.get('page', 1, type=int)
-    per_page = 10
+    per_page = 20  # Cambiado de 10 a 20 resultados por página
     
     cliente_filter = request.args.get('cliente', '')
     tecnico_filter = request.args.get('tecnico', '')
