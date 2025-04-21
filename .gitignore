@@ -25,52 +25,130 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+MANIFEST
 
-# Entornos virtuales
-venv/
-ENV/
-env/
-.venv
-.env-*/
+# PyInstaller
+*.manifest
+*.spec
 
-# Base de datos y migraciones
-*.db
-*.sqlite
-*.sqlite3
-migrations/versions/
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
-# Logs y archivos generados
-*.log
-logs/
-*.swp
-.DS_Store
-.idea/
-.vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
 
-# Archivos generados en tiempo de ejecución
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
 instance/
 .webassets-cache
 
-# Archivos de caché
-.pytest_cache/
-.coverage
-htmlcov/
-.tox/
+# Scrapy stuff:
+.scrapy
 
-# Node y npm
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#Pipfile.lock
+
+# poetry
+#poetry.lock
+
+# pdm
+.pdm.toml
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static analysis results
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# VS Code
+.vscode/
+
+# SQLite
+*.sqlite3
+*.sqlite3-journal
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node.js dependencies (if using frontend tools)
 node_modules/
-npm-debug.log
 package-lock.json
-app/models/__pycache__/__init__.cpython-313.pyc
-app/models/__pycache__/models.cpython-313.pyc
-app/routes/__pycache__/jobs.cpython-313.pyc
-app/__pycache__/__init__.cpython-313.pyc
-app/routes/__pycache__/jobs.cpython-313.pyc
-models_update_instructions.txt
-app/routes/__pycache__/jobs.cpython-313.pyc
-app/routes/__pycache__/jobs.cpython-313.pyc
+yarn.lock
