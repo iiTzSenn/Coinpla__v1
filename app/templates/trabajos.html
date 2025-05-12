@@ -31,67 +31,69 @@
   </div>
 </div>
 
-<!-- Tarjeta de trabajos -->
-<div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-    <div class="d-flex align-items-center gap-2">
-      <i class="bi bi-funnel" style="font-size: 0.9rem; color: #6c757d;"></i>
-      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtros de Búsqueda</span>
-    </div>
-  </div>
-  <div class="card-body">
-    <form action="{{ url_for('jobs.trabajos') }}" method="GET" class="row g-3">
-      <div class="col-md-6">
-        <div class="row">
-          <div class="col-md-6">
-            <label for="fecha_inicio" class="form-label">Fecha inicio:</label>
-            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ request.args.get('fecha_inicio', '') }}">
-          </div>
-          <div class="col-md-6">
-            <label for="fecha_fin" class="form-label">Fecha fin:</label>
-            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ request.args.get('fecha_fin', '') }}">
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <label for="estado_filtro" class="form-label">Estado:</label>
-        <select class="form-select" id="estado_filtro" name="estado">
-          <option value="">Todos los estados</option>
-          <option value="Pendiente" {% if request.args.get('estado') == 'Pendiente' %}selected{% endif %}>Pendiente</option>
-          <option value="En Proceso" {% if request.args.get('estado') == 'En Proceso' %}selected{% endif %}>En Proceso</option>
-          <option value="Presupuesto" {% if request.args.get('estado') == 'Presupuesto' %}selected{% endif %}>Presupuesto</option>
-          <option value="Completado" {% if request.args.get('estado') == 'Completado' %}selected{% endif %}>Completado</option>
-        </select>
-      </div>
-      <div class="col-12 d-flex justify-content-end gap-2 mt-3">
-        <a href="{{ url_for('jobs.trabajos') }}" class="btn btn-outline-secondary" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
-          <i class="bi bi-x-circle me-1"></i>Limpiar
-        </a>
-        <button type="submit" class="btn btn-filter" style="background-color: #28a745; color: white; border-radius: 1rem; padding: 0.5rem 1.25rem; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
-          <i class="bi bi-search me-1"></i>Buscar
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+<!-- Formulario oculto para manejar los filtros -->
+<form action="{{ url_for('jobs.trabajos') }}" method="GET" id="filtrosForm" style="display:none;">
+  <input type="hidden" id="estado_oculto" name="estado" value="{{ request.args.get('estado', '') }}">
+  <input type="hidden" id="fecha_inicio_oculto" name="fecha_inicio" value="{{ request.args.get('fecha_inicio', '') }}">
+  <input type="hidden" id="fecha_fin_oculto" name="fecha_fin" value="{{ request.args.get('fecha_fin', '') }}">
+</form>
 
 <!-- Tarjeta de trabajos -->
-<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+<div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
     <div class="d-flex align-items-center gap-2">
       <i class="bi bi-list-task" style="font-size: 0.9rem; color: #6c757d;"></i>
       <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Trabajos Activos</span>
     </div>
-    <div class="dropdown chart-filter-dropdown">
-      <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroEstadoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-        <span>Todos los trabajos</span>
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="filtroEstadoDropdown">
-        <li><a class="dropdown-item" href="#" data-filter="all"><i class="bi bi-list-stars me-2"></i>Todos los trabajos</a></li>
-        <li><a class="dropdown-item" href="#" data-filter="Presupuesto"><i class="bi bi-file-earmark-text me-2"></i>Presupuestos</a></li>
-        <li><a class="dropdown-item" href="#" data-filter="Pendiente"><i class="bi bi-hourglass me-2"></i>Pendientes</a></li>
-        <li><a class="dropdown-item" href="#" data-filter="En Proceso"><i class="bi bi-gear-wide-connected me-2"></i>En Proceso</a></li>
-      </ul>
+    <div class="d-flex align-items-center gap-3">
+      <!-- Filtro de Estado -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroEstadoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-funnel-fill me-1" style="color: #28a745;"></i>
+          <span>Estado: {{ request.args.get('estado', 'Todos') }}</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="filtroEstadoDropdown">
+          <li><a class="dropdown-item filter-estado" href="#" data-value=""><i class="bi bi-list-stars me-2"></i>Todos</a></li>
+          <li><a class="dropdown-item filter-estado" href="#" data-value="Pendiente"><i class="bi bi-hourglass me-2"></i>Pendiente</a></li>
+          <li><a class="dropdown-item filter-estado" href="#" data-value="En Proceso"><i class="bi bi-gear-wide-connected me-2"></i>En Proceso</a></li>
+          <li><a class="dropdown-item filter-estado" href="#" data-value="Presupuesto"><i class="bi bi-file-earmark-text me-2"></i>Presupuesto</a></li>
+          <li><a class="dropdown-item filter-estado" href="#" data-value="Completado"><i class="bi bi-check-circle me-2"></i>Completado</a></li>
+        </ul>
+      </div>
+      
+      <!-- Filtro de Fecha Inicio -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroFechaInicioDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-calendar-event me-1" style="color: #28a745;"></i>
+          <span>Desde: {{ request.args.get('fecha_inicio', 'Cualquier fecha') }}</span>
+        </button>
+        <div class="dropdown-menu p-3 dropdown-menu-end" style="min-width: 300px;" aria-labelledby="filtroFechaInicioDropdown">
+          <div class="mb-2">Fecha Inicio:</div>
+          <input type="date" class="form-control" id="fecha_inicio_filter" value="{{ request.args.get('fecha_inicio', '') }}">
+          <div class="d-flex justify-content-end mt-2">
+            <button type="button" class="btn btn-sm btn-green aplicar-fecha-inicio">Aplicar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filtro de Fecha Fin -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroFechaFinDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-calendar-event-fill me-1" style="color: #28a745;"></i>
+          <span>Hasta: {{ request.args.get('fecha_fin', 'Cualquier fecha') }}</span>
+        </button>
+        <div class="dropdown-menu p-3 dropdown-menu-end" style="min-width: 300px;" aria-labelledby="filtroFechaFinDropdown">
+          <div class="mb-2">Fecha Fin:</div>
+          <input type="date" class="form-control" id="fecha_fin_filter" value="{{ request.args.get('fecha_fin', '') }}">
+          <div class="d-flex justify-content-end mt-2">
+            <button type="button" class="btn btn-sm btn-green aplicar-fecha-fin">Aplicar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botón para limpiar filtros -->
+      <a href="{{ url_for('jobs.trabajos') }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 0.5rem;">
+        <i class="bi bi-x-circle"></i>
+      </a>
     </div>
   </div>
   <div class="card-body p-0">
@@ -542,29 +544,46 @@
         form.action = `{{ url_for('jobs.eliminar_trabajo', id=0) }}`.replace('0', jobId);
       });
     });
+      // Manejo de filtros en la cabecera
+    const filtrosForm = document.getElementById('filtrosForm');
+    const estadoOcultoInput = document.getElementById('estado_oculto');
+    const fechaInicioOcultoInput = document.getElementById('fecha_inicio_oculto');
+    const fechaFinOcultoInput = document.getElementById('fecha_fin_oculto');
     
-    // Filtrado de trabajos por estado mediante dropdown
-    const filterLinks = document.querySelectorAll('[data-filter]');
-    filterLinks.forEach(link => {
+    // Filtrado por estado con nuevo dropdown
+    document.querySelectorAll('.filter-estado').forEach(link => {
       link.addEventListener('click', function(e) {
         e.preventDefault();
-        const filter = this.getAttribute('data-filter');
-        const rows = document.querySelectorAll('#trabajosTable tbody tr');
+        const estadoValor = this.getAttribute('data-value');
         
-        rows.forEach(row => {
-          if (filter === 'all' || row.getAttribute('data-estado') === filter) {
-            row.style.display = '';
-          } else {
-            row.style.display = 'none';
-          }
-        });
+        // Actualizar campo oculto
+        estadoOcultoInput.value = estadoValor;
         
-        // Actualizar el texto del botón del dropdown
-        const dropdownButton = document.getElementById('filtroEstadoDropdown');
-        if (dropdownButton) {
-          dropdownButton.querySelector('span').textContent = this.textContent.trim();
-        }
+        // Enviar formulario automáticamente
+        filtrosForm.submit();
       });
+    });
+    
+    // Filtrado por fecha de inicio
+    document.querySelector('.aplicar-fecha-inicio').addEventListener('click', function() {
+      const fechaInicioValor = document.getElementById('fecha_inicio_filter').value;
+      
+      // Actualizar campo oculto
+      fechaInicioOcultoInput.value = fechaInicioValor;
+      
+      // Enviar formulario automáticamente
+      filtrosForm.submit();
+    });
+    
+    // Filtrado por fecha de fin
+    document.querySelector('.aplicar-fecha-fin').addEventListener('click', function() {
+      const fechaFinValor = document.getElementById('fecha_fin_filter').value;
+      
+      // Actualizar campo oculto
+      fechaFinOcultoInput.value = fechaFinValor;
+      
+      // Enviar formulario automáticamente
+      filtrosForm.submit();
     });
     
     // Función de búsqueda
@@ -812,8 +831,7 @@
   .breadcrumb-item {
     font-weight: bold !important;
   }
-  
-  /* Estilos para el dropdown del filtro de trabajos */
+    /* Estilos para el dropdown del filtro de trabajos */
   .chart-filter-dropdown {
     position: relative;
   }
@@ -830,6 +848,7 @@
     transform: none !important;
     margin-top: 0.5rem;
     min-width: 200px;
+    border-radius: 0.75rem;
   }
   
   .chart-period-btn {
@@ -840,6 +859,10 @@
     padding: 0.25rem 0.75rem;
     font-size: 0.85rem;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
   }
   
   .chart-period-btn:hover {
@@ -847,6 +870,7 @@
     color: #495057;
     transform: translateY(-1px);
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-color: #28a745;
   }
   
   .chart-period-menu .dropdown-item {
@@ -876,6 +900,24 @@
   
   .chart-period-menu .dropdown-item:hover i {
     transform: scale(1.1);
+  }
+  
+  /* Estilos específicos para los filtros de fecha en el dropdown */
+  .chart-filter-dropdown .dropdown-menu.p-3 {
+    padding: 1rem !important;
+    border-radius: 0.75rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  }
+  
+  #fecha_inicio_filter, #fecha_fin_filter {
+    border-radius: 0.5rem;
+    border: 1px solid #cbc6c6;
+  }
+  
+  .btn-green {
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
   }
   
   /* Estilos para la paginación minimalista como en el dashboard */
