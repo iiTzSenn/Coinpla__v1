@@ -216,8 +216,38 @@ def dashboard_stats():
 @jobs_bp.route('/listar_trabajos')
 @login_required
 def listar_trabajos():
-    trabajos = Job.query.filter(Job.estado != 'Completado').all()
+    # Obtener filtros de la URL
+    fecha_inicio = request.args.get('fecha_inicio', '')
+    fecha_fin = request.args.get('fecha_fin', '')
+    estado_filtro = request.args.get('estado', '')
+    
+    # Iniciar la consulta base
+    query = Job.query.filter(Job.estado != 'Completado')
+    
+    # Aplicar filtro por estado si está presente
+    if estado_filtro:
+        query = query.filter(Job.estado == estado_filtro)
+    
+    # Aplicar filtro por fecha de inicio si está presente
+    if fecha_inicio:
+        try:
+            fecha_inicio_obj = datetime.strptime(fecha_inicio, '%Y-%m-%d')
+            query = query.filter(Job.fecha >= fecha_inicio_obj)
+        except ValueError:
+            flash("Formato de fecha inicio inválido", "warning")
+    
+    # Aplicar filtro por fecha de fin si está presente
+    if fecha_fin:
+        try:
+            fecha_fin_obj = datetime.strptime(fecha_fin, '%Y-%m-%d')
+            query = query.filter(Job.fecha <= fecha_fin_obj)
+        except ValueError:
+            flash("Formato de fecha fin inválido", "warning")
+    
+    # Ejecutar la consulta y obtener los resultados
+    trabajos = query.order_by(Job.fecha.desc()).all()
     tecnicos = Technician.query.all()
+    
     return render_template('trabajos.html', trabajos=trabajos, tecnicos=tecnicos)
 
 @jobs_bp.route('/jobs/<int:id>')
@@ -643,3 +673,9 @@ def aprobar_presupuesto(id):
 
     flash('Presupuesto aprobado y trabajo marcado como "En Proceso".', 'success')
     return redirect(url_for('jobs.listar_trabajos'))
+
+@jobs_bp.route('/trabajos')
+@login_required
+def trabajos():
+    # Redireccionar a listar_trabajos para mantener la compatibilidad con el código existente
+    return listar_trabajos()

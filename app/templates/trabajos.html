@@ -32,6 +32,50 @@
 </div>
 
 <!-- Tarjeta de trabajos -->
+<div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-funnel" style="font-size: 0.9rem; color: #6c757d;"></i>
+      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtros de Búsqueda</span>
+    </div>
+  </div>
+  <div class="card-body">
+    <form action="{{ url_for('jobs.trabajos') }}" method="GET" class="row g-3">
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-md-6">
+            <label for="fecha_inicio" class="form-label">Fecha inicio:</label>
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ request.args.get('fecha_inicio', '') }}">
+          </div>
+          <div class="col-md-6">
+            <label for="fecha_fin" class="form-label">Fecha fin:</label>
+            <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ request.args.get('fecha_fin', '') }}">
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="estado_filtro" class="form-label">Estado:</label>
+        <select class="form-select" id="estado_filtro" name="estado">
+          <option value="">Todos los estados</option>
+          <option value="Pendiente" {% if request.args.get('estado') == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+          <option value="En Proceso" {% if request.args.get('estado') == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+          <option value="Presupuesto" {% if request.args.get('estado') == 'Presupuesto' %}selected{% endif %}>Presupuesto</option>
+          <option value="Completado" {% if request.args.get('estado') == 'Completado' %}selected{% endif %}>Completado</option>
+        </select>
+      </div>
+      <div class="col-12 d-flex justify-content-end gap-2 mt-3">
+        <a href="{{ url_for('jobs.trabajos') }}" class="btn btn-outline-secondary" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
+          <i class="bi bi-x-circle me-1"></i>Limpiar
+        </a>
+        <button type="submit" class="btn btn-filter" style="background-color: #28a745; color: white; border-radius: 1rem; padding: 0.5rem 1.25rem; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tarjeta de trabajos -->
 <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
   <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
     <div class="d-flex align-items-center gap-2">
@@ -499,7 +543,7 @@
       });
     });
     
-    // Filtrado de trabajos por estado
+    // Filtrado de trabajos por estado mediante dropdown
     const filterLinks = document.querySelectorAll('[data-filter]');
     filterLinks.forEach(link => {
       link.addEventListener('click', function(e) {
@@ -580,127 +624,122 @@
       // Función para actualizar los controles de paginación
       function updatePagination(currentPage) {
         const pagination = document.querySelector('.pagination');
-        if (!pagination) return;
-        
-        // Limpiar paginación actual
-        pagination.innerHTML = '';
-        
-        // Crear controles de paginación minimalista al estilo dashboard
-        
-        // Botón para primera página
-        const firstPageLi = document.createElement('li');
-        firstPageLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-        const firstPageLink = document.createElement('a');
-        firstPageLink.className = 'page-link minimal-pagination';
-        firstPageLink.href = '#';
-        firstPageLink.innerHTML = '&laquo;';
-        firstPageLink.setAttribute('aria-label', 'Primera página');
-        if (currentPage > 1) {
-          firstPageLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showPage(1);
-          });
+        if (pagination) {
+          const pageLinks = pagination.querySelectorAll('span.page-link');
+          if (pageLinks && pageLinks.length > 0) {
+            const pageInfoSpan = pageLinks[2]; // El tercero es el que contiene la información de la página
+            pageInfoSpan.textContent = `${currentPage} / ${pageCount}`;
+          }
+          
+          // Actualizar estado de los botones siguiente/anterior
+          const prevButton = pagination.querySelector('.page-item:nth-child(2)');
+          const nextButton = pagination.querySelector('.page-item:nth-child(4)');
+          
+          if (prevButton) {
+            if (currentPage <= 1) {
+              prevButton.classList.add('disabled');
+            } else {
+              prevButton.classList.remove('disabled');
+              const prevLink = prevButton.querySelector('a, span');
+              if (prevLink.tagName === 'A') {
+                prevLink.onclick = function(e) {
+                  e.preventDefault();
+                  showPage(currentPage - 1);
+                };
+              }
+            }
+          }
+          
+          if (nextButton) {
+            if (currentPage >= pageCount) {
+              nextButton.classList.add('disabled');
+            } else {
+              nextButton.classList.remove('disabled');
+              const nextLink = nextButton.querySelector('a, span');
+              if (nextLink.tagName === 'A') {
+                nextLink.onclick = function(e) {
+                  e.preventDefault();
+                  showPage(currentPage + 1);
+                };
+              }
+            }
+          }
+          
+          // Actualizar primer y último botón
+          const firstButton = pagination.querySelector('.page-item:first-child');
+          const lastButton = pagination.querySelector('.page-item:last-child');
+          
+          if (firstButton) {
+            if (currentPage <= 1) {
+              firstButton.classList.add('disabled');
+            } else {
+              firstButton.classList.remove('disabled');
+              const firstLink = firstButton.querySelector('a, span');
+              if (firstLink.tagName === 'A') {
+                firstLink.onclick = function(e) {
+                  e.preventDefault();
+                  showPage(1);
+                };
+              }
+            }
+          }
+          
+          if (lastButton) {
+            if (currentPage >= pageCount) {
+              lastButton.classList.add('disabled');
+            } else {
+              lastButton.classList.remove('disabled');
+              const lastLink = lastButton.querySelector('a, span');
+              if (lastLink.tagName === 'A') {
+                lastLink.onclick = function(e) {
+                  e.preventDefault();
+                  showPage(pageCount);
+                };
+              }
+            }
+          }
         }
-        firstPageLi.appendChild(firstPageLink);
-        pagination.appendChild(firstPageLi);
-        
-        // Botón para página anterior
-        const prevLi = document.createElement('li');
-        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link minimal-pagination';
-        prevLink.href = '#';
-        prevLink.innerHTML = '&lt;';
-        prevLink.setAttribute('aria-label', 'Página anterior');
-        if (currentPage > 1) {
-          prevLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showPage(currentPage - 1);
-          });
-        }
-        prevLi.appendChild(prevLink);
-        pagination.appendChild(prevLi);
-        
-        // Indicador de página actual / total
-        const currentPageLi = document.createElement('li');
-        currentPageLi.className = 'page-item disabled';
-        const currentPageSpan = document.createElement('span');
-        currentPageSpan.className = 'page-link minimal-pagination';
-        currentPageSpan.textContent = `${currentPage} / ${pageCount}`;
-        currentPageLi.appendChild(currentPageSpan);
-        pagination.appendChild(currentPageLi);
-        
-        // Botón para página siguiente
-        const nextLi = document.createElement('li');
-        nextLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link minimal-pagination';
-        nextLink.href = '#';
-        nextLink.innerHTML = '&gt;';
-        nextLink.setAttribute('aria-label', 'Página siguiente');
-        if (currentPage < pageCount) {
-          nextLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showPage(currentPage + 1);
-          });
-        }
-        nextLi.appendChild(nextLink);
-        pagination.appendChild(nextLi);
-        
-        // Botón para última página
-        const lastPageLi = document.createElement('li');
-        lastPageLi.className = `page-item ${currentPage === pageCount ? 'disabled' : ''}`;
-        const lastPageLink = document.createElement('a');
-        lastPageLink.className = 'page-link minimal-pagination';
-        lastPageLink.href = '#';
-        lastPageLink.innerHTML = '&raquo;';
-        lastPageLink.setAttribute('aria-label', 'Última página');
-        if (currentPage < pageCount) {
-          lastPageLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            showPage(pageCount);
-          });
-        }
-        lastPageLi.appendChild(lastPageLink);
-        pagination.appendChild(lastPageLi);
       }
       
-      // Mostrar la primera página al cargar
-      if (rows.length > 0) {
+      // Si hay más de una página, inicializar la paginación
+      if (pageCount > 1) {
         showPage(1);
+        
+        // Actualizar navegación inicial
+        const pagination = document.querySelector('.pagination');
+        if (pagination) {
+          const pageLinks = pagination.querySelectorAll('.page-link');
+          
+          // Configurar los botones de navegación
+          if (pageLinks.length >= 5) {
+            pageLinks[0].onclick = function(e) {
+              e.preventDefault();
+              showPage(1);
+            };
+            
+            pageLinks[1].onclick = function(e) {
+              e.preventDefault();
+              const currentPage = parseInt(pageLinks[2].textContent.split(' / ')[0]);
+              if (currentPage > 1) {
+                showPage(currentPage - 1);
+              }
+            };
+            
+            pageLinks[3].onclick = function(e) {
+              e.preventDefault();
+              const currentPage = parseInt(pageLinks[2].textContent.split(' / ')[0]);
+              if (currentPage < pageCount) {
+                showPage(currentPage + 1);
+              }
+            };
+            
+            pageLinks[4].onclick = function(e) {
+              e.preventDefault();
+              showPage(pageCount);
+            };
+          }
+        }
       }
-    }
-    
-    // Añadir efectos de hover a los botones
-    const btnThird = document.querySelectorAll('.btn-third');
-    btnThird.forEach(btn => {
-      btn.addEventListener('mouseover', function() {
-        this.style.backgroundColor = '#4b6cb7';
-        this.style.color = 'white';
-        this.style.transform = 'translateY(-2px)';
-      });
-      
-      btn.addEventListener('mouseout', function() {
-        this.style.backgroundColor = '';
-        this.style.color = '';
-        this.style.transform = 'translateY(0)';
-      });
-    });
-    
-    // Añadir efectos de hover al botón de historial
-    const btnHistorial = document.querySelector('.btn-outline-secondary[href*="historial"]');
-    if (btnHistorial) {
-      btnHistorial.addEventListener('mouseover', function() {
-        this.style.backgroundColor = '#6c757d';
-        this.style.color = 'white';
-        this.style.transform = 'translateY(-2px)';
-      });
-      
-      btnHistorial.addEventListener('mouseout', function() {
-        this.style.backgroundColor = '';
-        this.style.color = '';
-        this.style.transform = 'translateY(0)';
-      });
     }
   });
 </script>
