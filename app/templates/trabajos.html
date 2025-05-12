@@ -89,10 +89,10 @@
           </div>
         </div>
       </div>
-      
-      <!-- Botón para limpiar filtros -->
-      <a href="{{ url_for('jobs.trabajos') }}" class="btn btn-sm btn-outline-secondary" style="border-radius: 0.5rem;">
-        <i class="bi bi-x-circle"></i>
+        <!-- Botón para limpiar filtros -->
+      <a href="{{ url_for('jobs.trabajos') }}" class="btn btn-sm btn-outline-secondary chart-period-btn" style="border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-arrow-repeat me-1" style="color: #28a745;"></i>
+        <span>Limpiar filtros</span>
       </a>
     </div>
   </div>
@@ -144,18 +144,17 @@
               <div class="text-truncate" style="max-width: 150px;" title="{{ trabajo.descripcion }}">
                 {{ trabajo.descripcion }}
               </div>
-            </td>
-            <td>
+            </td>            <td>
               <div class="d-flex gap-1 justify-content-center">
                 <!-- Botón para ver detalles -->
-                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary" title="Ver detalles">
+                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles del trabajo">
                   <i class="bi bi-eye"></i>
                 </a>
                 
                 <!-- Botón para aprobar presupuesto (solo si está en estado Presupuesto) -->
                 {% if trabajo.estado == 'Presupuesto' %}
                 <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}">
-                  <button type="submit" class="btn btn-sm btn-success" title="Aprobar presupuesto">
+                  <button type="submit" class="btn btn-sm btn-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar presupuesto">
                     <i class="bi bi-check-circle"></i>
                   </button>
                 </form>
@@ -163,13 +162,11 @@
                 
                 <!-- Botón para completar comprobante (solo si está En Proceso) -->
                 {% if trabajo.estado == 'En Proceso' %}
-                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info" title="Completar comprobante">
+                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
                   <i class="bi bi-file-earmark-text"></i>
                 </a>
-                {% endif %}
-                
-                <!-- Botón para editar -->
-                <button class="btn btn-sm btn-warning editar-trabajo" 
+                {% endif %}                <!-- Botón para editar -->
+                <button class="btn btn-sm btn-warning editar-trabajo action-btn" 
                         data-bs-toggle="modal" 
                         data-bs-target="#editJobModal"
                         data-id="{{ trabajo.id }}"
@@ -185,15 +182,16 @@
                         data-tecnico_id="{{ trabajo.technician_id or '' }}"
                         data-estado="{{ trabajo.estado }}"
                         data-cantidad="{{ trabajo.cantidad or '' }}"
+                        data-bs-custom-class="tooltip-warning"
                         title="Editar trabajo">
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                
-                <!-- Botón para eliminar -->
-                <button class="btn btn-sm btn-danger confirm-delete-job"
+                  <!-- Botón para eliminar -->
+                <button class="btn btn-sm btn-danger confirm-delete-job action-btn"
                         data-id="{{ trabajo.id }}"
                         data-bs-toggle="modal"
                         data-bs-target="#confirmDeleteModal"
+                        data-bs-custom-class="tooltip-danger"
                         title="Eliminar trabajo">
                   <i class="bi bi-trash"></i>
                 </button>
@@ -491,8 +489,35 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
+<script>  document.addEventListener('DOMContentLoaded', function() {
+    // Añadir atributos para tooltips a los botones que no los tienen
+    document.querySelectorAll('.action-btn').forEach(function(btn) {
+      if (!btn.getAttribute('title')) {
+        // Determinar el tipo de botón por su icono o clase
+        if (btn.querySelector('.bi-eye')) {
+          btn.setAttribute('title', 'Ver detalles del trabajo');
+        } else if (btn.querySelector('.bi-pencil-square')) {
+          btn.setAttribute('title', 'Editar trabajo');
+        } else if (btn.querySelector('.bi-trash')) {
+          btn.setAttribute('title', 'Eliminar trabajo');
+        } else if (btn.querySelector('.bi-check-circle')) {
+          btn.setAttribute('title', 'Aprobar presupuesto');
+        } else if (btn.querySelector('.bi-file-earmark-text')) {
+          btn.setAttribute('title', 'Completar comprobante de trabajo');
+        }
+      }
+    });
+    
+    // Inicializar tooltips para todos los elementos con título
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('.action-btn[title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        trigger: 'hover',
+        placement: 'top',
+        delay: { show: 300, hide: 100 }
+      });
+    });
+    
     // Configuración del formulario de presupuesto
     const addBudgetForm = document.getElementById('addBudgetForm');
     if (addBudgetForm) {
@@ -1009,8 +1034,7 @@
       max-width: 95%;
     }
   }
-  
-  .form-control:focus, .form-select:focus {
+    .form-control:focus, .form-select:focus {
     border-color: #28a745 !important;
     box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
   }
@@ -1018,6 +1042,65 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+    /* Estilos para centrar los iconos en los botones de acción */
+  .action-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+  }
+  
+  .action-btn i {
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0; /* Eliminar márgenes del icono */
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  }
+    /* Asegurar que los botones dentro de forms también estén centrados */
+  form .action-btn {
+    margin: 0 auto;
+  }
+  
+  /* Estilos para los tooltips personalizados */
+  .tooltip {
+    font-size: 0.8rem;
+    opacity: 0.95 !important;
+  }
+  
+  .tooltip-inner {
+    padding: 0.4rem 0.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 200px;
+  }
+  
+  .tooltip-warning .tooltip-inner {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .tooltip-danger .tooltip-inner {
+    background-color: #dc3545;
+  }
+  
+  .bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: inherit;
+  }
+  
+  /* Ajuste adicional para el contenedor de botones de acciones */
+  td .d-flex.gap-1.justify-content-center {
+    display: inline-flex !important;
+    min-width: 120px; /* Ancho mínimo para que quepan los 3 botones */
   }
 </style>
 {% endblock %}
