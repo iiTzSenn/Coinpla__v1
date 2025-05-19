@@ -4,6 +4,7 @@
 {% block content %}
 <h2 class="mb-4">Editar Trabajo</h2>
 <form method="POST" action="{{ url_for('jobs.editar_trabajo', id=trabajo.id) }}" class="mb-4" id="formEditarTrabajo">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="row g-3 mb-3">
     <div class="col-md-6">
       <label for="nombre_cliente" class="form-label">Nombre del Cliente:</label>

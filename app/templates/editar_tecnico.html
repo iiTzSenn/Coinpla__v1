@@ -3,6 +3,7 @@
 {% block content %}
 <h2 class="mb-4">Editar Técnico</h2>
 <form method="POST" action="{{ url_for('editar_tecnico', id=tecnico.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <div class="form-group">
     <label for="nombre">Nombre del Técnico</label>
     <input type="text" class="form-control" id="nombre" name="nombre" value="{{ tecnico.nombre }}" required>

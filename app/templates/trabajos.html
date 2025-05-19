@@ -153,6 +153,7 @@
                 <!-- Botón para aprobar presupuesto (solo si está en estado Presupuesto) -->
                 {% if trabajo.estado == 'Presupuesto' %}
                 <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="btn btn-sm btn-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar presupuesto">
                     <i class="bi bi-check-circle"></i>
                   </button>
@@ -244,6 +245,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form method="POST" action="{{ url_for('jobs.crear_presupuesto') }}" id="addBudgetForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal-body">
           <!-- Sección de Datos de Cliente -->
           <div class="mb-4">
@@ -351,6 +353,7 @@
 <div class="modal fade" id="editJobModal" tabindex="-1" aria-labelledby="editJobModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <form id="editJobForm" method="POST" action="" class="needs-validation" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="modal-content" style="border-radius: 1rem; overflow: hidden;">
         <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
           <h5 class="modal-title" id="editJobModalLabel">

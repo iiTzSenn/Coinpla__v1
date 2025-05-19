@@ -3,6 +3,7 @@
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form id="{{ id }}Form" method="POST" action="{{ action_url }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="modal-content modal-rectangular">
         <div class="modal-header">
           <h5 class="modal-title" id="{{ id }}Label">{{ title }}</h5>
@@ -26,6 +27,7 @@
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-labelledby="{{ id }}Label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <form id="{{ id }}Form" method="POST" action="{{ action_url }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="modal-content modal-rectangular">
         <div class="modal-header">
           <h5 class="modal-title" id="{{ id }}Label">{{ title }}</h5>

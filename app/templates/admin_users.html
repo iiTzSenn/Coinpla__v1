@@ -283,12 +283,14 @@
                 <td>{{ user.email }}</td>
                 <td>                  <div class="action-buttons-container">                    <!-- Botón para verificar -->
                     <form method="POST" action="{{ url_for('admin.admin_verify_user', user_id=user.id) }}" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar usuario" data-bs-custom-class="tooltip-success">
                         <i class="bi bi-check2-circle"></i>
                       </button>
                     </form>
                     <!-- Botón para eliminar solicitud -->
                     <form method="POST" action="{{ url_for('admin.admin_delete_pending_user', user_id=user.id) }}" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Rechazar solicitud" data-bs-custom-class="tooltip-danger">
                         <i class="bi bi-trash"></i>
                       </button>
@@ -342,6 +344,7 @@
                 </td><td>
                   <div class="action-buttons-container">                    <!-- Botón para quitar la verificación (quitar permisos) -->
                     <form method="POST" action="{{ url_for('admin.admin_unverify_user', user_id=user.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-warning btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Revocar verificación" data-bs-custom-class="tooltip-warning">
                         <i class="bi bi-x-circle"></i>
                       </button>
@@ -349,11 +352,13 @@
                     <!-- Botones para promover o revocar permisos -->
                     {% if user.role != 'admin' %}
                     <form method="POST" action="{{ url_for('admin.admin_promote_user', user_id=user.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-primary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Promover a Administrador">
                         <i class="bi bi-arrow-up-circle"></i>
                       </button>
                     </form>{% else %}                      {% if user.id != current_user.id %}
                       <form method="POST" action="{{ url_for('admin.admin_demote_user', user_id=user.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-sm btn-outline-secondary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Cambiar a Técnico">
                           <i class="bi bi-arrow-down-circle"></i>
                         </button>
@@ -362,6 +367,7 @@
                     {% endif %}
                     {% if user.id != current_user.id %}
                     <form method="POST" action="{{ url_for('admin.admin_delete_user', user_id=user.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar usuario" data-bs-custom-class="tooltip-danger">
                         <i class="bi bi-trash"></i>
                       </button>

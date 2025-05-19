@@ -1,0 +1,38 @@
+/* Estilos específicos para la página de perfil */
+
+/* Contenedor principal para mantener estructura fija */
+.card-body.p-0 {
+  overflow: hidden;
+  position: relative;
+}
+
+/* Formulario de edición con ancho controlado */
+#profileForm {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Campo de entrada con ancho máximo */
+#profileForm .form-control {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Asegurar que los grupos de entrada no rompan el layout */
+#profileForm .input-group {
+  max-width: 100%;
+  flex-wrap: nowrap;
+}
+
+/* Prevenir overflow horizontal en dispositivos móviles */
+@media (max-width: 767px) {
+  #profileForm .row {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  #profileForm .col-md-12 {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}

@@ -5,6 +5,7 @@
 <div class="container mt-4 mb-5">
   <h4 class="mb-4 text-center">🧾 Comprobante de Servicio DDD</h4>
   <form method="POST" action="{{ url_for('jobs.guardar_comprobante', id=trabajo.id) }}" id="comprobanteForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     
     <!-- A. Datos del Contratante -->
     <div class="card mb-4">

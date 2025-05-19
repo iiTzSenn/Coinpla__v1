@@ -22,6 +22,7 @@
     </div>
     <div class="card-body">
       <form method="POST" action="{{ url_for('technicians.crear_tecnico') }}" id="addTechForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             {{ text_field("first_name", "Nombre del Técnico:", "Ingrese el nombre del técnico", required=true) }}
@@ -83,6 +84,7 @@
                     <i class="bi bi-trash-fill"></i>
                   </button>
                   <form method="POST" action="{{ url_for('technicians.toggle_tecnico', id=tecnico.id) }}" class="d-inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="button" class="btn btn-info btn-sm btn-action toggle-disponibilidad" title="Alternar disponibilidad">
                       {% if tecnico.available %}
                         <i class="bi bi-toggle-on"></i>
@@ -113,6 +115,7 @@
 <div class="modal fade" id="editTecnicoModal" tabindex="-1" aria-labelledby="editTecnicoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <form id="editTecnicoForm" method="POST" action="">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <div class="modal-content modal-rectangular">
         <div class="modal-header">
           <h5 class="modal-title" id="editTecnicoModalLabel">Editar Técnico</h5>

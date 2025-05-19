@@ -1,39 +1,214 @@
 {% extends "base.html" %}
 {% block title %}Mi Perfil{% endblock %}
 
+{% block head_extra %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
 {% block content %}
-<div class="container mb-5 mt-4">
-  <div class="card shadow-sm" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-    <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-      <i class="bi bi-person-circle me-2" style="font-size: 1.2rem; color: #6c757d;"></i>
-      <h4 class="mb-0">Mi Perfil</h4>
+<!-- Breadcrumb estilizado -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Mi Perfil</span>
+</div>
+
+<!-- Cabecera de perfil con foto y nombre -->
+<div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden; background-color: #fff;">
+  <div class="card-body py-4">
+    <div class="row align-items-center">
+      <div class="col-auto">
+        <div class="position-relative">
+          <div class="bg-light rounded-circle" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-person-circle" style="font-size: 2.5rem; color: #6c757d;"></i>
+          </div>
+          <div class="position-absolute bottom-0 end-0">
+            <span class="badge rounded-pill {{ 'bg-success' if current_user.role == 'admin' else 'bg-primary' }}" style="border: 2px solid #fff;">
+              {{ 'Administrador' if current_user.role == 'admin' else 'Usuario' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <h3 class="fw-bold mb-1">{{ current_user.username }}</h3>
+        <p class="text-muted mb-0">{{ current_user.email }}</p>
+      </div>
+      <div class="col-auto">
+        <button type="button" class="btn btn-sm btn-outline-primary" id="btnEditarPerfil" style="border-radius: 0.6rem; cursor: pointer;">
+          <i class="bi bi-pencil-square me-1"></i>Editar
+        </button>
+      </div>
     </div>
-    <div class="card-body">
-      <form method="POST" action="{{ url_for('users.profile') }}">
-        <div class="mb-3">
-          <label for="username" class="form-label">Usuario</label>
-          <input type="text" class="form-control" id="username" name="username" required value="{{ current_user.username }}">
+  </div>
+</div>
+
+<div class="row">
+  <!-- Información combinada en una estructura más clara -->
+  <div class="col-lg-6">
+    <div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+      <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+        <i class="bi bi-person-vcard me-2" style="font-size: 1.2rem; color: #28a745;"></i>
+        <h4 class="mb-0" style="font-size: 0.9rem; font-weight: 600; color: #333;">Datos Personales</h4>
+      </div>
+      
+      <div class="card-body p-0">
+        <!-- Vista de detalles -->
+        <div id="profileDetails" class="p-4">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item px-0 py-2 border-0 border-bottom">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-person me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+                <div>
+                  <div class="fw-bold small">Nombre de Usuario</div>
+                  <div class="text-muted">{{ current_user.username }}</div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-2 border-0 border-bottom">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-envelope me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+                <div>
+                  <div class="fw-bold small">Correo Electrónico</div>
+                  <div class="text-muted">{{ current_user.email }}</div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-2 border-0 border-bottom">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+                <div>
+                  <div class="fw-bold small">Estado de verificación</div>
+                  <div>
+                    <span class="badge {{ 'bg-success' if current_user.verified else 'bg-warning' }}">
+                      {{ 'Verificado' if current_user.verified else 'Sin verificar' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="list-group-item px-0 py-2 border-0">
+              <div class="d-flex align-items-center">
+                <i class="bi bi-key me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+                <div>
+                  <div class="fw-bold small">Contraseña</div>
+                  <div class="text-muted">••••••••••</div>
+                </div>
+              </div>
+            </li>
+          </ul>
         </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Correo Electrónico</label>
-          <input type="email" class="form-control" id="email" name="email" required value="{{ current_user.email }}">
+        
+        <!-- Formulario de edición (oculto por defecto) -->
+        <div id="profileForm" style="display: none;" class="p-4">
+          <form method="POST" action="{{ url_for('users.profile') }}" id="userProfileForm" class="overflow-hidden">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="row g-3">
+              <div class="col-md-12">
+                <label for="username" class="form-label fw-bold">Usuario</label>
+                <div class="input-group flex-nowrap">
+                  <span class="input-group-text" style="background-color: #f8f9fa;"><i class="bi bi-person"></i></span>
+                  <input type="text" class="form-control" id="username" name="username" required value="{{ current_user.username }}" style="border-radius: 0 0.6rem 0.6rem 0;">
+                </div>
+              </div>
+              <div class="col-md-12">
+                <label for="email" class="form-label fw-bold">Correo Electrónico</label>
+                <div class="input-group flex-nowrap">
+                  <span class="input-group-text" style="background-color: #f8f9fa;"><i class="bi bi-envelope"></i></span>
+                  <input type="email" class="form-control" id="email" name="email" required value="{{ current_user.email }}" style="border-radius: 0 0.6rem 0.6rem 0;">
+                </div>
+              </div>
+              
+              <!-- Campos de contraseña añadidos nuevamente -->
+              <div class="col-md-12">
+                <label for="password" class="form-label fw-bold">Nueva Contraseña</label>
+                <div class="input-group flex-nowrap">
+                  <span class="input-group-text" style="background-color: #f8f9fa;"><i class="bi bi-lock"></i></span>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle-password" style="border-radius: 0 0.6rem 0.6rem 0;"><i class="bi bi-eye"></i></button>
+                </div>
+                <div class="form-text text-muted small mt-1">Mínimo 8 caracteres</div>
+              </div>
+              <div class="col-md-12">
+                <label for="confirm_password" class="form-label fw-bold">Confirmar Contraseña</label>
+                <div class="input-group flex-nowrap">
+                  <span class="input-group-text" style="background-color: #f8f9fa;"><i class="bi bi-shield-lock"></i></span>
+                  <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
+                  <button class="btn btn-outline-secondary" type="button" id="toggle-confirm-password" style="border-radius: 0 0.6rem 0.6rem 0;"><i class="bi bi-eye"></i></button>
+                </div>
+              </div>
+              
+              <div class="col-12 mt-4">
+                <div class="d-flex">
+                  <button type="submit" class="btn btn-success px-4" style="border-radius: 0.6rem;">
+                    <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                  </button>
+                  <button type="reset" class="btn btn-outline-secondary ms-2 px-4" style="border-radius: 0.6rem;">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i>Restablecer
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary ms-auto" id="cancelEditBtn" style="border-radius: 0.6rem;">
+                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
-        <div class="mb-3">
-          <label for="password" class="form-label">Nueva Contraseña</label>
-          <div class="input-group">
-            <input type="password" class="form-control" id="password" name="password" placeholder="Dejar en blanco para no cambiar">
-            <button class="btn btn-outline-secondary" type="button" id="toggle-password"><i class="bi bi-eye"></i></button>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label for="confirm_password" class="form-label">Confirmar Contraseña</label>
-          <div class="input-group">
-            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="">
-            <button class="btn btn-outline-secondary" type="button" id="toggle-confirm-password"><i class="bi bi-eye"></i></button>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-success">Guardar Cambios</button>
-      </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Información de cuenta -->
+  <div class="col-lg-6">
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+      <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+        <i class="bi bi-info-circle me-2" style="font-size: 1.2rem; color: #28a745;"></i>
+        <h4 class="mb-0" style="font-size: 0.9rem; font-weight: 600; color: #333;">Información de Cuenta</h4>
+      </div>
+      <div class="card-body p-0">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item px-4 py-3 border-0 border-bottom">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-calendar3 me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+              <div>
+                <div class="fw-bold small">Fecha de registro</div>
+                <div class="text-muted small">{{ current_user.created_at.strftime('%d/%m/%Y') if current_user.created_at else 'No disponible' }}</div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item px-4 py-3 border-0 border-bottom">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-clock me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+              <div>
+                <div class="fw-bold small">Último acceso</div>
+                <div class="text-muted small">{{ current_user.last_login.strftime('%d/%m/%Y %H:%M') if current_user.last_login else 'No disponible' }}</div>
+              </div>
+            </div>
+          </li>
+          <li class="list-group-item px-4 py-3 border-0">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-shield-check me-3" style="font-size: 1.1rem; color: #6c757d;"></i>
+              <div>
+                <div class="fw-bold small">Rol de usuario</div>
+                <div><span class="badge {{ 'bg-success' if current_user.role == 'admin' else 'bg-primary' }}">{{ current_user.get_role_display }}</span></div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast para notificaciones -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="profileToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-success text-white">
+      <i class="bi bi-check-circle me-2"></i>
+      <strong class="me-auto">Actualización de Perfil</strong>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Sus datos de perfil han sido actualizados correctamente.
     </div>
   </div>
 </div>
@@ -41,21 +216,156 @@
 
 {% block extra_scripts %}
 <script>
-  document.getElementById('toggle-password')?.addEventListener('click', function() {
-    const pwd = document.getElementById('password');
-    if (pwd.type === 'password') {
-      pwd.type = 'text'; this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-    } else {
-      pwd.type = 'password'; this.innerHTML = '<i class="bi bi-eye"></i>';
+  // Funcionalidad para mostrar/ocultar el formulario de edición
+  document.addEventListener('DOMContentLoaded', function() {
+    const profileDetails = document.getElementById('profileDetails');
+    const profileForm = document.getElementById('profileForm');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const btnEditarPerfil = document.getElementById('btnEditarPerfil');
+    
+    // Log para depuración
+    console.log('Elementos del DOM:', {
+      profileDetails: profileDetails ? 'Encontrado' : 'No encontrado',
+      profileForm: profileForm ? 'Encontrado' : 'No encontrado',
+      cancelEditBtn: cancelEditBtn ? 'Encontrado' : 'No encontrado',
+      btnEditarPerfil: btnEditarPerfil ? 'Encontrado' : 'No encontrado'
+    });
+      // Función para mostrar el formulario sin afectar el layout
+    function showEditForm() {
+      console.log('Ejecutando showEditForm');
+      if (profileDetails && profileForm) {
+        // Establecer ancho máximo para evitar que se ensanche
+        const container = profileDetails.closest('.card-body');
+        if (container) {
+          const containerWidth = container.offsetWidth;
+          container.style.maxWidth = containerWidth + 'px';
+        }
+        
+        // Ocultar detalles y mostrar formulario
+        profileDetails.style.display = 'none';
+        profileForm.style.display = 'block';
+        console.log('Formulario mostrado');
+        
+        // Contener el overflow para evitar ensanchamiento
+        document.body.style.overflowX = 'hidden';
+        
+        // Preservar la estructura del sidebar
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+          sidebar.setAttribute('data-original-class', sidebar.className);
+          // Fijar el ancho del sidebar para evitar cambios
+          sidebar.style.width = getComputedStyle(sidebar).width;
+        }
+      }
     }
-  });
-  document.getElementById('toggle-confirm-password')?.addEventListener('click', function() {
-    const pwd = document.getElementById('confirm_password');
-    if (pwd.type === 'password') {
-      pwd.type = 'text'; this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      // Función para ocultar el formulario sin afectar el layout
+    function hideEditForm() {
+      if (profileDetails && profileForm) {
+        profileDetails.style.display = 'block';
+        profileForm.style.display = 'none';
+        
+        // Restaurar el ancho del contenedor
+        const container = profileDetails.closest('.card-body');
+        if (container) {
+          container.style.maxWidth = '';
+        }
+        
+        // Restaurar sidebar si fue afectada
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && sidebar.hasAttribute('data-original-class')) {
+          const originalClass = sidebar.getAttribute('data-original-class');
+          sidebar.className = originalClass;
+          sidebar.style.width = ''; // Eliminar el ancho fijado
+          sidebar.removeAttribute('data-original-class');
+        }
+      }
+    }// Botón para mostrar el formulario
+    if (btnEditarPerfil) {
+      btnEditarPerfil.addEventListener('click', function(e) {
+        console.log('Botón de editar perfil clickeado');
+        e.preventDefault();
+        showEditForm();
+      });
     } else {
-      pwd.type = 'password'; this.innerHTML = '<i class="bi bi-eye"></i>';
+      console.error('El botón de editar perfil no existe en el DOM');
     }
+    
+    // Botón para cancelar la edición
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        hideEditForm();
+      });
+    }
+    
+    // Si hay errores en el formulario, asegurarse de que el formulario sea visible
+    {% if get_flashed_messages(category_filter=["error"]) %}
+      showEditForm();
+    {% endif %}
   });
+  // Eliminamos código no utilizado de los apartados eliminados
+  // Mostrar el toast cuando se ha actualizado el perfil
+  document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si hay un mensaje flash de éxito
+    {% if get_flashed_messages(category_filter=["success"]) %}
+      const toastElement = document.getElementById('profileToast');
+      if (toastElement) {
+        var toast = new bootstrap.Toast(toastElement);
+        toast.show();
+      }
+    {% endif %}
+  });
+  
+  // Restaurar funcionalidad para mostrar/ocultar contraseñas
+  const togglePassword = document.getElementById('toggle-password');
+  if (togglePassword) {
+    togglePassword.addEventListener('click', function() {
+      const pwd = document.getElementById('password');
+      if (pwd.type === 'password') {
+        pwd.type = 'text'; 
+        this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      } else {
+        pwd.type = 'password'; 
+        this.innerHTML = '<i class="bi bi-eye"></i>';
+      }
+    });
+  }
+  
+  const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+  if (toggleConfirmPassword) {
+    toggleConfirmPassword.addEventListener('click', function() {
+      const pwd = document.getElementById('confirm_password');
+      if (pwd.type === 'password') {
+        pwd.type = 'text'; 
+        this.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      } else {
+        pwd.type = 'password'; 
+        this.innerHTML = '<i class="bi bi-eye"></i>';
+      }
+    });
+  }
+  
+  // Restaurar validación del formulario para contraseñas
+  const userProfileForm = document.getElementById('userProfileForm');
+  if (userProfileForm) {
+    userProfileForm.addEventListener('submit', function(e) {
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm_password').value;
+      
+      if (password !== confirmPassword && password.trim() !== '') {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden. Por favor, verifica los campos de contraseña.');
+        return false;
+      }
+      
+      if (password.trim() !== '' && password.length < 8) {
+        e.preventDefault();
+        alert('La contraseña debe tener al menos 8 caracteres.');
+        return false;
+      }
+      
+      return true;
+    });
+  }
 </script>
 {% endblock %}

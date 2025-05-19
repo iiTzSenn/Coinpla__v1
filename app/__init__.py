@@ -1,12 +1,16 @@
 import os
 from flask import Flask
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
 
 from app.config import Config
 from app.extensions import db, login_manager, mail, cache, migrate
 
 # Carga el .env (ya se carga en config, pero por si acaso)
 load_dotenv()
+
+# Inicializar CSRF Protection
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +22,7 @@ def create_app():
     cache.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    csrf.init_app(app)  # Inicializar CSRF protection
 
     login_manager.login_view = 'auth.login'
     login_manager.login_message = None
