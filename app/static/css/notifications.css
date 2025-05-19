@@ -7,6 +7,13 @@
   max-width: 90%;
 }
 
+/* Estilos específicos para alertas permanentes */
+.persistent-alert {
+  opacity: 1 !important; /* Asegura que la opacidad se mantiene */
+  animation: none !important; /* Evita cualquier animación */
+  transition: none !important; /* Desactiva las transiciones */
+}
+
 .flash-message {
   background-color: #fff;
   border-radius: 8px;

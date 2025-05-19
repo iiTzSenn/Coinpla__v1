@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Configura las notificaciones para que se auto-oculten después de un tiempo
  */
 function setupNotifications() {
-  const notifications = document.querySelectorAll('.alert');
+  const notifications = document.querySelectorAll('.alert:not(.persistent-alert)');
   
   notifications.forEach((notification, index) => {
     // Asignar tiempo de desaparición incremental para cada notificación subsiguiente
