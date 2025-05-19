@@ -79,6 +79,12 @@ form label {
   font-weight: 500;
 }
 
+form label svg {
+  fill: var(--base-color);
+  width: 24px;
+  height: 24px;
+}
+
 form input {
   box-sizing: border-box;
   flex-grow: 1;
@@ -91,6 +97,35 @@ form input {
   border-left: none;
   background-color: var(--input-color); /* Color de input cambiado a gris claro */
   transition: 150ms ease;
+}
+
+/* Estilos para el botón de alternar visibilidad de contraseña */
+form div:has(.password-toggle) {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+  color: var(--accent-color);
+}
+
+/* Modificar el padding del input cuando tiene el botón de alternar visibilidad */
+form div:has(.password-toggle) input {
+  padding-right: 40px;
 }
 
 form input:hover {
