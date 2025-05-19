@@ -112,13 +112,12 @@
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          {% for trabajo in trabajos %}
-          <tr data-estado="{{ trabajo.estado }}">
+        <tbody>          {% for trabajo in trabajos %}
+          <tr data-estado="{{ trabajo.estado }}" data-id="{{ trabajo.id }}" class="trabajo-row" style="cursor: pointer;">
             <td class="text-center">
-              <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="text-decoration-none">
+              <span class="text-decoration-none">
                 Nº_{{ trabajo.id }}
-              </a>
+              </span>
             </td>
             <td>{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }}</td>
             <td>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
@@ -1100,7 +1099,39 @@
   /* Ajuste adicional para el contenedor de botones de acciones */
   td .d-flex.gap-1.justify-content-center {
     display: inline-flex !important;
-    min-width: 120px; /* Ancho mínimo para que quepan los 3 botones */
-  }
+    min-width: 120px; /* Ancho mínimo para que quepan los 3 botones */  }
 </style>
+
+<!-- Script para hacer las filas de la tabla clickeables -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Agregar estilo CSS para filas clickeables
+    const style = document.createElement('style');
+    style.textContent = `
+      .trabajo-row {
+        transition: background-color 0.15s ease-in-out;
+      }
+      .trabajo-row:hover {
+        background-color: rgba(67, 171, 1, 0.05);
+      }
+    `;
+    document.head.appendChild(style);
+      // Hacer que las filas de la tabla sean clickeables
+    document.querySelectorAll('.trabajo-row').forEach(row => {
+      row.addEventListener('click', function(e) {
+        // Evitar que el clic funcione si se hace en un botón o enlace dentro de la fila
+        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('form')) {
+          return;
+        }
+        
+        // Obtener el ID del trabajo desde el atributo data-id
+        const trabajoId = this.getAttribute('data-id');
+        // Redirigir a la página de detalles del trabajo
+        if (trabajoId) {
+          window.location.href = '/jobs/' + trabajoId;
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}

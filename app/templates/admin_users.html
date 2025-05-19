@@ -1,229 +1,566 @@
 {% extends 'base.html' %}
+{% block title %}Gestión de Usuarios{% endblock %}
+
 {% block content %}
-<!-- Estilos personalizados para los botones -->
-<style>
-  .btn-action {
+<!-- Estilos personalizados -->
+<style>  .btn-action {
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     width: 32px;
     height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 2px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 3px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: none;
+    padding: 0 !important;
   }
   
   .btn-action:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  }
+    /* Estilos específicos para botones outline de acción */
+  .btn-outline-success.btn-action {
+    color: #43ab01;
+    border: 1px solid #43ab01;
+    background-color: transparent;
   }
   
-  .btn-success.btn-action {
-    background-color: #28a745;
-  }
-  .btn-success.btn-action:hover {
-    background-color: #218838;
-  }
-  
-  .btn-danger.btn-action {
-    background-color: #dc3545;
-  }
-  .btn-danger.btn-action:hover {
-    background-color: #c82333;
+  .btn-outline-success.btn-action:hover {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    border-color: #43ab01;
   }
   
-  .btn-warning.btn-action {
-    background-color: #ffc107;
-    color: #212529;
-  }
-  .btn-warning.btn-action:hover {
-    background-color: #e0a800;
+  .btn-outline-danger.btn-action {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
   }
   
-  .btn-primary.btn-action {
-    background-color: #007bff;
-  }
-  .btn-primary.btn-action:hover {
-    background-color: #0069d9;
-  }
-  
-  .btn-secondary.btn-action {
-    background-color: #6c757d;
-  }
-  .btn-secondary.btn-action:hover {
-    background-color: #5a6268;
+  .btn-outline-danger.btn-action:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: #dc3545;
   }
   
+  .btn-outline-warning.btn-action {
+    color: #ffc107;
+    border: 1px solid #ffc107;
+    background-color: transparent;
+  }
+  
+  .btn-outline-warning.btn-action:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+  
+  .btn-outline-primary.btn-action {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+  }
+  
+  .btn-outline-primary.btn-action:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  .btn-outline-secondary.btn-action {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background-color: transparent;
+  }
+  
+  .btn-outline-secondary.btn-action:hover {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border-color: #6c757d;
+  }
   .btn-action i {
     font-size: 1rem;
-  }
-  
-  .action-buttons-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    transition: all 0.2s ease;
+  }  .action-buttons-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 6px;
   }
+  
+  /* Estilos para tooltips */
+  .tooltip-inner {
+    padding: 0.4rem 0.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 200px;
+    background-color: #495057;
+    border-radius: 6px;
+  }
+  
+  .tooltip-success .tooltip-inner {
+    background-color: #43ab01;
+  }
+  
+  .tooltip-danger .tooltip-inner {
+    background-color: #dc3545;
+  }
+  
+  .tooltip-warning .tooltip-inner {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .bs-tooltip-top .tooltip-arrow::before, 
+  .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #495057;
+  }
+  
+  .tooltip-success.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-success.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #43ab01;
+  }
+  
+  .tooltip-danger.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-danger.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #dc3545;
+  }
+  
+  .tooltip-warning.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-warning.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #ffc107;
+  }
+  
+  /* Estilos adicionales */
+  .custom-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+    .custom-table thead th {
+    background-color: #f8f9fa;
+    color: #495057;
+    padding: 14px 15px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #cbc6c6;
+  }
+    .custom-table tbody td {
+    padding: 14px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+  }
+  
+  .custom-table tbody tr {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .custom-table tbody tr:last-child td {
+    border-bottom: none;
+  }  .custom-table tbody tr:hover {
+    background-color: rgba(67, 171, 1, 0.05);
+    transition: all 0.3s ease;
+    box-shadow: inset 4px 0 0 #43ab01, 0 2px 5px rgba(67, 171, 1, 0.1);
+    transform: translateY(-1px);
+  }
+  
+  /* Estilo para el padding al hacer hover */
+  .custom-table tbody tr:hover td:first-child {
+    padding-left: 25px;
+    transition: padding 0.2s ease;
+  }
+  
+  .status {
+    padding: 5px 12px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+  }
+  /* Sección de usuarios verificados */
+  .status-paid {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    padding: 6px 12px;
+    font-weight: 500;
+    border-radius: 50px;
+  }
+  
+  /* Clase para el texto verde principal */
+  .text-green {
+    color: #43ab01;
+  }
+  
+  /* Clase común para botones verdes */
+  .btn-green {
+    background-color: #43ab01;
+    color: white;
+    border: 1px solid #43ab01;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-green:hover {
+    background-color: #3a9701;
+    color: white;
+    border: 1px solid #3a9701;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+    .persistent-alert {
+    margin-bottom: 20px;
+    border-radius: 1rem;
+    padding: 12px;
+  }
+  
+  /* Estilos para los contenedores */
+  .main-container {
+    max-width: 95%;
+    margin: 0 auto;
+  }
+  
+  @media (min-width: 1200px) {
+    .main-container {
+      max-width: 92%;
+    }
+  }
+  
+  @media (min-width: 1400px) {
+    .main-container {
+      max-width: 90%;
+    }
+  }
 </style>
 
-<div class="container mt-4">
-  <!-- =========================================
-       RUTA DE LA PÁGINA
-       ========================================= -->
-  <div class="mb-3">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item" style="font-weight: bold;">Coinpla</li>
-        <li class="breadcrumb-item active" aria-current="page" style="font-weight: bold;">Usuarios</li>
-      </ol>
-    </nav>
+<div class="main-container mt-4">
+  <!-- Breadcrumb estilizado -->
+  <div class="d-flex align-items-center mb-4 mt-3">
+    <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+    <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+    <span class="fw-bold" style="color: #888; font-size: 20px;">Usuarios</span>
+  </div>
+  <!-- Botones de acción principales (si fueran necesarios) -->
+  <div class="d-flex gap-2 mb-4">
+    <div class="ms-auto">
+      <div class="input-group" style="border-radius: 1rem; overflow: hidden; border: 1px solid #cbc6c6; min-width: 300px;">
+        <input type="text" class="form-control" placeholder="Buscar usuario..." id="searchInput" style="border: none; border-radius: 1rem 0 0 1rem; padding: 10px 15px;">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton" style="border: none; background-color: #f8f9fa; border-radius: 0 1rem 1rem 0; min-width: 50px;">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Sección de solicitudes de verificación -->
   {% set pending_users = users | selectattr("verified", "equalto", False) | list %}
   {% if pending_users %}
   <div class="mb-5">
-    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-        <i class="bi bi-person-check" style="font-size: 0.9rem; color: #6c757d;"></i>
-        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Solicitudes de Verificación</span>
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem; padding: 12px 20px;">
+        <i class="bi bi-person-check" style="font-size: 1rem; color: var(--primary, #43ab01);"></i>
+        <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Solicitudes de Verificación</span>
       </div>
       <div class="card-body p-0">
-        <table class="custom-table">
-          <thead style="border-radius: 0 !important;">
-            <tr>
-              <th style="border-top-left-radius: 0; border-top-right-radius: 0;">Usuario</th>
-              <th style="border-radius: 0;">Email</th>
-              <th style="border-radius: 0;">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in pending_users %}
-            <tr>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <div class="action-buttons-container">
-                  <!-- Botón para verificar -->
-                  <form method="POST" action="{{ url_for('admin.admin_verify_user', user_id=user.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar verificación del usuario">
-                      <i class="bi bi-check2-circle"></i>
-                    </button>
-                  </form>
-                  <!-- Botón para eliminar solicitud -->
-                  <form method="POST" action="{{ url_for('admin.admin_delete_pending_user', user_id=user.id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Rechazar y eliminar solicitud">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table class="table mb-0 custom-table" id="pendingUsersTable">
+            <thead class="table-light">
+              <tr>
+                <th style="padding-left: 20px;">Usuario</th>
+                <th>Email</th>
+                <th style="text-align: center; width: 150px;">Acciones</th>
+              </tr>
+            </thead>            <tbody>
+              {% for user in pending_users %}
+              <tr>
+                <td style="padding-left: 20px;">{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>                  <div class="action-buttons-container">                    <!-- Botón para verificar -->
+                    <form method="POST" action="{{ url_for('admin.admin_verify_user', user_id=user.id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-outline-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar usuario" data-bs-custom-class="tooltip-success">
+                        <i class="bi bi-check2-circle"></i>
+                      </button>
+                    </form>
+                    <!-- Botón para eliminar solicitud -->
+                    <form method="POST" action="{{ url_for('admin.admin_delete_pending_user', user_id=user.id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Rechazar solicitud" data-bs-custom-class="tooltip-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
-  </div>
-  {% else %}
-    <div class="alert alert-info persistent-alert text-center">
-      <i class="bi bi-info-circle"></i> No hay solicitudes de verificación pendientes.
+  </div>  {% else %}    <div class="alert alert-info text-center persistent-alert" style="background-color: rgba(67, 171, 1, 0.1); border: 1px solid rgba(67, 171, 1, 0.2); color: #43ab01;">
+      <i class="bi bi-info-circle me-2"></i> No hay solicitudes de verificación pendientes.
     </div>
   {% endif %}
-  
-  <!-- Sección de usuarios registrados (solo los verificados) -->
+    <!-- Sección de usuarios registrados (solo los verificados) -->
   {% set registered_users = users | selectattr("verified", "equalto", True) | list %}
   <div class="mb-4">
     {% if registered_users %}
-    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6;">
-        <i class="bi bi-people" style="font-size: 0.9rem; color: #6c757d;"></i>
-        <span style="font-size: 0.85rem; color: #6c757d; font-weight: 500;">Usuarios Registrados</span>
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem; padding: 12px 20px;">
+        <i class="bi bi-people" style="font-size: 1rem; color: var(--primary, #43ab01);"></i>
+        <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Usuarios Registrados</span>
       </div>
       <div class="card-body p-0">
-        <table class="custom-table">
-          <thead style="border-radius: 0 !important;">
-            <tr>
-              <th style="border-top-left-radius: 0; border-top-right-radius: 0;">Usuario</th>
-              <th style="border-radius: 0;">Email</th>
-              <th style="border-radius: 0;">Rol</th>
-              <th style="border-radius: 0;">Verificado</th>
-              <th style="border-radius: 0;">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in registered_users %}
-            <tr>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                {% if user.role == 'admin' %}
-                  Administrador
-                {% elif user.role == 'tecnico' %}
-                  Técnico
-                {% else %}
-                  {{ user.role }}
-                {% endif %}
-              </td>
-              <td>
-                <p class="status status-paid">Verificado</p>
-              </td>
-              <td>
-                <div class="action-buttons-container">
-                  <!-- Botón para quitar la verificación (quitar permisos) -->
-                  <form method="POST" action="{{ url_for('admin.admin_unverify_user', user_id=user.id) }}">
-                    <button type="submit" class="btn btn-warning btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Revocar verificación del usuario">
-                      <i class="bi bi-x-circle"></i>
-                    </button>
-                  </form>
-                  <!-- Botones para promover o revocar permisos -->
-                  {% if user.role != 'admin' %}
-                  <form method="POST" action="{{ url_for('admin.admin_promote_user', user_id=user.id) }}">
-                    <button type="submit" class="btn btn-primary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Promover a Administrador">
-                      <i class="bi bi-arrow-up-circle"></i>
-                    </button>
-                  </form>
+        <div class="table-responsive">
+          <table class="table mb-0 custom-table" id="registeredUsersTable">
+            <thead class="table-light">
+              <tr>
+                <th style="padding-left: 20px;">Usuario</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Verificado</th>
+                <th style="text-align: center; width: 220px;">Acciones</th>
+              </tr>
+            </thead>            <tbody>
+              {% for user in registered_users %}
+              <tr>
+                <td style="padding-left: 20px;">{{ user.username }}</td>
+                <td>{{ user.email }}</td>                <td>
+                  {% if user.role == 'admin' %}
+                    <span class="badge rounded-pill bg-primary">Administrador</span>
+                  {% elif user.role == 'tecnico' %}
+                    <span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Técnico</span>
                   {% else %}
+                    <span class="badge rounded-pill bg-secondary">{{ user.role }}</span>
+                  {% endif %}
+                </td><td>
+                  <span class="status status-paid">Verificado</span>
+                </td><td>
+                  <div class="action-buttons-container">                    <!-- Botón para quitar la verificación (quitar permisos) -->
+                    <form method="POST" action="{{ url_for('admin.admin_unverify_user', user_id=user.id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-warning btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Revocar verificación" data-bs-custom-class="tooltip-warning">
+                        <i class="bi bi-x-circle"></i>
+                      </button>
+                    </form>
+                    <!-- Botones para promover o revocar permisos -->
+                    {% if user.role != 'admin' %}
+                    <form method="POST" action="{{ url_for('admin.admin_promote_user', user_id=user.id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-primary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Promover a Administrador">
+                        <i class="bi bi-arrow-up-circle"></i>
+                      </button>
+                    </form>{% else %}                      {% if user.id != current_user.id %}
+                      <form method="POST" action="{{ url_for('admin.admin_demote_user', user_id=user.id) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Cambiar a Técnico">
+                          <i class="bi bi-arrow-down-circle"></i>
+                        </button>
+                      </form>
+                      {% endif %}
+                    {% endif %}
                     {% if user.id != current_user.id %}
-                    <form method="POST" action="{{ url_for('admin.admin_demote_user', user_id=user.id) }}">
-                      <button type="submit" class="btn btn-secondary btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Cambiar a Técnico">
-                        <i class="bi bi-arrow-down-circle"></i>
+                    <form method="POST" action="{{ url_for('admin.admin_delete_user', user_id=user.id) }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar usuario" data-bs-custom-class="tooltip-danger">
+                        <i class="bi bi-trash"></i>
                       </button>
                     </form>
                     {% endif %}
-                  {% endif %}
-                  {% if user.id != current_user.id %}
-                  <form method="POST" action="{{ url_for('admin.admin_delete_user', user_id=user.id) }}">
-                    <button type="submit" class="btn btn-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar usuario permanentemente">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </form>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>      <!-- Paginación (si fuera necesaria) -->
+      {% if registered_users|length > 15 %}
+      <div class="d-flex justify-content-center" style="padding: 15px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+        <nav aria-label="Paginación de usuarios">
+          <ul class="pagination m-0">
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&laquo;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">&lt;</span>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">1 / 1</span>
+            </li>
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="#">&gt;</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link minimal-pagination" href="#">&raquo;</a>
+            </li>
+          </ul>
+        </nav>
       </div>
-    </div>
-    {% else %}
-      <div class="alert alert-info text-center">
-        <i class="bi bi-info-circle"></i> No hay usuarios registrados.
+      {% endif %}
+    </div>    {% else %}      <div class="alert alert-info text-center persistent-alert" style="background-color: rgba(67, 171, 1, 0.1); border: 1px solid rgba(67, 171, 1, 0.2); color: #43ab01;">
+        <i class="bi bi-info-circle me-2"></i> No hay usuarios registrados.
       </div>
     {% endif %}
   </div>
 </div>
 
-<!-- Script para activar tooltips de Bootstrap -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
+<!-- Script para activar tooltips de Bootstrap y funcionalidad de búsqueda -->
+<script>  document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips con opciones mejoradas
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        delay: { show: 50, hide: 50 },
+        container: 'body',
+        animation: true
+      });
     });
+    
+    // Funcionalidad de búsqueda
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+      function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const tables = ['pendingUsersTable', 'registeredUsersTable'];
+      
+      tables.forEach(tableId => {
+        const table = document.getElementById(tableId);
+        if (table) {
+          const rows = table.querySelectorAll('tbody tr');
+          
+          rows.forEach(row => {
+            const username = row.cells[0].textContent.toLowerCase();
+            const email = row.cells[1].textContent.toLowerCase();
+            // Añadir búsqueda por rol si existe la columna
+            let role = '';
+            if (row.cells.length > 2) {
+              role = row.cells[2].textContent.toLowerCase();
+            }
+            
+            if (username.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        }
+      });
+    }
+    
+    if (searchButton && searchInput) {
+      searchButton.addEventListener('click', performSearch);
+      searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    }
+    
+    // Inicializar paginación si hay muchos usuarios
+    function initPagination(tableId, rowsPerPageCount = 15) {
+      const table = document.getElementById(tableId);
+      if (table) {
+        const rows = table.querySelectorAll('tbody tr');
+        if (rows.length <= rowsPerPageCount) return;
+        
+        const pageCount = Math.ceil(rows.length / rowsPerPageCount);
+        
+        // Inicializar la paginación aquí si es necesario
+      }
+    }
+    
+    // Inicializar paginación para las tablas
+    initPagination('pendingUsersTable');
+    initPagination('registeredUsersTable');
   });
 </script>
+
+<!-- Estilos adicionales para la paginación y otros elementos -->
+<style>  /* Estilos para la paginación minimalista */  .minimal-pagination {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    background-color: #fff;
+    transition: all 0.2s ease;
+    margin: 0 2px;
+  }
+  .minimal-pagination:hover:not(.disabled) {
+    background-color: rgba(67, 171, 1, 0.1);
+    border-color: #adb5bd;
+    color: var(--primary, #43ab01);
+  }
+    .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+  .page-item.disabled .minimal-pagination {
+    color: #adb5bd;
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+  }
+    #searchInput:focus {
+    box-shadow: none !important;
+    border-color: #cbc6c6 !important;
+    outline: none !important;
+  }
+  
+  /* Estilo para el buscador */  #searchButton:hover {
+    background-color: rgba(67, 171, 1, 0.1) !important;
+    color: var(--primary, #43ab01) !important;
+    transition: all 0.2s ease;
+  }
+  
+  #searchButton:hover i.bi-search {
+    transform: scale(1.1);
+    color: var(--primary, #43ab01);
+    transition: all 0.2s ease;
+  }
+    /* Estilos para las badges */
+  .badge.rounded-pill {
+    padding: 0.4em 0.8em;
+    font-weight: 500;
+  }
+  
+  /* Estilos para verificado */
+  .status.status-paid {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    padding: 6px 12px;
+    font-weight: 500;
+    border-radius: 50px;
+  }  /* Tooltip personalizado */
+  .tooltip {
+    font-size: 0.8rem;
+    opacity: 0.95 !important;
+  }
+  
+  /* Los estilos de tooltip-inner se definieron anteriormente */
+    
+  /* Colores de tooltips para flechas */
+  .bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #495057;
+  }
+  
+  .tooltip-success.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #43ab01;
+  }
+  
+  .tooltip-danger.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #dc3545;
+  }
+  
+  .tooltip-warning.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #ffc107;
+  }
+</style>
 {% endblock %}
