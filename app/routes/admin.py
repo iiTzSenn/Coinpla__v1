@@ -12,7 +12,8 @@ def admin_users():
         flash("Acceso denegado", "danger")
         return redirect(url_for('jobs.index'))
     users = User.query.all()
-    return render_template('admin_users.html', users=users)
+    technicians = Technician.query.all()
+    return render_template('admin_users.html', users=users, technicians=technicians)
 
 @admin_bp.route('/delete_pending/<int:user_id>', methods=['POST'])
 @login_required

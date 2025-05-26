@@ -409,6 +409,103 @@
       </div>
     {% endif %}
   </div>
+
+  <!-- Sección de Técnicos -->
+  <div class="mb-4 mt-5">
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+      <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9 !important; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem; padding: 12px 20px;">
+        <i class="bi bi-person-gear" style="font-size: 1rem; color: var(--primary, #43ab01);"></i>
+        <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Técnicos Registrados</span>
+      </div>
+      <div class="card-body p-0">
+        {% if technicians %}
+        <div class="table-responsive">          <table class="table mb-0 custom-table" id="techniciansTable">
+            <thead class="table-light">
+              <tr>
+                <th style="padding-left: 20px;">Nombre completo</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Especialidad</th>
+                <th>Estado</th>
+                <th style="text-align: center; width: 150px;">Acciones</th>
+              </tr>
+            </thead>            
+            <tbody>
+              {% for tecnico in technicians %}
+              <tr>
+                <td style="padding-left: 20px;">{{ tecnico.nombre }} {{ tecnico.apellido if tecnico.apellido else '' }}</td>
+                <td>{{ tecnico.email }}</td>
+                <td>{{ tecnico.telefono if tecnico.telefono else '-' }}</td>
+                <td>{{ tecnico.especialidad if tecnico.especialidad else '-' }}</td>
+                <td>
+                  {% if tecnico.available %}
+                    <span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Disponible</span>
+                  {% else %}
+                    <span class="badge rounded-pill bg-warning text-dark">Ocupado</span>
+                  {% endif %}
+                </td>                <td>
+                  <div class="action-buttons-container">
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-action edit-tech-btn" data-id="{{ tecnico.id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar técnico">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for('technicians.eliminar_tecnico', id=tecnico.id) }}" style="display:inline;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar técnico" data-bs-custom-class="tooltip-danger">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info m-3 text-center">
+          <i class="bi bi-info-circle me-2"></i> No hay técnicos registrados aún.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para Editar Técnico -->
+<div class="modal fade" id="editarTecnicoModal" tabindex="-1" aria-labelledby="editarTecnicoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius: 1rem; border: none; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+      <div class="modal-header" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+        <h5 class="modal-title" id="editarTecnicoModalLabel" style="color: #495057; font-weight: 500;">Editar Técnico</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form id="editTechForm" method="POST" action="">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <div class="mb-3">
+            <label for="edit_nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="edit_nombre" name="first_name" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="edit_apellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="edit_apellido" name="last_name">
+          </div>
+          
+          <div class="mb-3">
+            <label for="edit_telefono" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="edit_telefono" name="telefono">
+          </div>
+          
+          <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-green">Guardar Cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Script para activar tooltips de Bootstrap y funcionalidad de búsqueda -->
@@ -422,13 +519,40 @@
         animation: true
       });
     });
+      // Manejo del modal de edición de técnico
+    document.querySelectorAll('.edit-tech-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const techId = this.getAttribute('data-id');
+        const row = this.closest('tr');
+        
+        // Obtener datos de la fila
+        const nombreCompleto = row.cells[0].textContent.trim();
+        // Dividir el nombre completo en nombre y apellido
+        const nombreParts = nombreCompleto.split(' ');
+        const nombre = nombreParts[0];
+        // El apellido es todo lo que queda después del primer espacio
+        const apellido = nombreParts.length > 1 ? nombreParts.slice(1).join(' ') : '';
+        const telefono = row.cells[2].textContent.trim() === '-' ? '' : row.cells[2].textContent.trim();
+        
+        // Establecer valores en el formulario
+        document.getElementById('edit_nombre').value = nombre;
+        document.getElementById('edit_apellido').value = apellido;
+        document.getElementById('edit_telefono').value = telefono;
+        
+        // Configurar la acción del formulario
+        document.getElementById('editTechForm').action = `/technicians/edit/${techId}`;
+        
+        // Abrir el modal
+        const modal = new bootstrap.Modal(document.getElementById('editarTecnicoModal'));
+        modal.show();
+      });
+    });
     
     // Funcionalidad de búsqueda
     const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-      function performSearch() {
+    const searchButton = document.getElementById('searchButton');      function performSearch() {
       const searchTerm = searchInput.value.toLowerCase();
-      const tables = ['pendingUsersTable', 'registeredUsersTable'];
+      const tables = ['pendingUsersTable', 'registeredUsersTable', 'techniciansTable'];
       
       tables.forEach(tableId => {
         const table = document.getElementById(tableId);
@@ -436,15 +560,13 @@
           const rows = table.querySelectorAll('tbody tr');
           
           rows.forEach(row => {
-            const username = row.cells[0].textContent.toLowerCase();
-            const email = row.cells[1].textContent.toLowerCase();
-            // Añadir búsqueda por rol si existe la columna
-            let role = '';
-            if (row.cells.length > 2) {
-              role = row.cells[2].textContent.toLowerCase();
+            // Buscar en todas las celdas del registro
+            let textContent = '';
+            for (let i = 0; i < row.cells.length - 1; i++) { // Excluimos la última columna de acciones
+              textContent += row.cells[i].textContent.toLowerCase() + ' ';
             }
             
-            if (username.includes(searchTerm) || email.includes(searchTerm) || role.includes(searchTerm)) {
+            if (textContent.includes(searchTerm)) {
               row.style.display = '';
             } else {
               row.style.display = 'none';
