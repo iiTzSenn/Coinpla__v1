@@ -99,8 +99,8 @@ def generate_history_row(trabajo):
     technician_name = f"{trabajo.technician.nombre} {trabajo.technician.apellido or ''}" if trabajo.technician else "Sin asignar"
     
     return f"""
-    <tr>
-      <td class="text-center"><a href="/jobs/{trabajo.id}" class="text-decoration-none">Nº_{trabajo.id}</a></td>
+    <tr class="clickable-row" data-href="/jobs/{trabajo.id}" style="cursor: pointer;">
+      <td class="text-center">Nº_{trabajo.id}</td>
       <td>{trabajo.nombre_cliente} {trabajo.apellido_cliente or ''}</td>
       <td>{technician_name}</td>
       <td>{trabajo.fecha.strftime("%d/%m/%Y")}</td>

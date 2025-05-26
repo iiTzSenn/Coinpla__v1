@@ -6,6 +6,13 @@
 {% from "components/table.html" import paginated_table %}
 {% from "components/filters.html" import filter_card, date_range_filters %}
 
+<style>
+  .clickable-row:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    transition: background-color 0.2s;
+  }
+</style>
+
 <!-- Breadcrumb estilizado según la imagen -->
 <div class="d-flex align-items-center mb-4 mt-3">
   <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
@@ -172,6 +179,13 @@
 {% block extra_scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Manejo de filas clickeables
+    document.querySelectorAll('.clickable-row').forEach(row => {
+      row.addEventListener('click', function() {
+        window.location.href = this.dataset.href;
+      });
+    });
+    
     // Manejo de filtros en la cabecera
     const filtrosForm = document.getElementById('filtrosForm');
     const clienteOcultoInput = document.getElementById('cliente_oculto');
