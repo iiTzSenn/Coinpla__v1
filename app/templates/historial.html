@@ -13,45 +13,13 @@
   <span class="fw-bold" style="color: #888; font-size: 20px;">Historial</span>
 </div>
 
-<!-- Filtros de búsqueda -->
-<div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-  <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
-    <div class="d-flex align-items-center gap-2">
-      <i class="bi bi-funnel" style="font-size: 0.9rem; color: #6c757d;"></i>
-      <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Filtros de Búsqueda</span>
-    </div>
-  </div>
-  <div class="card-body">
-    <form action="{{ url_for('jobs.historial') }}" method="GET" class="row g-3">
-      <div class="col-md-3">
-        {{ text_field("cliente", "Cliente:", "Ingrese nombre del cliente", value=request.args.get('cliente', '')) }}
-      </div>
-      <div class="col-md-3">
-        <label for="tecnico" class="form-label">Técnico:</label>
-        <select class="form-select" id="tecnico" name="tecnico">
-          <option value="">Todos los técnicos</option>
-          {% for tecnico in tecnicos %}
-            <option value="{{ tecnico.id }}" {% if request.args.get('tecnico')|int == tecnico.id %}selected{% endif %}>
-              {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
-            </option>
-          {% endfor %}
-        </select>
-      </div>
-      {{ date_range_filters(
-        fecha_inicio_value=request.args.get('fecha_inicio', ''),
-        fecha_fin_value=request.args.get('fecha_fin', '')
-      ) }}
-      <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-        <a href="{{ url_for('jobs.historial') }}" class="btn btn-outline-secondary" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; transition: all 0.3s ease;">
-          <i class="bi bi-x-circle me-1"></i>Limpiar
-        </a>
-        <button type="submit" class="btn btn-filter" style="background-color: #28a745; color: white; border-radius: 1rem; padding: 0.5rem 1.25rem; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
-          <i class="bi bi-search me-1"></i>Buscar
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+<!-- Formulario oculto para manejar los filtros -->
+<form action="{{ url_for('jobs.historial') }}" method="GET" id="filtrosForm" style="display:none;">
+  <input type="hidden" id="cliente_oculto" name="cliente" value="{{ request.args.get('cliente', '') }}">
+  <input type="hidden" id="tecnico_oculto" name="tecnico" value="{{ request.args.get('tecnico', '') }}">
+  <input type="hidden" id="fecha_inicio_oculto" name="fecha_inicio" value="{{ request.args.get('fecha_inicio', '') }}">
+  <input type="hidden" id="fecha_fin_oculto" name="fecha_fin" value="{{ request.args.get('fecha_fin', '') }}">
+</form>
 
 <!-- Tabla de trabajos completados -->
 <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
@@ -59,6 +27,92 @@
     <div class="d-flex align-items-center gap-2">
       <i class="bi bi-check-circle" style="font-size: 0.9rem; color: #6c757d;"></i>
       <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Trabajos Completados</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <!-- Filtro de Cliente -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroClienteDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person me-1"></i>
+          <span>Cliente: {{ request.args.get('cliente', 'Todos') if request.args.get('cliente') else 'Todos' }}</span>
+        </button>
+        <div class="dropdown-menu p-3 dropdown-menu-end" style="min-width: 300px;" aria-labelledby="filtroClienteDropdown">
+          <div class="mb-3">
+            <label for="cliente_filter" class="form-label">Nombre del cliente:</label>
+            <input type="text" class="form-control" id="cliente_filter" value="{{ request.args.get('cliente', '') }}" placeholder="Ingrese nombre del cliente">
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-green aplicar-cliente">Aplicar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filtro de Técnico -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroTecnicoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-person-gear me-1"></i>
+          <span>Técnico: 
+            {% set tecnico_id = request.args.get('tecnico')|int %}
+            {% set tecnico_nombre = 'Todos' %}
+            {% for tecnico in tecnicos %}
+              {% if tecnico.id == tecnico_id %}
+                {% set tecnico_nombre = tecnico.nombre + ' ' + (tecnico.apellido if tecnico.apellido else '') %}
+              {% endif %}
+            {% endfor %}
+            {{ tecnico_nombre }}
+          </span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end chart-period-menu" aria-labelledby="filtroTecnicoDropdown">
+          <a class="dropdown-item filter-tecnico" href="#" data-value="">
+            <i class="bi bi-people"></i> Todos los técnicos
+          </a>
+          <div class="dropdown-divider"></div>
+          {% for tecnico in tecnicos %}
+            <a class="dropdown-item filter-tecnico" href="#" data-value="{{ tecnico.id }}">
+              <i class="bi bi-person"></i> {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Filtro de Fecha Inicio -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroFechaInicioDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-calendar-event me-1"></i>
+          <span>Desde: {{ request.args.get('fecha_inicio', 'Cualquier fecha') }}</span>
+        </button>
+        <div class="dropdown-menu p-3 dropdown-menu-end" style="min-width: 300px;" aria-labelledby="filtroFechaInicioDropdown">
+          <div class="mb-3">
+            <label for="fecha_inicio_filter" class="form-label">Fecha inicio:</label>
+            <input type="date" class="form-control" id="fecha_inicio_filter" value="{{ request.args.get('fecha_inicio', '') }}">
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-green aplicar-fecha-inicio">Aplicar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Filtro de Fecha Fin -->
+      <div class="dropdown chart-filter-dropdown">
+        <button class="btn btn-sm dropdown-toggle chart-period-btn" type="button" id="filtroFechaFinDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-calendar-check me-1"></i>
+          <span>Hasta: {{ request.args.get('fecha_fin', 'Actualidad') }}</span>
+        </button>
+        <div class="dropdown-menu p-3 dropdown-menu-end" style="min-width: 300px;" aria-labelledby="filtroFechaFinDropdown">
+          <div class="mb-3">
+            <label for="fecha_fin_filter" class="form-label">Fecha fin:</label>
+            <input type="date" class="form-control" id="fecha_fin_filter" value="{{ request.args.get('fecha_fin', '') }}">
+          </div>
+          <div class="d-flex justify-content-end">
+            <button type="button" class="btn btn-sm btn-green aplicar-fecha-fin">Aplicar</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Botón para limpiar filtros -->
+      <a href="{{ url_for('jobs.historial') }}" class="btn btn-sm btn-outline-secondary chart-period-btn" style="border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        <i class="bi bi-arrow-repeat me-1" style="color: #28a745;"></i>
+        <span>Limpiar filtros</span>
+      </a>
     </div>
   </div>
   <div class="card-body p-0">
@@ -118,6 +172,60 @@
 {% block extra_scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Manejo de filtros en la cabecera
+    const filtrosForm = document.getElementById('filtrosForm');
+    const clienteOcultoInput = document.getElementById('cliente_oculto');
+    const tecnicoOcultoInput = document.getElementById('tecnico_oculto');
+    const fechaInicioOcultoInput = document.getElementById('fecha_inicio_oculto');
+    const fechaFinOcultoInput = document.getElementById('fecha_fin_oculto');
+    
+    // Filtrado por cliente
+    document.querySelector('.aplicar-cliente')?.addEventListener('click', function() {
+      const clienteValor = document.getElementById('cliente_filter').value;
+      
+      // Actualizar campo oculto
+      clienteOcultoInput.value = clienteValor;
+      
+      // Enviar formulario automáticamente
+      filtrosForm.submit();
+    });
+    
+    // Filtrado por técnico
+    document.querySelectorAll('.filter-tecnico').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const tecnicoValor = this.getAttribute('data-value');
+        
+        // Actualizar campo oculto
+        tecnicoOcultoInput.value = tecnicoValor;
+        
+        // Enviar formulario automáticamente
+        filtrosForm.submit();
+      });
+    });
+    
+    // Filtrado por fecha de inicio
+    document.querySelector('.aplicar-fecha-inicio')?.addEventListener('click', function() {
+      const fechaInicioValor = document.getElementById('fecha_inicio_filter').value;
+      
+      // Actualizar campo oculto
+      fechaInicioOcultoInput.value = fechaInicioValor;
+      
+      // Enviar formulario automáticamente
+      filtrosForm.submit();
+    });
+    
+    // Filtrado por fecha de fin
+    document.querySelector('.aplicar-fecha-fin')?.addEventListener('click', function() {
+      const fechaFinValor = document.getElementById('fecha_fin_filter').value;
+      
+      // Actualizar campo oculto
+      fechaFinOcultoInput.value = fechaFinValor;
+      
+      // Enviar formulario automáticamente
+      filtrosForm.submit();
+    });
+    
     // Efectos para botones de búsqueda
     const btnOutlineSecondary = document.querySelectorAll('.btn-outline-secondary');
     btnOutlineSecondary.forEach(btn => {
@@ -152,11 +260,110 @@
   });
 </script>
 
-<style>
-  /* Estilo para los inputs y selects */
+<style>  /* Estilo para los inputs y selects */
   .form-control, .form-select {
     border-radius: 0.5rem !important;
     border: 1px solid #cbc6c6;
+  }
+  
+  /* Estilos para el dropdown del filtro */
+  .chart-filter-dropdown {
+    position: relative;
+  }
+
+  .chart-filter-dropdown .dropdown-menu {
+    box-shadow: 0 5px 15px rgba(0,0,0,.1);
+    border: none;
+    animation: fadeIn 0.3s ease-in-out;
+    padding: 0.5rem 0;
+    position: absolute;
+    right: 0;
+    left: auto;
+    top: 100%;
+    transform: none !important;
+    margin-top: 0.5rem;
+    min-width: 200px;
+    border-radius: 0.75rem;
+  }
+  
+  .chart-period-btn {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem !important;
+    color: #6c757d;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+  
+  .chart-period-btn:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-color: #28a745;
+  }
+  
+  .chart-period-menu .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  
+  .chart-period-menu .dropdown-item:hover {
+    background-color: rgba(40, 167, 69, 0.1); /* Verde claro igual que en dashboard */
+    color: #495057;
+  }
+  
+  .chart-period-menu .dropdown-item:active {
+    background-color: #28a745; /* Verde para estado activo */
+    color: white;
+  }
+  
+  .chart-period-menu .dropdown-item i {
+    color: #28a745; /* Verde para los iconos */
+    width: 1.2rem;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+  
+  .chart-period-menu .dropdown-item:hover i {
+    transform: scale(1.1);
+  }
+  
+  /* Estilos específicos para los filtros de fecha en el dropdown */
+  .chart-filter-dropdown .dropdown-menu.p-3 {
+    padding: 1rem !important;
+    border-radius: 0.75rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  }
+  
+  /* Botón verde */
+  .btn-green {
+    background-color: #28a745 !important;
+    color: white !important;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-green:hover {
+    background-color: #218838 !important;
+    color: white !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   /* Estilos para el desplegable de técnicos como en dashboard */
