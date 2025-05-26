@@ -7,9 +7,21 @@
 {% from "components/filters.html" import filter_card, date_range_filters %}
 
 <style>
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
   .clickable-row:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-    transition: background-color 0.2s;
+    background-color: rgba(40, 167, 69, 0.05);
+  }
+    /* Efecto de iluminación en verde para el texto (sin cambio de grosor) */
+  .clickable-row td {
+    transition: color 0.3s ease;
+  }
+  
+  .clickable-row:hover td {
+    color: #28a745;
   }
 </style>
 
@@ -239,35 +251,28 @@
       // Enviar formulario automáticamente
       filtrosForm.submit();
     });
-    
-    // Efectos para botones de búsqueda
+      // Efectos para botones de búsqueda (solo cambio de color, sin movimiento)
     const btnOutlineSecondary = document.querySelectorAll('.btn-outline-secondary');
     btnOutlineSecondary.forEach(btn => {
       btn.addEventListener('mouseover', function() {
         this.style.backgroundColor = '#6c757d';
         this.style.color = 'white';
-        this.style.transform = 'translateY(-2px)';
       });
       
       btn.addEventListener('mouseout', function() {
         this.style.backgroundColor = '';
         this.style.color = '';
-        this.style.transform = 'translateY(0)';
       });
     });
 
-    // Efectos para botones de filtrado
+    // Efectos para botones de filtrado (solo cambio de color, sin movimiento)
     const btnFilter = document.querySelectorAll('.btn-filter');
     btnFilter.forEach(btn => {
       btn.addEventListener('mouseover', function() {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 4px 8px rgba(40, 167, 69, 0.3)';
         this.style.backgroundColor = '#218838';
       });
       
       btn.addEventListener('mouseout', function() {
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 2px 5px rgba(0,0,0,0.15)';
         this.style.backgroundColor = '#28a745';
       });
     });
@@ -313,12 +318,9 @@
     text-overflow: ellipsis;
     max-width: 200px;
   }
-  
-  .chart-period-btn:hover {
+    .chart-period-btn:hover {
     background-color: #e9ecef;
     color: #495057;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-color: #28a745;
   }
   
@@ -346,9 +348,8 @@
     text-align: center;
     transition: all 0.2s ease;
   }
-  
-  .chart-period-menu .dropdown-item:hover i {
-    transform: scale(1.1);
+    .chart-period-menu .dropdown-item:hover i {
+    opacity: 1;
   }
   
   /* Estilos específicos para los filtros de fecha en el dropdown */
@@ -367,12 +368,9 @@
     padding: 0.25rem 0.75rem;
     transition: all 0.3s ease;
   }
-  
-  .btn-green:hover {
+    .btn-green:hover {
     background-color: #218838 !important;
     color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
   }
   
   @keyframes fadeIn {
@@ -438,12 +436,9 @@
     border: none;
     font-weight: 500;
   }
-  
-  .btn-filter:hover, .btn-filter:focus {
+    .btn-filter:hover, .btn-filter:focus {
     background-color: #218838;
     color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
   }
   
   /* Estilos para la paginación minimalista como en el dashboard */
@@ -459,12 +454,10 @@
     margin: 0;
     transition: all 0.2s ease;
   }
-  
-  .minimal-pagination:hover:not(.disabled) {
+    .minimal-pagination:hover:not(.disabled) {
     background-color: rgba(40, 167, 69, 0.1);
     color: #28a745;
     border-color: #28a745;
-    transform: translateY(-1px);
   }
   
   .pagination {
@@ -489,16 +482,16 @@
     padding: 0.75rem 1rem;
     background-color: #f8f9fa;
   }
-  
-  .dashboard-table tbody td {
+    .dashboard-table tbody td {
     padding: 0.75rem 1rem;
     vertical-align: middle;
     border-color: #f0f0f0;
   }
   
-  .dashboard-table tbody tr:hover {
+  /* Comentamos este estilo para evitar conflictos con .clickable-row:hover */
+  /* .dashboard-table tbody tr:hover {
     background-color: rgba(40, 167, 69, 0.05);
-  }
+  } */
   
   /* Asegurar que las migas de pan estén en negrita */
   .breadcrumb-item {
