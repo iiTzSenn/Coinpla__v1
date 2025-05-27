@@ -54,17 +54,28 @@
     <div class="col-md-4">
       <label for="hora" class="form-label">Hora:</label>
       <input type="time" name="hora" id="hora" class="form-control" value="{{ trabajo.hora }}" required>
-    </div>
-    <div class="col-md-4">
-      <label for="tecnico_id" class="form-label">Técnico Asignado:</label>
-      <select name="tecnico_id" id="tecnico_id" class="form-control">
+    </div>    <div class="col-md-4">
+      <label for="tecnico_id" class="form-label">Técnico Asignado:</label>      <select name="tecnico_id" id="tecnico_id" class="form-control">
         <option value="">-- Seleccionar --</option>
         {% for tecnico in tecnicos %}
           <option value="{{ tecnico.id }}" {% if trabajo.technician_id == tecnico.id %}selected{% endif %}>
             {{ tecnico.nombre }} {% if tecnico.apellido %}{{ tecnico.apellido }}{% endif %}
           </option>
         {% endfor %}
+        {% if trabajo.technician_id and not trabajo.technician_id in tecnicos|map(attribute='id')|list %}
+          <option value="{{ trabajo.technician_id }}" selected>{{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }} (No disponible)</option>
+        {% endif %}
       </select>
+      <small class="form-text text-muted">
+        {% if tecnicos|selectattr('available', 'equalto', true)|list %}
+          Solo se muestran técnicos disponibles.
+        {% else %}
+          <span class="text-warning">No hay técnicos disponibles en este momento.</span>
+        {% endif %}
+        {% if trabajo.technician_id and not trabajo.technician.available %}
+          <br><span class="text-info">El técnico actual no está disponible para nuevos trabajos.</span>
+        {% endif %}
+      </small>
     </div>
     <div class="col-md-4">
       <label for="estado" class="form-label">Estado:</label>

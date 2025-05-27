@@ -51,12 +51,10 @@ class Technician(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # Llave foránea para relacionar con el usuario, opcional inicialmente
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    
     nombre = db.Column(db.String(100), nullable=False)
     apellido = db.Column(db.String(100))
     email = db.Column(db.String(100))
     telefono = db.Column(db.String(20))
-    especialidad = db.Column(db.String(100))
     available = db.Column(db.Boolean, default=True)
     workload = db.Column(db.Integer, default=0)
     direccion = db.Column(db.String(200))

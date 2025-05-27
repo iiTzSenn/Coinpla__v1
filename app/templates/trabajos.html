@@ -425,9 +425,7 @@
               </div>
             </div>
   
-            <div class="row g-3 mb-3">
-              <div class="col-md-6">
-                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
+            <div class="row g-3 mb-3">              <div class="col-md-6">                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
                 <select class="form-select" id="modalTecnicoId" name="tecnico_id" style="border-radius: 0.5rem;">
                   <option value="">Sin asignar</option>
                   {% for tecnico in tecnicos %}
@@ -436,6 +434,13 @@
                   </option>
                   {% endfor %}
                 </select>
+                <small class="form-text text-muted">
+                  {% if tecnicos %}
+                    Solo se muestran técnicos disponibles.
+                  {% else %}
+                    <span class="text-warning">No hay técnicos disponibles en este momento.</span>
+                  {% endif %}
+                </small>
               </div>
               <div class="col-md-6">
                 <label for="modalEstado" class="form-label">Estado del Trabajo</label>

@@ -243,10 +243,9 @@ def listar_trabajos():
             query = query.filter(Job.fecha <= fecha_fin_obj)
         except ValueError:
             flash("Formato de fecha fin inválido", "warning")
-    
-    # Ejecutar la consulta y obtener los resultados
+      # Ejecutar la consulta y obtener los resultados
     trabajos = query.order_by(Job.fecha.desc()).all()
-    tecnicos = Technician.query.all()
+    tecnicos = Technician.query.filter_by(available=True).all()
     
     return render_template('trabajos.html', trabajos=trabajos, tecnicos=tecnicos)
 
@@ -266,7 +265,13 @@ def crear_trabajo():
 @login_required
 def editar_trabajo(id):
     trabajo = Job.query.get_or_404(id)
-    tecnicos = Technician.query.all()
+    tecnicos = Technician.query.filter_by(available=True).all()
+    
+    # Si el técnico actual no está disponible, lo añadimos a la lista para que se pueda mostrar en el select
+    if trabajo.technician_id and not any(t.id == trabajo.technician_id for t in tecnicos):
+        current_tech = Technician.query.get(trabajo.technician_id)
+        if current_tech:
+            tecnicos.append(current_tech)
 
     trabajo.nombre_cliente = request.form.get('nombre_cliente')
     trabajo.apellido_cliente = request.form.get('apellido_cliente')
@@ -378,7 +383,7 @@ def historial():
         page=page, per_page=per_page, error_out=False
     )
     
-    tecnicos = Technician.query.all()
+    tecnicos = Technician.query.filter_by(available=True).all()
     
     return render_template(
         'historial.html', 

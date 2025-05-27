@@ -421,11 +421,9 @@
         {% if technicians %}
         <div class="table-responsive">          <table class="table mb-0 custom-table" id="techniciansTable">
             <thead class="table-light">
-              <tr>
-                <th style="padding-left: 20px;">Nombre completo</th>
+              <tr>                <th style="padding-left: 20px;">Nombre completo</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th>Especialidad</th>
                 <th>Estado</th>
                 <th style="text-align: center; width: 150px;">Acciones</th>
               </tr>
@@ -436,7 +434,6 @@
                 <td style="padding-left: 20px;">{{ tecnico.nombre }} {{ tecnico.apellido if tecnico.apellido else '' }}</td>
                 <td>{{ tecnico.email }}</td>
                 <td>{{ tecnico.telefono if tecnico.telefono else '-' }}</td>
-                <td>{{ tecnico.especialidad if tecnico.especialidad else '-' }}</td>
                 <td>
                   {% if tecnico.available %}
                     <span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Disponible</span>
@@ -447,6 +444,16 @@
                   <div class="action-buttons-container">
                     <button type="button" class="btn btn-sm btn-outline-primary btn-action edit-tech-btn" data-id="{{ tecnico.id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar técnico">
                       <i class="bi bi-pencil"></i>
+                    </button>                    <button type="button" 
+                      class="btn btn-sm {% if tecnico.available %}btn-outline-success{% else %}btn-outline-warning{% endif %} btn-action toggle-availability-btn" 
+                      data-id="{{ tecnico.id }}" 
+                      data-available="{{ tecnico.available|lower }}" 
+                      data-csrf="{{ csrf_token() }}"
+                      data-bs-toggle="tooltip" 
+                      data-bs-placement="top" 
+                      title="{% if tecnico.available %}Marcar como no disponible{% else %}Marcar como disponible{% endif %}" 
+                      data-bs-custom-class="{% if tecnico.available %}tooltip-success{% else %}tooltip-warning{% endif %}">
+                        <i class="bi bi-{% if tecnico.available %}toggle-on{% else %}toggle-off{% endif %}"></i>
                     </button>
                     <form method="POST" action="{{ url_for('technicians.eliminar_tecnico', id=tecnico.id) }}" style="display:inline;">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -601,6 +608,107 @@
     // Inicializar paginación para las tablas
     initPagination('pendingUsersTable');
     initPagination('registeredUsersTable');
+    
+    // Manejador para botones de disponibilidad
+    document.querySelectorAll('.toggle-availability-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const techId = this.getAttribute('data-id');
+        const currentAvailable = this.getAttribute('data-available') === 'true';
+        const csrfToken = this.getAttribute('data-csrf');
+        const button = this;
+        const row = this.closest('tr');
+        const statusCell = row.querySelector('td:nth-child(4)');
+        
+        // Desactivar tooltips mientras se procesa
+        const tooltip = bootstrap.Tooltip.getInstance(button);
+        if (tooltip) {
+          tooltip.dispose();
+        }
+        
+        // Mostrar indicador de carga en el botón
+        const originalIcon = button.innerHTML;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        button.disabled = true;
+          // Realizar petición AJAX
+        fetch(`/technicians/toggle/${techId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            csrf_token: csrfToken
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Actualizar la interfaz sin recargar
+          if (data.success) {
+            // Actualizar el estado visual
+            const newAvailable = !currentAvailable;
+            
+            // 1. Actualizar la celda de estado
+            if (newAvailable) {
+              statusCell.innerHTML = '<span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Disponible</span>';
+            } else {
+              statusCell.innerHTML = '<span class="badge rounded-pill bg-warning text-dark">Ocupado</span>';
+            }
+            
+            // 2. Actualizar el botón
+            button.classList.toggle('btn-outline-success', newAvailable);
+            button.classList.toggle('btn-outline-warning', !newAvailable);
+            button.setAttribute('data-available', String(newAvailable));
+            button.setAttribute('title', newAvailable ? 'Marcar como no disponible' : 'Marcar como disponible');
+            button.innerHTML = `<i class="bi bi-${newAvailable ? 'toggle-on' : 'toggle-off'}"></i>`;
+            
+            // Actualizar la clase custom del tooltip
+            button.setAttribute('data-bs-custom-class', newAvailable ? 'tooltip-success' : 'tooltip-warning');
+            
+            // Reinicializar el tooltip
+            new bootstrap.Tooltip(button, {
+              delay: { show: 50, hide: 50 },
+              container: 'body',
+              animation: true
+            });
+            
+            // Mostrar notificación de éxito
+            showNotification('Estado actualizado correctamente', 'success');
+          } else {
+            // Restaurar el botón original en caso de error
+            button.innerHTML = originalIcon;
+            showNotification('Error al actualizar el estado', 'danger');
+          }
+          button.disabled = false;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          button.innerHTML = originalIcon;
+          button.disabled = false;
+          showNotification('Error de conexión', 'danger');
+        });
+      });
+    });
+    
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      alertDiv.style.top = '20px';
+      alertDiv.style.right = '20px';
+      alertDiv.style.zIndex = '9999';
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.body.appendChild(alertDiv);
+      
+      // Auto-ocultar después de 3 segundos
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alertDiv);
+        bsAlert.close();
+      }, 3000);
+    }
   });
 </script>
 

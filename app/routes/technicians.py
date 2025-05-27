@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required
 from app.extensions import db
 from app.models.models import Technician, Job, JobHistory
@@ -54,7 +54,24 @@ def toggle_tecnico(id):
     tecnico = Technician.query.get_or_404(id)
     tecnico.available = not tecnico.available
     db.session.commit()
-    flash("Estado actualizado", "success")
+      # Responder según el tipo de petición
+    # Si es una petición AJAX (JSON)
+    if request.headers.get('Content-Type') == 'application/json' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'id': tecnico.id,
+            'available': tecnico.available,
+            'message': 'Estado del técnico actualizado'
+        })
+    
+    # Si es una petición normal de formulario
+    flash("Estado del técnico actualizado", "success")
+    
+    # Verificar si viene de la página de administración de usuarios
+    referer = request.headers.get('Referer', '')
+    if 'admin/users' in referer:
+        return redirect(url_for('admin.admin_users'))
+    
     return redirect(url_for('technicians.listar_tecnicos'))
 
 @tech_bp.route('/delete/<int:id>', methods=['POST'])
