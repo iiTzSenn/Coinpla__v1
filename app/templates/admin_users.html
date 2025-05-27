@@ -331,16 +331,15 @@
               {% for user in registered_users %}
               <tr>
                 <td style="padding-left: 20px;">{{ user.username }}</td>
-                <td>{{ user.email }}</td>                <td>
+                <td>{{ user.email }}</td>                <td style="text-align: center;">
                   {% if user.role == 'admin' %}
-                    <span class="badge rounded-pill bg-primary">Administrador</span>
+                    <span class="badge badge-custom badge-admin">Administrador</span>
                   {% elif user.role == 'tecnico' %}
-                    <span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Técnico</span>
+                    <span class="badge badge-custom badge-tecnico">Técnico</span>
                   {% else %}
-                    <span class="badge rounded-pill bg-secondary">{{ user.role }}</span>
-                  {% endif %}
-                </td><td>
-                  <span class="status status-paid">Verificado</span>
+                    <span class="badge badge-custom badge-otro">{{ user.role }}</span>
+                  {% endif %}                </td><td style="text-align: center;">
+                  <span class="badge badge-custom badge-verificado">Verificado</span>
                 </td><td>
                   <div class="action-buttons-container">                    <!-- Botón para quitar la verificación (quitar permisos) -->
                     <form method="POST" action="{{ url_for('admin.admin_unverify_user', user_id=user.id) }}">
@@ -433,14 +432,13 @@
               <tr>
                 <td style="padding-left: 20px;">{{ tecnico.nombre }} {{ tecnico.apellido if tecnico.apellido else '' }}</td>
                 <td>{{ tecnico.email }}</td>
-                <td>{{ tecnico.telefono if tecnico.telefono else '-' }}</td>
-                <td>
+                <td>{{ tecnico.telefono if tecnico.telefono else '-' }}</td>                <td style="text-align: center;">
                   {% if tecnico.available %}
-                    <span class="badge rounded-pill" style="background-color: #43ab01; color: white;">Disponible</span>
+                    <span class="badge badge-custom badge-disponible">Disponible</span>
                   {% else %}
-                    <span class="badge rounded-pill bg-warning text-dark">Ocupado</span>
+                    <span class="badge badge-custom badge-ocupado">Ocupado</span>
                   {% endif %}
-                </td>                <td>
+                </td><td>
                   <div class="action-buttons-container">
                     <button type="button" class="btn btn-sm btn-outline-primary btn-action edit-tech-btn" data-id="{{ tecnico.id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar técnico">
                       <i class="bi bi-pencil"></i>

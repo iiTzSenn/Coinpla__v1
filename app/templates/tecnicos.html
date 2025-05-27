@@ -58,12 +58,11 @@
             {% for tecnico in tecnicos %}
             <tr>
               <td>{{ tecnico.nombre }} {{ tecnico.apellido or "" }}</td>
-              <td class="text-center">{{ tecnico.telefono or "" }}</td>
-              <td class="text-center">
+              <td class="text-center">{{ tecnico.telefono or "" }}</td>              <td class="text-center">
                 {% if tecnico.available %}
-                  <span class="badge bg-success">Disponible</span>
+                  <span class="badge badge-custom badge-disponible">Disponible</span>
                 {% else %}
-                  <span class="badge bg-danger">No disponible</span>
+                  <span class="badge badge-custom badge-ocupado">Ocupado</span>
                 {% endif %}
               </td>
               <td class="text-center">

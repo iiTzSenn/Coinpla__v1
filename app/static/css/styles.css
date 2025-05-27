@@ -966,3 +966,43 @@ table.custom-table {
   border-color: var(--primary);
   border-radius: 0 0.5rem 0.5rem 0;
 }
+
+/* Estilos para los badges de disponibilidad y roles */
+.badge-custom {
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Badges de disponibilidad */
+.badge-disponible {
+  background-color: #66C70A;
+  color: white;
+}
+
+.badge-ocupado {
+  background-color: #FFC107;
+  color: #212529;
+}
+
+/* Badges de roles */
+.badge-admin {
+  background-color: #0D6EFD;
+  color: white;
+}
+
+.badge-tecnico {
+  background-color: #43ab01;
+  color: white;
+}
+
+.badge-otro {
+  background-color: #6C757D;
+  color: white;
+}
+
+.badge-verificado {
+  background-color: #28a745;
+  color: white;
+}
