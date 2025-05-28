@@ -144,17 +144,17 @@
                 {{ trabajo.descripcion }}
               </div>
             </td>            <td>
-              <div class="d-flex gap-1 justify-content-center">
+              <div class="d-flex gap-1 justify-content-center action-buttons-container">
                 <!-- Botón para ver detalles -->
-                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles del trabajo">
+                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles del trabajo">
                   <i class="bi bi-eye"></i>
                 </a>
                 
                 <!-- Botón para aprobar presupuesto (solo si está en estado Presupuesto) -->
                 {% if trabajo.estado == 'Presupuesto' %}
-                <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}">
+                <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}" style="display: inline;">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-sm btn-success action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar presupuesto">
+                  <button type="submit" class="btn btn-sm btn-success btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar presupuesto">
                     <i class="bi bi-check-circle"></i>
                   </button>
                 </form>
@@ -162,11 +162,11 @@
                 
                 <!-- Botón para completar comprobante (solo si está En Proceso) -->
                 {% if trabajo.estado == 'En Proceso' %}
-                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
+                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
                   <i class="bi bi-file-earmark-text"></i>
                 </a>
                 {% endif %}                <!-- Botón para editar -->
-                <button class="btn btn-sm btn-warning editar-trabajo action-btn" 
+                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn" 
                         data-bs-toggle="modal" 
                         data-bs-target="#editJobModal"
                         data-id="{{ trabajo.id }}"
@@ -187,7 +187,7 @@
                   <i class="bi bi-pencil-square"></i>
                 </button>
                   <!-- Botón para eliminar -->
-                <button class="btn btn-sm btn-danger confirm-delete-job action-btn"
+                <button class="btn btn-sm btn-danger confirm-delete-job btn-action action-btn"
                         data-id="{{ trabajo.id }}"
                         data-bs-toggle="modal"
                         data-bs-target="#confirmDeleteModal"
@@ -1050,16 +1050,23 @@
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-    /* Estilos para centrar los iconos en los botones de acción */
+  /* Estilos para botones de acción - estética uniforme con admin_users.html */
   .action-btn {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 32px;
-    height: 32px;
+    margin: 0 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     padding: 0 !important;
-    transition: all 0.2s ease;
-    margin: 0 2px;
+  }
+  
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
   }
   
   .action-btn i {
@@ -1067,19 +1074,84 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin: 0; /* Eliminar márgenes del icono */
+    margin: 0;
+    transition: all 0.2s ease;
   }
   
-  .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  /* Estilos específicos para botones outline de acción */
+  .btn-outline-secondary.action-btn {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background-color: transparent;
   }
-    /* Asegurar que los botones dentro de forms también estén centrados */
+  
+  .btn-outline-secondary.action-btn:hover {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .btn-success.action-btn {
+    color: #43ab01;
+    border: 1px solid #43ab01;
+    background-color: transparent;
+  }
+  
+  .btn-success.action-btn:hover {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    border-color: #43ab01;
+  }
+  
+  .btn-info.action-btn {
+    color: #17a2b8;
+    border: 1px solid #17a2b8;
+    background-color: transparent;
+  }
+  
+  .btn-info.action-btn:hover {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: #17a2b8;
+    border-color: #17a2b8;
+  }
+  
+  .btn-warning.action-btn {
+    color: #ffc107;
+    border: 1px solid #ffc107;
+    background-color: transparent;
+  }
+  
+  .btn-warning.action-btn:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+  
+  .btn-danger.action-btn {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+  }
+  
+  .btn-danger.action-btn:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  /* Contenedor de botones de acción */
+  .action-buttons-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  /* Asegurar que los botones dentro de forms también estén centrados */
   form .action-btn {
     margin: 0 auto;
   }
-  
-  /* Estilos para los tooltips personalizados */
+    /* Estilos para los tooltips personalizados */
   .tooltip {
     font-size: 0.8rem;
     opacity: 0.95 !important;
@@ -1089,6 +1161,16 @@
     padding: 0.4rem 0.8rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     max-width: 200px;
+    background-color: #495057;
+    border-radius: 6px;
+  }
+  
+  .tooltip-success .tooltip-inner {
+    background-color: #43ab01;
+  }
+  
+  .tooltip-danger .tooltip-inner {
+    background-color: #dc3545;
   }
   
   .tooltip-warning .tooltip-inner {
@@ -1096,18 +1178,42 @@
     color: #212529;
   }
   
-  .tooltip-danger .tooltip-inner {
-    background-color: #dc3545;
+  .tooltip-info .tooltip-inner {
+    background-color: #17a2b8;
   }
   
-  .bs-tooltip-top .tooltip-arrow::before {
-    border-top-color: inherit;
+  .bs-tooltip-top .tooltip-arrow::before, 
+  .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #495057;
   }
   
-  /* Ajuste adicional para el contenedor de botones de acciones */
-  td .d-flex.gap-1.justify-content-center {
+  .tooltip-success.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-success.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #43ab01;
+  }
+  
+  .tooltip-danger.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-danger.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #dc3545;
+  }
+  
+  .tooltip-warning.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-warning.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #ffc107;
+  }
+  
+  .tooltip-info.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-info.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #17a2b8;
+  }
+    /* Ajuste adicional para el contenedor de botones de acciones */
+  td .action-buttons-container {
     display: inline-flex !important;
-    min-width: 120px; /* Ancho mínimo para que quepan los 3 botones */  }
+    min-width: 140px; /* Ancho mínimo aumentado para mejor separación */
+    justify-content: center;
+    align-items: center;
+    gap: 6px; /* Mismo gap que en admin_users.html */
+  }
 </style>
 
 <!-- Script para hacer las filas de la tabla clickeables -->
