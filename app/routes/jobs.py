@@ -427,9 +427,7 @@ def asignar_numeros_trabajos():
 def crear_presupuesto():
     from app.models.presupuesto import Presupuesto
     from app.extensions import db
-    from datetime import datetime, timedelta
-
-    # Obtener datos del formulario
+    from datetime import datetime, timedelta    # Obtener datos del formulario
     nombre_cliente = request.form.get('nombre_cliente')
     apellido_cliente = request.form.get('apellido_cliente')
     telefono = request.form.get('telefono')
@@ -440,6 +438,8 @@ def crear_presupuesto():
     duracion = request.form.get('duracion') or 'media'
     cantidad = request.form.get('cantidad') or 0
     tipo_plaga = request.form.get('tipo_plaga')
+    direccion = request.form.get('direccion')  # Obtener la dirección del formulario
+    codigo_postal = request.form.get('codigo_postal')  # Obtener el código postal también
 
     # Validar y procesar fecha y hora
     fecha_manual = bool(fecha_str)
@@ -540,8 +540,7 @@ def crear_presupuesto():
             return redirect(url_for('jobs.listar_trabajos'))
 
     # Convertir hora a string
-    hora_str = hora.strftime('%H:%M')
-      # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
+    hora_str = hora.strftime('%H:%M')    # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
     nuevo_presupuesto = Presupuesto.crear(
         nombre_cliente=nombre_cliente,
         apellido_cliente=apellido_cliente,
@@ -553,7 +552,9 @@ def crear_presupuesto():
         duracion=duracion,
         tecnico_id=candidato.id,
         cantidad=cantidad,
-        tipo_plaga=tipo_plaga
+        tipo_plaga=tipo_plaga,
+        direccion=direccion,  # Pasar la dirección explícitamente
+        codigo_postal=codigo_postal  # Pasar el código postal también
     )
     
     # Generar y enviar el presupuesto por correo electrónico

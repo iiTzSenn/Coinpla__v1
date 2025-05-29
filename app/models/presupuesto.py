@@ -8,9 +8,10 @@ class Presupuesto:
     En lugar de usar herencia, esta clase se encarga de crear y manipular
     objetos Job con estados de presupuesto.
     """
+    
     @staticmethod
     def crear(nombre_cliente, apellido_cliente, telefono, email, descripcion, 
-             fecha, hora, duracion, tecnico_id, cantidad=0, tipo_plaga=None, **kwargs):
+             fecha, hora, duracion, tecnico_id, cantidad=0, tipo_plaga=None, direccion=None, codigo_postal=None, **kwargs):
         """
         Crea un nuevo presupuesto (un Job con estado='Pendiente')
         """
@@ -29,7 +30,8 @@ class Presupuesto:
             cantidad=cantidad,  # Guardamos la cantidad (importe)
             tipo_plaga=tipo_plaga,  # Guardamos el tipo de plaga
             technician_id=tecnico_id,  # Mapear tecnico_id a technician_id
-            direccion=kwargs.get('direccion', 'Pendiente de asignar'),
+            direccion=direccion if direccion else 'Pendiente de asignar',
+            codigo_postal=codigo_postal,  # Añadir código postal
             estado='Pendiente'  # Cambiado de 'Presupuesto' a 'Pendiente'
         )
         

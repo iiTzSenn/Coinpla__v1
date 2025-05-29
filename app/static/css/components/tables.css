@@ -3,9 +3,11 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
-  border: 1px solid var(--card-border);
+  border: 1px solid var(--subtle-border);
   border-radius: var(--radius);
   overflow: hidden;
+  box-shadow: var(--subtle-shadow);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .custom-table thead th {

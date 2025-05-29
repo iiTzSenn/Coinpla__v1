@@ -67,9 +67,8 @@
 <div class="container-fluid px-0 mb-5">
   <div class="row g-4">
     <!-- Columna principal con tarjetas de información -->
-    <div class="col-lg-8">
-      <!-- Tarjeta de información del cliente -->
-      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+    <div class="col-lg-8">      <!-- Tarjeta de información del cliente -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-person-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información del Cliente</span>
@@ -109,10 +108,8 @@
             </table>
           </div>
         </div>
-      </div>
-
-      <!-- Tarjeta de detalles del servicio -->
-      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+      </div>      <!-- Tarjeta de detalles del servicio -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-tools me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Detalles del Servicio</span>
@@ -121,15 +118,12 @@
         <div class="card-body p-0">
           <div class="table-responsive">
             <table class="table table-hover mb-0 info-table">
-              <tbody>
-                <tr>
+              <tbody>                <tr>
                   <td class="fw-medium text-muted" style="width: 30%; border-right: 1px solid #f2f2f2;">Técnico asignado</td>
                   <td class="text-dark">
                     {% if trabajo.technician %}
-                      <span class="d-flex align-items-center">
-                        <i class="bi bi-person-badge-fill text-success me-2"></i>
-                        {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
-                      </span>
+                      <i class="bi bi-person-badge-fill text-success me-2"></i>
+                      {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
                     {% else %}
                       <span class="badge bg-secondary">Sin asignar</span>
                     {% endif %}
@@ -172,20 +166,16 @@
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Tipo de plaga</td>
                   <td class="text-dark">
-                    <span class="d-flex align-items-center">
-                      <i class="bi bi-bug-fill me-2 text-danger"></i>
-                      {{ trabajo.tipo_plaga|default('No especificado') }}
-                    </span>
+                    <i class="bi bi-bug-fill me-2 text-danger"></i>
+                    {{ trabajo.tipo_plaga|default('No especificado') }}
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-      </div>
-
-      <!-- Tarjeta de descripción -->
-      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+      </div>      <!-- Tarjeta de descripción -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-file-text me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Descripción del Trabajo</span>
@@ -196,10 +186,8 @@
             <p class="mb-0">{{ trabajo.descripcion }}</p>
           </div>
         </div>
-      </div>
-
-      <!-- Historial del trabajo -->
-      <div class="card shadow-sm" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+      </div>      <!-- Historial del trabajo -->
+      <div class="card shadow-sm">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-clock-history me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Historial del Trabajo</span>
@@ -231,9 +219,8 @@
     </div>
     
     <!-- Columna lateral con acciones y resumen -->
-    <div class="col-lg-4">
-      <!-- Información de trabajo -->
-      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+    <div class="col-lg-4">      <!-- Información de trabajo -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-info-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información de Trabajo</span>
@@ -280,10 +267,8 @@
           </div>
           {% endif %}
         </div>
-      </div>
-
-      <!-- Acciones rápidas -->
-      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+      </div>      <!-- Acciones rápidas -->
+      <div class="card shadow-sm mb-4">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-lightning-charge me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Acciones Rápidas</span>
@@ -338,10 +323,9 @@
           </div>
         </div>
       </div>
-      
-      <!-- Google Map (si hay dirección) -->
+        <!-- Google Map (si hay dirección) -->
       {% if trabajo.direccion and trabajo.codigo_postal %}
-      <div class="card shadow-sm" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+      <div class="card shadow-sm">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-geo-alt me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Ubicación</span>
@@ -390,8 +374,10 @@
     padding: 15px 20px;
     vertical-align: middle;
   }
-    .info-table tr:hover {
+  .info-table tr:hover {
     background-color: rgba(46, 125, 50, 0.03);
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
   }
   
   /* Estilos para la línea de tiempo */
@@ -413,8 +399,14 @@
   .timeline-item {
     position: relative;
     margin-bottom: 25px;
+    transition: transform 0.2s ease;
   }
-    .timeline-marker {
+
+  .timeline-item:hover {
+    transform: translateX(5px);
+  }
+  
+  .timeline-marker {
     position: absolute;
     left: -30px;
     top: 0;
@@ -423,6 +415,12 @@
     border-radius: 50%;
     background-color: #2E7D32;
     box-shadow: 0 0 0 4px white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .timeline-item:hover .timeline-marker {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 4px white, 0 0 10px rgba(46, 125, 50, 0.5);
   }
   
   .timeline-content {
@@ -432,6 +430,61 @@
   
   .timeline-item:last-child .timeline-content {
     border-bottom: none;
+  }
+  
+  /* Efectos de sombra y relieve para todas las tarjetas */
+  .card {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    border: none;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+  }
+  
+  /* Estilos para los iconos dentro de la tabla */
+  .table i.bi {
+    transition: transform 0.2s ease;
+  }
+  
+  .info-table tr:hover i.bi {
+    transform: scale(1.2);
+  }
+  
+  /* Estilo para el banner de estado */
+  .status-banner {
+    transition: all 0.3s ease;
+  }
+  
+  .status-banner:hover {
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transform: translateY(-3px);
+  }
+  
+  /* Estilos para los elementos de información en la columna lateral */
+  .info-item {
+    transition: all 0.2s ease;
+    padding: 5px;
+    border-radius: 6px;
+  }
+  
+  .info-item:hover {
+    background-color: rgba(46, 125, 50, 0.05);
+    transform: translateX(3px);
+  }
+
+  /* Efecto para la description-box */
+  .description-box {
+    transition: all 0.3s ease;
+  }
+  
+  .description-box:hover {
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    background-color: #f5f5f5;
   }
   
   /* Estilos para los botones de acción */
@@ -452,6 +505,26 @@
   
   .action-button:active {
     transform: translateY(0);
+  }
+  
+  /* Mejora para los enlaces de navegación */
+  .d-flex.align-items-center.mb-4.mt-3 a {
+    transition: all 0.2s ease;
+  }
+  
+  .d-flex.align-items-center.mb-4.mt-3 a:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  /* Mejoras para los badges */
+  .badge {
+    transition: all 0.2s ease;
+  }
+  
+  .badge:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
   
   /* Estilos para impresión */
