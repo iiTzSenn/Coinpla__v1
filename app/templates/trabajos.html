@@ -236,9 +236,9 @@
 
 <!-- Modal para nuevo presupuesto -->
 <div class="modal fade" id="newPresupuestoModal" tabindex="-1" aria-labelledby="newPresupuestoModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xxl modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 1rem; overflow: hidden;">
-      <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+      <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; padding: 1.25rem;">
         <h5 class="modal-title" id="newPresupuestoModalLabel">
           <i class="bi bi-file-earmark-plus me-2 text-green"></i>Crear Nuevo Presupuesto
         </h5>
@@ -246,116 +246,179 @@
       </div>
       <form method="POST" action="{{ url_for('jobs.crear_presupuesto') }}" id="addBudgetForm">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="modal-body">
+        <div class="modal-body p-4">
           <!-- Sección de Datos de Cliente -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-green mb-3"><i class="bi bi-person me-2"></i>Datos del Cliente</h6>
+          <div class="mb-4 bg-light rounded p-3" style="border-left: 4px solid #28a745;">
+            <h6 class="fw-bold text-green mb-3 d-flex align-items-center">
+              <i class="bi bi-person-circle me-2"></i>Datos del Cliente
+            </h6>
             <div class="row g-3 mb-3">
-              <div class="col-md-3">
-                {{ text_field("nombre_cliente", "Nombre:", "Ingrese el nombre del cliente", required=true) }}
+              <!-- Primera fila de datos del cliente -->
+              <div class="col-lg-3 col-md-6">
+                <label for="nombre_cliente" class="form-label">
+                  <i class="bi bi-person-fill me-1 small text-muted"></i>Nombre:
+                </label>
+                <input type="text" class="form-control" id="nombre_cliente" name="nombre_cliente" 
+                       placeholder="Ingrese nombre" required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-3">
-                {{ text_field("apellido_cliente", "Apellido:", "Ingrese el apellido del cliente", required=true) }}
+              <div class="col-lg-3 col-md-6">
+                <label for="apellido_cliente" class="form-label">
+                  <i class="bi bi-person-fill me-1 small text-muted"></i>Apellido:
+                </label>
+                <input type="text" class="form-control" id="apellido_cliente" name="apellido_cliente" 
+                       placeholder="Ingrese apellido" required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-3">
-                {{ phone_field("telefono", "Teléfono:", "Ingrese el teléfono del cliente", required=true) }}
+              <div class="col-lg-3 col-md-6">
+                <label for="telefono" class="form-label">
+                  <i class="bi bi-telephone-fill me-1 small text-muted"></i>Teléfono:
+                </label>
+                <input type="tel" class="form-control" id="telefono" name="telefono" 
+                       placeholder="Ej: 612345678" 
+                       pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
+                       title="Formato: +34 123456789 o 123-456-789"
+                       required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-3">
-                {{ text_field("email", "Correo Electrónico:", "Ingrese el correo electrónico", required=true) }}
+              <div class="col-lg-3 col-md-6">
+                <label for="email" class="form-label">
+                  <i class="bi bi-envelope-fill me-1 small text-muted"></i>Email:
+                </label>
+                <input type="email" class="form-control" id="email" name="email" 
+                       placeholder="email@ejemplo.com" required style="border-radius: 0.5rem;">
               </div>
             </div>
             
-            <div class="row g-3 mb-1">
-              <div class="col-md-3">
-                <label for="dni_cif" class="form-label">DNI/NIE/CIF:</label>
-                <input type="text" class="form-control" id="dni_cif" name="dni_cif" placeholder="Para facturación" style="border-radius: 0.5rem;">
-                <div class="form-text small">
-                  <i class="bi bi-info-circle me-1 text-green"></i>Necesario para facturación
+            <!-- Segunda fila de datos del cliente -->
+            <div class="row g-3">
+              <div class="col-lg-5 col-md-4">
+                <label for="direccion" class="form-label">
+                  <i class="bi bi-geo-alt-fill me-1 small text-muted"></i>Dirección:
+                </label>
+                <input type="text" class="form-control" id="direccion" name="direccion" 
+                       placeholder="Ingrese dirección completa" style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-lg-2 col-md-2">
+                <label for="codigo_postal" class="form-label">
+                  <i class="bi bi-mailbox me-1 small text-muted"></i>C.P.:
+                </label>
+                <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" 
+                       placeholder="Ej: 28001" style="border-radius: 0.5rem;">
+              </div>
+              <div class="col-lg-3 col-md-4">
+                <label for="dni_cif" class="form-label">
+                  <i class="bi bi-card-text me-1 small text-muted"></i>DNI/NIE/CIF:
+                </label>
+                <input type="text" class="form-control" id="dni_cif" name="dni_cif" 
+                       placeholder="Para facturación" style="border-radius: 0.5rem;">
+                <div class="form-text small text-muted">
+                  <i class="bi bi-info-circle me-1"></i>Necesario para facturación
                 </div>
               </div>
-              <div class="col-md-2">
-                <label for="tipo_documento" class="form-label">Tipo de documento:</label>
+              <div class="col-lg-2 col-md-2">
+                <label for="tipo_documento" class="form-label">
+                  <i class="bi bi-card-checklist me-1 small text-muted"></i>Tipo:
+                </label>
                 <select class="form-select" id="tipo_documento" name="tipo_documento" style="border-radius: 0.5rem;">
                   <option value="dni">DNI</option>
                   <option value="nie">NIE</option>
                   <option value="cif">CIF</option>
                 </select>
               </div>
-              <div class="col-md-5">
-                <label for="direccion" class="form-label">Dirección:</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ingrese la dirección" style="border-radius: 0.5rem;">
-              </div>
-              <div class="col-md-2">
-                <label for="codigo_postal" class="form-label">Código Postal:</label>
-                <input type="text" class="form-control" id="codigo_postal" name="codigo_postal" placeholder="C.P." style="border-radius: 0.5rem;">
-              </div>
             </div>
           </div>
           
           <!-- Sección de Detalles del Trabajo -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-green mb-3"><i class="bi bi-tools me-2"></i>Detalles del Trabajo</h6>
-            <div class="row mb-3">
-              <div class="col-md-8">
-                {{ textarea_field("descripcion", "Descripción del Trabajo:", "Ingrese una descripción detallada del trabajo a realizar...", rows=3, required=true) }}
+          <div class="mb-4 bg-light rounded p-3" style="border-left: 4px solid #28a745;">
+            <h6 class="fw-bold text-green mb-3 d-flex align-items-center">
+              <i class="bi bi-tools me-2"></i>Detalles del Trabajo
+            </h6>
+            
+            <!-- Descripción del trabajo -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <label for="descripcion" class="form-label">
+                  <i class="bi bi-file-text-fill me-1 small text-muted"></i>Descripción del Trabajo:
+                </label>                <textarea class="form-control" id="descripcion" name="descripcion" rows="2" 
+                  placeholder="Ingrese una descripción detallada del trabajo a realizar..." 
+                  required style="border-radius: 0.5rem;"></textarea>
               </div>
-              <div class="col-md-4">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <label for="fecha" class="form-label">Fecha Programada:</label>
-                    <input type="date" class="form-control" id="fecha" name="fecha" style="border-radius: 0.5rem;">
-                    <div class="form-text small">
-                      <i class="bi bi-calendar3 me-1 text-green"></i>Opcional
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <label for="hora" class="form-label">Hora:</label>
-                    <input type="time" class="form-control" id="hora" name="hora" style="border-radius: 0.5rem;">
-                    <div class="form-text small">
-                      <i class="bi bi-clock me-1 text-green"></i>Opcional
-                    </div>
-                  </div>                  <div class="col-md-12">
-                    <label for="duracion" class="form-label">Duración Estimada:</label>
-                    <select class="form-select" id="duracion" name="duracion" style="border-radius: 0.5rem;" required>
-                      <option value="corta">Corta (1 hora)</option>
-                      <option value="media" selected>Media (2 horas)</option>
-                      <option value="larga">Larga (3 horas)</option>
-                    </select>
-                  </div>
-                  <div class="col-md-12">
-                    <label for="tipo_plaga" class="form-label">Tipo de Plaga:</label>
-                    <select class="form-select" id="tipo_plaga" name="tipo_plaga" style="border-radius: 0.5rem;">
-                      <option value="">Seleccione tipo de plaga</option>
-                      <option value="Cucaracha Americana (Periplaneta Americana)">Cucaracha Americana (Periplaneta Americana)</option>
-                      <option value="Cucaracha Alemana (Blatella Germanica)">Cucaracha Alemana (Blatella Germanica)</option>
-                      <option value="Rata Campo (Rattus Rattus)">Rata Campo (Rattus Rattus)</option>
-                      <option value="Rata Alcantarilla (Rattus Norvegicus)">Rata Alcantarilla (Rattus Norvegicus)</option>
-                      <option value="Ratón Común (Mus Musculus)">Ratón Común (Mus Musculus)</option>
-                      <option value="Hormiga Común (Lasius Niger)">Hormiga Común (Lasius Niger)</option>
-                      <option value="Chinche Cama (Cimex Lectularius)">Chinche Cama (Cimex Lectularius)</option>
-                      <option value="Moscas, Mosquitos (Dípteros)">Moscas, Mosquitos (Dípteros)</option>
-                    </select>
-                    <div class="form-text small">
-                      <i class="bi bi-bug me-1 text-green"></i>Seleccione para servicios de control de plagas
-                    </div>
-                  </div>
-                  <div class="col-md-12">
-                    <label for="cantidad" class="form-label">Importe Total (€):</label>
-                    <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
-                      <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" placeholder="0.00" required style="border-radius: 0.5rem 0 0 0.5rem;">
-                      <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
-                    </div>
-                  </div>
+            </div>
+            
+            <!-- Detalles de programación y costos -->
+            <div class="row g-3">
+              <div class="col-md-3 col-sm-6">
+                <label for="fecha" class="form-label">
+                  <i class="bi bi-calendar-date me-1 small text-muted"></i>Fecha:
+                </label>
+                <input type="date" class="form-control" id="fecha" name="fecha" style="border-radius: 0.5rem;">
+                <div class="form-text small text-muted">
+                  <i class="bi bi-calendar3 me-1"></i>Día programado
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <label for="hora" class="form-label">
+                  <i class="bi bi-clock me-1 small text-muted"></i>Hora:
+                </label>
+                <input type="time" class="form-control" id="hora" name="hora" style="border-radius: 0.5rem;">
+                <div class="form-text small text-muted">
+                  <i class="bi bi-clock me-1"></i>Hora programada
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <label for="duracion" class="form-label">
+                  <i class="bi bi-hourglass-split me-1 small text-muted"></i>Duración:
+                </label>
+                <select class="form-select" id="duracion" name="duracion" style="border-radius: 0.5rem;" required>
+                  <option value="corta">Corta (1 hora)</option>
+                  <option value="media" selected>Media (2 horas)</option>
+                  <option value="larga">Larga (3 horas)</option>
+                </select>
+              </div>
+              <div class="col-md-3 col-sm-6">
+                <label for="cantidad" class="form-label">
+                  <i class="bi bi-currency-euro me-1 small text-muted"></i>Importe:
+                </label>
+                <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
+                  <input type="number" class="form-control" id="cantidad" name="cantidad" step="0.01" min="0" 
+                         placeholder="0.00" required style="border-radius: 0.5rem 0 0 0.5rem;">
+                  <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Sección de Tipo de Plaga -->
+          <div class="bg-light rounded p-3" style="border-left: 4px solid #28a745;">
+            <h6 class="fw-bold text-green mb-3 d-flex align-items-center">
+              <i class="bi bi-bug me-2"></i>Información de Plaga
+            </h6>
+            <div class="row">
+              <div class="col-12">
+                <label for="tipo_plaga" class="form-label">
+                  <i class="bi bi-bug-fill me-1 small text-muted"></i>Tipo de Plaga:
+                </label>
+                <select class="form-select" id="tipo_plaga" name="tipo_plaga" style="border-radius: 0.5rem;">
+                  <option value="">Seleccione tipo de plaga</option>
+                  <option value="Cucaracha Americana (Periplaneta Americana)">Cucaracha Americana (Periplaneta Americana)</option>
+                  <option value="Cucaracha Alemana (Blatella Germanica)">Cucaracha Alemana (Blatella Germanica)</option>
+                  <option value="Rata Campo (Rattus Rattus)">Rata Campo (Rattus Rattus)</option>
+                  <option value="Rata Alcantarilla (Rattus Norvegicus)">Rata Alcantarilla (Rattus Norvegicus)</option>
+                  <option value="Ratón Común (Mus Musculus)">Ratón Común (Mus Musculus)</option>
+                  <option value="Hormiga Común (Lasius Niger)">Hormiga Común (Lasius Niger)</option>
+                  <option value="Chinche Cama (Cimex Lectularius)">Chinche Cama (Cimex Lectularius)</option>
+                  <option value="Moscas, Mosquitos (Dípteros)">Moscas, Mosquitos (Dípteros)</option>
+                </select>
+                <div class="form-text small text-muted">
+                  <i class="bi bi-info-circle me-1"></i>Seleccione para servicios de control de plagas
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 1rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
+        <div class="modal-footer" style="background-color: #f9f9f9; border-top: 1px solid #cbc6c6; padding: 1rem 1.5rem;">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 0.75rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
             <i class="bi bi-x-circle me-1"></i>Cancelar
           </button>
-          <button type="submit" class="btn btn-green" id="submitPresupuesto" style="border-radius: 1rem; border: 1px solid #28a745; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+          <button type="submit" class="btn btn-green" id="submitPresupuesto" style="border-radius: 0.75rem; border: 1px solid #28a745; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
             <i class="bi bi-file-earmark-plus me-1"></i><span id="submitText">Generar y Enviar Presupuesto</span>
             <span id="loadingSpinner" class="spinner-border spinner-border-sm ms-1" role="status" style="display: none;"></span>
           </button>
@@ -370,31 +433,42 @@
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <form id="editJobForm" method="POST" action="" class="needs-validation" novalidate>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <div class="modal-content" style="border-radius: 1rem; overflow: hidden;">
-        <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
+      <div class="modal-content" style="border-radius: 1rem; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+        <div class="modal-header" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; padding: 1.25rem;">
           <h5 class="modal-title" id="editJobModalLabel">
-            <i class="bi bi-pencil-square me-2"></i>Editar Trabajo
+            <i class="bi bi-pencil-square me-2 text-primary"></i>Editar Trabajo
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <!-- Datos del Cliente -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person me-2"></i>Datos del Cliente</h6>
+        <div class="modal-body p-4">
+          <!-- Sección de Datos de Cliente -->
+          <div class="mb-4 bg-light rounded p-3" style="border-left: 4px solid #0d6efd;">
+            <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+              <i class="bi bi-person-circle me-2"></i>Datos del Cliente
+            </h6>
             <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label for="modalNombreCliente" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="modalNombreCliente" name="nombre_cliente" required style="border-radius: 0.5rem;">
+              <!-- Primera fila de datos del cliente -->
+              <div class="col-lg-4 col-md-6">
+                <label for="modalNombreCliente" class="form-label">
+                  <i class="bi bi-person-fill me-1 small text-muted"></i>Nombre:
+                </label>
+                <input type="text" class="form-control" id="modalNombreCliente" name="nombre_cliente" 
+                       required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-4">
-                <label for="modalApellidoCliente" class="form-label">Apellido</label>
-                <input type="text" class="form-control" id="modalApellidoCliente" name="apellido_cliente" style="border-radius: 0.5rem;">
+              <div class="col-lg-4 col-md-6">
+                <label for="modalApellidoCliente" class="form-label">
+                  <i class="bi bi-person-fill me-1 small text-muted"></i>Apellido:
+                </label>
+                <input type="text" class="form-control" id="modalApellidoCliente" name="apellido_cliente" 
+                       style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-4">
-                <label for="modalTelefono" class="form-label">Teléfono</label>
+              <div class="col-lg-4 col-md-12">
+                <label for="modalTelefono" class="form-label">
+                  <i class="bi bi-telephone-fill me-1 small text-muted"></i>Teléfono:
+                </label>
                 <input type="text" class="form-control" id="modalTelefono" name="telefono"
                       pattern="^(?:\+34[\s-]?)?(?:\d{3}[\s.-]?\d{3}[\s.-]?\d{3})$"
-                      title="Formato de teléfono español inválido. Ej: +34 123456789 o 123-456-789"
+                      title="Formato: +34 123456789 o 123-456-789"
                       maxlength="15" style="border-radius: 0.5rem;">
                 <div id="telefono-error" class="invalid-feedback">
                   Formato de teléfono inválido
@@ -402,44 +476,73 @@
               </div>
             </div>
             
-            <div class="row g-3 mb-3">
-              <div class="col-md-8">
-                <label for="modalDireccion" class="form-label">Dirección</label>
-                <input type="text" class="form-control" id="modalDireccion" name="direccion" required style="border-radius: 0.5rem;">
+            <div class="row g-3">
+              <div class="col-lg-8 col-md-8">
+                <label for="modalDireccion" class="form-label">
+                  <i class="bi bi-geo-alt-fill me-1 small text-muted"></i>Dirección:
+                </label>
+                <input type="text" class="form-control" id="modalDireccion" name="direccion" 
+                       required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-4">
-                <label for="modalCodigoPostal" class="form-label">Código Postal</label>
-                <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal" style="border-radius: 0.5rem;">
+              <div class="col-lg-4 col-md-4">
+                <label for="modalCodigoPostal" class="form-label">
+                  <i class="bi bi-mailbox me-1 small text-muted"></i>Código Postal:
+                </label>
+                <input type="text" class="form-control" id="modalCodigoPostal" name="codigo_postal" 
+                       style="border-radius: 0.5rem;">
               </div>
             </div>
           </div>
-          
-          <!-- Detalles del Trabajo -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-tools me-2"></i>Detalles del Trabajo</h6>
-            <div class="mb-3">
-              <label for="modalDescripcion" class="form-label">Descripción</label>
-              <textarea class="form-control" id="modalDescripcion" name="descripcion" rows="3" required style="border-radius: 0.5rem;"></textarea>
+            <!-- Sección de Detalles del Trabajo -->
+          <div class="mb-4 bg-light rounded p-3" style="border-left: 4px solid #0d6efd;">
+            <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+              <i class="bi bi-tools me-2"></i>Detalles del Trabajo
+            </h6>
+            <div class="row mb-4">
+              <div class="col-12">                <label for="modalDescripcion" class="form-label">
+                  <i class="bi bi-file-text-fill me-1 small text-muted"></i>Descripción:
+                </label>
+                <textarea class="form-control" id="modalDescripcion" name="descripcion" rows="2" required style="border-radius: 0.5rem;"></textarea>
+              </div>
             </div>
           
-            <div class="row g-3 mb-3">
-              <div class="col-md-4">
-                <label for="modalFecha" class="form-label">Fecha</label>
+            <div class="row g-3 mb-4">
+              <div class="col-lg-3 col-md-6">
+                <label for="modalFecha" class="form-label">
+                  <i class="bi bi-calendar-date me-1 small text-muted"></i>Fecha:
+                </label>
                 <input type="date" class="form-control" id="modalFecha" name="fecha" required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-4">
-                <label for="modalHora" class="form-label">Hora</label>
+              <div class="col-lg-3 col-md-6">
+                <label for="modalHora" class="form-label">
+                  <i class="bi bi-clock me-1 small text-muted"></i>Hora:
+                </label>
                 <input type="time" class="form-control" id="modalHora" name="hora" required style="border-radius: 0.5rem;">
               </div>
-              <div class="col-md-4">
-                <label for="modalDuracion" class="form-label">Duración Estimada</label>
+              <div class="col-lg-3 col-md-6">
+                <label for="modalDuracion" class="form-label">
+                  <i class="bi bi-hourglass-split me-1 small text-muted"></i>Duración:
+                </label>
                 <select class="form-select" id="modalDuracion" name="duracion" style="border-radius: 0.5rem;">
                   <option value="corta">Corta (1 hora)</option>
                   <option value="media">Media (2 horas)</option>
                   <option value="larga">Larga (3 horas)</option>
                 </select>
               </div>
-            </div>            <div class="row g-3 mb-3">              <div class="col-md-6">                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
+              <div class="col-lg-3 col-md-6">
+                <label for="modalCantidad" class="form-label">Importe (€):</label>
+                <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
+                  <input type="number" class="form-control" id="modalCantidad" name="cantidad" step="0.01" min="0" placeholder="0.00" style="border-radius: 0.5rem 0 0 0.5rem;">
+                  <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-4">              
+              <div class="col-lg-6 col-md-6">                
+                <label for="modalTecnicoId" class="form-label">
+                  <i class="bi bi-person-badge me-1 small text-muted"></i>Técnico Asignado:
+                </label>
                 <select class="form-select" id="modalTecnicoId" name="tecnico_id" style="border-radius: 0.5rem;">
                   <option value="">Sin asignar</option>
                   {% for tecnico in tecnicos %}
@@ -448,28 +551,41 @@
                   </option>
                   {% endfor %}
                 </select>
-                <small class="form-text text-muted">
+                <div class="form-text small text-muted">
                   {% if tecnicos %}
-                    Solo se muestran técnicos disponibles.
+                    <i class="bi bi-info-circle me-1"></i>Solo se muestran técnicos disponibles
                   {% else %}
-                    <span class="text-warning">No hay técnicos disponibles en este momento.</span>
+                    <span class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>No hay técnicos disponibles en este momento</span>
                   {% endif %}
-                </small>
+                </div>
               </div>
-              <div class="col-md-6">
-                <label for="modalEstado" class="form-label">Estado del Trabajo</label>
+              <div class="col-lg-6 col-md-6">
+                <label for="modalEstado" class="form-label">
+                  <i class="bi bi-clipboard-check me-1 small text-muted"></i>Estado del Trabajo:
+                </label>
                 <select class="form-select" id="modalEstado" name="estado" style="border-radius: 0.5rem;">
                   <option value="Presupuesto">Presupuesto</option>
                   <option value="Pendiente">Pendiente</option>
                   <option value="En Proceso">En Proceso</option>
                   <option value="Completado">Completado</option>
                 </select>
+                <div class="form-text small text-muted">
+                  <i class="bi bi-info-circle me-1"></i>Indica el progreso actual del trabajo
+                </div>
               </div>
             </div>
-            
-            <div class="row g-3 mb-3">
-              <div class="col-md-12">
-                <label for="modalTipoPlaga" class="form-label">Tipo de Plaga</label>
+          </div>
+          
+          <!-- Sección de Tipo de Plaga -->
+          <div class="bg-light rounded p-3" style="border-left: 4px solid #0d6efd;">
+            <h6 class="fw-bold text-primary mb-3 d-flex align-items-center">
+              <i class="bi bi-bug me-2"></i>Información de Plaga
+            </h6>
+            <div class="row">
+              <div class="col-12">
+                <label for="modalTipoPlaga" class="form-label">
+                  <i class="bi bi-bug-fill me-1 small text-muted"></i>Tipo de Plaga:
+                </label>
                 <select class="form-select" id="modalTipoPlaga" name="tipo_plaga" style="border-radius: 0.5rem;">
                   <option value="">Seleccione tipo de plaga</option>
                   <option value="Cucaracha Americana (Periplaneta Americana)">Cucaracha Americana (Periplaneta Americana)</option>
@@ -487,26 +603,12 @@
               </div>
             </div>
           </div>
-          
-          <!-- Importe -->
-          <div class="mb-4">
-            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-currency-euro me-2"></i>Importe</h6>
-            <div class="row">
-              <div class="col-md-6">
-                <label for="modalCantidad" class="form-label">Importe (€)</label>
-                <div class="input-group" style="border-radius: 0.5rem; overflow: hidden;">
-                  <input type="number" class="form-control" id="modalCantidad" name="cantidad" step="0.01" min="0" style="border-radius: 0.5rem 0 0 0.5rem;">
-                  <span class="input-group-text" style="border-radius: 0 0.5rem 0.5rem 0;">€</span>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 1rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
+        <div class="modal-footer" style="background-color: #f9f9f9; border-top: 1px solid #cbc6c6; padding: 1rem 1.5rem;">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 0.75rem; padding: 0.5rem 1.25rem; transition: all 0.3s ease; border: 1px solid #cbc6c6;">
             <i class="bi bi-x-circle me-1"></i>Cancelar
           </button>
-          <button type="submit" class="btn btn-third" id="editJobSubmit" style="border-radius: 1rem; border: 1px solid #cbc6c6; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
+          <button type="submit" class="btn btn-primary" id="editJobSubmit" style="border-radius: 0.75rem; padding: 0.5rem 1.25rem; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: all 0.3s ease;">
             <i class="bi bi-save me-1"></i><span>Guardar Cambios</span>
             <span id="editLoadingSpinner" class="spinner-border spinner-border-sm ms-1" role="status" style="display: none;"></span>
           </button>
@@ -830,423 +932,169 @@
 </script>
 
 <style>
-  /* Estilo para los inputs y selects */
+  /* Estilos mejorados para formularios y modales */
   .form-control, .form-select {
     border-radius: 0.5rem !important;
     border: 1px solid #cbc6c6;
+    padding: 0.6rem 0.75rem;
+    transition: all 0.2s ease-in-out;
   }
   
-  /* Estilo para los botones con clase btn-third */
-  .btn-third {
-    background-color: #6772E5;
-    color: white;
-    transition: all 0.3s ease;
+  .form-control:focus, .form-select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
   }
   
-  /* Estilo para las esquinas de elementos de formulario con clase form-control y form-select */
-  .input-group .form-control:first-child {
-    border-top-left-radius: 0.5rem !important;
-    border-bottom-left-radius: 0.5rem !important;
-  }
-  
-  .input-group .input-group-text:last-child {
-    border-top-right-radius: 0.5rem !important;
-    border-bottom-right-radius: 0.5rem !important;
-  }
-  
-  /* Mejoras visuales para los modales */
   .modal-content {
     border: none;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
   }
-  
-  .modal-header {
+    .modal-header {
     border-bottom-color: #f0f0f0;
+    padding: 0.85rem 1.25rem;
   }
   
   .modal-footer {
     border-top-color: #f0f0f0;
+    padding: 0.85rem 1.25rem;
   }
   
-  /* Estilo para la barra de búsqueda */
-  .input-group {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  .modal-body {
+    padding: 1rem 1.25rem;
+  }
+    .modal-xxl {
+    max-width: 85%;
   }
   
-  /* Eliminar el borde verde al seleccionar la caja de búsqueda */
-  #searchInput:focus {
-    box-shadow: none !important;
-    border-color: #cbc6c6 !important;
-    outline: none !important;
+  /* Hacer los modales más pequeños en general */
+  .modal-dialog {
+    max-width: 80%;
   }
   
-  /* Estilo hover para el botón de búsqueda */
-  #searchButton:hover {
-    background-color: rgba(40, 167, 69, 0.1) !important;
-    color: #28a745 !important;
-    transition: all 0.2s ease;
-  }
-  
-  #searchButton:hover i.bi-search {
-    transform: scale(1.1);
-    color: #28a745;
-    transition: all 0.2s ease;
-  }
-  
-  /* Asegurar que las migas de pan estén en negrita */
-  .breadcrumb-item {
-    font-weight: bold !important;
-  }
-    /* Estilos para el dropdown del filtro de trabajos */
-  .chart-filter-dropdown {
-    position: relative;
-  }
-
-  .chart-filter-dropdown .dropdown-menu {
-    box-shadow: 0 5px 15px rgba(0,0,0,.1);
-    border: none;
-    animation: fadeIn 0.3s ease-in-out;
-    padding: 0.5rem 0;
-    position: absolute;
-    right: 0;
-    left: auto;
-    top: 100%;
-    transform: none !important;
-    margin-top: 0.5rem;
-    min-width: 200px;
-    border-radius: 0.75rem;
-  }
-  
-  .chart-period-btn {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 0.5rem !important;
-    color: #6c757d;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.85rem;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-  }
-  
-  .chart-period-btn:hover {
-    background-color: #e9ecef;
-    color: #495057;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    border-color: #28a745;
-  }
-  
-  .chart-period-menu .dropdown-item {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    color: #6c757d;
-    transition: all 0.2s ease;
-    position: relative;
-  }
-  
-  .chart-period-menu .dropdown-item:hover {
-    background-color: rgba(40, 167, 69, 0.1); /* Verde claro igual que en dashboard */
-    color: #495057;
-  }
-  
-  .chart-period-menu .dropdown-item:active {
-    background-color: #28a745; /* Verde para estado activo */
-    color: white;
-  }
-  
-  .chart-period-menu .dropdown-item i {
-    color: #28a745; /* Verde para los iconos */
-    width: 1.2rem;
-    text-align: center;
-    transition: all 0.2s ease;
-  }
-  
-  .chart-period-menu .dropdown-item:hover i {
-    transform: scale(1.1);
-  }
-  
-  /* Estilos específicos para los filtros de fecha en el dropdown */
-  .chart-filter-dropdown .dropdown-menu.p-3 {
-    padding: 1rem !important;
-    border-radius: 0.75rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-  }
-  
-  #fecha_inicio_filter, #fecha_fin_filter {
+  /* Estilos para secciones de formularios */
+  .form-section {
+    padding: 1rem;
     border-radius: 0.5rem;
-    border: 1px solid #cbc6c6;
+    background-color: #f9f9f9;
+    margin-bottom: 1.5rem;
   }
   
+  .form-section-title {
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .form-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-text {
+    font-size: 0.75rem;
+  }
+  
+  /* Estilos para botones en modales */
   .btn-green {
-    border-radius: 0.5rem;
-    font-size: 0.85rem;
-    padding: 0.25rem 0.75rem;
-  }
-  
-  /* Estilos para la paginación minimalista como en el dashboard */
-  .minimal-pagination {
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.5rem !important;
-    border: 1px solid #e9ecef;
-    color: #6c757d;
-    font-size: 0.85rem;
-    background-color: #f8f9fa;
-    min-width: 32px;
-    text-align: center;
-    margin: 0;
-    transition: all 0.2s ease;
-  }
-  
-  .minimal-pagination:hover:not(.disabled) {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: #28a745;
+    background-color: #28a745;
+    color: white;
     border-color: #28a745;
-    transform: translateY(-1px);
+    transition: all 0.2s;
   }
   
-  .pagination {
-    gap: 0.35rem;
+  .btn-green:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
   }
   
-  .page-item.disabled .minimal-pagination {
-    opacity: 0.6;
-    pointer-events: none;
+  .modal-body .row {
+    margin-bottom: 1rem;
+  }
+    /* Mejorar el espacio entre elementos de formulario */
+  .modal-body .form-label {
+    margin-bottom: 0.2rem;
+    font-size: 0.85rem;
   }
   
-  /* Estilo para los botones principales de acción */
-  .btn-outline-secondary:hover {
-    background-color: rgba(40, 167, 69, 0.1) !important;
-    color: #28a745 !important;
-    border-color: #28a745 !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+  /* Reducir espacio entre filas del formulario */
+  .modal-body .row {
+    margin-bottom: 0.5rem;
   }
   
-  /* Estilos para el modal con tema verde */
+  /* Hacer los inputs y selects más pequeños */
+  .form-control, .form-select {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Reducir espaciado en secciones del formulario */
+  .mb-4 {
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* Ajustes para secciones con fondo */
+  .bg-light.rounded.p-3 {
+    padding: 0.75rem !important;
+  }
+  
+  /* Mejora visual para los elementos con iconos */
+  .input-group {
+    box-shadow: none !important;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .input-group:focus-within {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+  }
+  
+  .input-group .form-control {
+    border-right: 0;
+  }
+  
+  .input-group .input-group-text {
+    background-color: #f8f9fa;
+    border-color: #cbc6c6;
+  }
+  
+  /* Estilo para elementos requeridos */
+  .form-control:required, .form-select:required {
+    background-image: linear-gradient(45deg, transparent, transparent 50%, #dc3545 50%, transparent 51%);
+    background-position: right 2px top 2px;
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+  }
+  
+  /* Colores de tema */
   .text-green {
     color: #28a745 !important;
   }
   
-  .btn-green {
-    background-color: #28a745 !important;
-    color: white !important;
-    transition: all 0.3s ease;
+  /* Mejoras en la tabla */
+  .dashboard-table thead th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom-width: 1px;
   }
   
-  .btn-green:hover {
-    background-color: #218838 !important;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+  .dashboard-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.03);
   }
   
-  /* Definición de modal extra grande */
-  .modal-xxl {
-    max-width: 95%;
-    width: 1400px;
-    margin-left: 125px; /* Desplazar a la derecha para centrarlo en el área de contenido */
-  }
-  
-  /* Ajuste para centrar el modal en la zona de contenido */
-  @media (min-width: 992px) {
-    .modal-dialog.modal-xxl {
-      margin-right: auto;
-      margin-left: 255px; /* Ajustar para compensar el ancho del sidebar */
-      max-width: calc(95% - 130px); /* Reducir un poco el ancho para compensar el espacio del sidebar */
-    }
-  }
-  
-  /* Ajuste para pantallas muy grandes */
-  @media (min-width: 1400px) {
-    .modal-dialog.modal-xxl {
-      margin-left: 275px; /* Ajuste para pantallas grandes */
-      max-width: calc(95% - 150px);
-    }
-  }
-  
-  /* Ajuste para pantallas pequeñas */
-  @media (max-width: 991.98px) {
-    .modal-dialog.modal-xxl {
-      margin-left: auto; /* En pantallas pequeñas, centrado normal */
-      margin-right: auto;
-      max-width: 95%;
-    }
-  }
-    .form-control:focus, .form-select:focus {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  /* Estilos para botones de acción - estética uniforme con admin_users.html */
-  .action-btn {
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    width: 32px;
-    height: 32px;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 3px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 0 !important;
-  }
-  
-  .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-  }
-  
-  .action-btn i {
-    font-size: 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    transition: all 0.2s ease;
-  }
-  
-  /* Estilos específicos para botones outline de acción */
-  .btn-outline-secondary.action-btn {
-    color: #6c757d;
-    border: 1px solid #6c757d;
-    background-color: transparent;
-  }
-  
-  .btn-outline-secondary.action-btn:hover {
-    background-color: rgba(108, 117, 125, 0.1);
-    color: #6c757d;
-    border-color: #6c757d;
-  }
-  
-  .btn-success.action-btn {
-    color: #43ab01;
-    border: 1px solid #43ab01;
-    background-color: transparent;
-  }
-  
-  .btn-success.action-btn:hover {
-    background-color: rgba(67, 171, 1, 0.1);
-    color: #43ab01;
-    border-color: #43ab01;
-  }
-  
-  .btn-info.action-btn {
-    color: #17a2b8;
-    border: 1px solid #17a2b8;
-    background-color: transparent;
-  }
-  
-  .btn-info.action-btn:hover {
-    background-color: rgba(23, 162, 184, 0.1);
-    color: #17a2b8;
-    border-color: #17a2b8;
-  }
-  
-  .btn-warning.action-btn {
-    color: #ffc107;
-    border: 1px solid #ffc107;
-    background-color: transparent;
-  }
-  
-  .btn-warning.action-btn:hover {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: #ffc107;
-    border-color: #ffc107;
-  }
-  
-  .btn-danger.action-btn {
-    color: #dc3545;
-    border: 1px solid #dc3545;
-    background-color: transparent;
-  }
-  
-  .btn-danger.action-btn:hover {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #dc3545;
-    border-color: #dc3545;
-  }
-  
-  /* Contenedor de botones de acción */
   .action-buttons-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
+    min-width: 120px;
   }
   
-  /* Asegurar que los botones dentro de forms también estén centrados */
-  form .action-btn {
-    margin: 0 auto;
-  }
-    /* Estilos para los tooltips personalizados */
-  .tooltip {
-    font-size: 0.8rem;
-    opacity: 0.95 !important;
-  }
-  
-  .tooltip-inner {
-    padding: 0.4rem 0.8rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    max-width: 200px;
-    background-color: #495057;
-    border-radius: 6px;
-  }
-  
-  .tooltip-success .tooltip-inner {
-    background-color: #43ab01;
-  }
-  
-  .tooltip-danger .tooltip-inner {
-    background-color: #dc3545;
-  }
-  
-  .tooltip-warning .tooltip-inner {
-    background-color: #ffc107;
-    color: #212529;
-  }
-  
-  .tooltip-info .tooltip-inner {
-    background-color: #17a2b8;
-  }
-  
-  .bs-tooltip-top .tooltip-arrow::before, 
-  .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
-    border-top-color: #495057;
-  }
-  
-  .tooltip-success.bs-tooltip-top .tooltip-arrow::before, 
-  .tooltip-success.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
-    border-top-color: #43ab01;
-  }
-  
-  .tooltip-danger.bs-tooltip-top .tooltip-arrow::before, 
-  .tooltip-danger.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
-    border-top-color: #dc3545;
-  }
-  
-  .tooltip-warning.bs-tooltip-top .tooltip-arrow::before, 
-  .tooltip-warning.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
-    border-top-color: #ffc107;
-  }
-  
-  .tooltip-info.bs-tooltip-top .tooltip-arrow::before, 
-  .tooltip-info.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
-    border-top-color: #17a2b8;
-  }
-    /* Ajuste adicional para el contenedor de botones de acciones */
-  td .action-buttons-container {
-    display: inline-flex !important;
-    min-width: 140px; /* Ancho mínimo aumentado para mejor separación */
-    justify-content: center;
-    align-items: center;
-    gap: 6px; /* Mismo gap que en admin_users.html */
+  /* Estilo para las secciones en formularios */
+  .section-divider {
+    height: 4px;
+    width: 50px;
+    background-color: #0d6efd;
+    margin: 1rem 0;
+    border-radius: 2px;
   }
 </style>
 
@@ -1278,8 +1126,7 @@
         if (trabajoId) {
           window.location.href = '/jobs/' + trabajoId;
         }
-      });
-    });
+      });    });
   });
 </script>
 {% endblock %}
