@@ -146,15 +146,17 @@
             </td>            <td>
               <div class="d-flex gap-1 justify-content-center action-buttons-container">
                 <!-- Botón para ver detalles -->
-                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-sm btn-outline-secondary btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver detalles del trabajo">
+                <a href="{{ url_for('jobs.ver_trabajo', id=trabajo.id) }}" class="btn btn-outline-primary btn-action" 
+                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="tooltip-primary" title="Ver detalles">
                   <i class="bi bi-eye"></i>
                 </a>
                 
                 <!-- Botón para aprobar presupuesto (solo si está en estado Presupuesto) -->
                 {% if trabajo.estado == 'Presupuesto' %}
                 <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}" style="display: inline;">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-sm btn-success btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Aprobar presupuesto">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-outline-success btn-action" 
+                          data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="tooltip-success" title="Aprobar presupuesto">
                     <i class="bi bi-check-circle"></i>
                   </button>
                 </form>
@@ -162,10 +164,15 @@
                 
                 <!-- Botón para completar comprobante (solo si está En Proceso) -->
                 {% if trabajo.estado == 'En Proceso' %}
-                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
+                <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-outline-info btn-action"
+                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="tooltip-info" title="Completar comprobante">
                   <i class="bi bi-file-earmark-text"></i>
                 </a>
-                {% endif %}                <!-- Botón para editar -->                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn"                        data-bs-toggle="modal" 
+                {% endif %}
+                
+                <!-- Botón para editar -->
+                <button class="btn btn-outline-warning btn-action editar-trabajo"
+                        data-bs-toggle="modal" 
                         data-bs-target="#editJobModal"
                         data-id="{{ trabajo.id }}"
                         data-nombre_cliente="{{ trabajo.nombre_cliente }}"
@@ -182,15 +189,20 @@
                         data-estado="{{ trabajo.estado }}"
                         data-cantidad="{{ trabajo.cantidad or '' }}"
                         data-tipo_plaga="{{ trabajo.tipo_plaga or '' }}"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         data-bs-custom-class="tooltip-warning"
                         title="Editar trabajo">
                   <i class="bi bi-pencil-square"></i>
                 </button>
-                  <!-- Botón para eliminar -->
-                <button class="btn btn-sm btn-danger confirm-delete-job btn-action action-btn"
+                
+                <!-- Botón para eliminar -->
+                <button class="btn btn-outline-danger btn-action confirm-delete-job"
                         data-id="{{ trabajo.id }}"
                         data-bs-toggle="modal"
                         data-bs-target="#confirmDeleteModal"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
                         data-bs-custom-class="tooltip-danger"
                         title="Eliminar trabajo">
                   <i class="bi bi-trash"></i>
@@ -1077,8 +1089,7 @@
   .text-green {
     color: #28a745 !important;
   }
-  
-  /* Mejoras en la tabla */
+    /* Mejoras en la tabla */
   .dashboard-table thead th {
     font-weight: 600;
     color: #495057;
@@ -1101,9 +1112,175 @@
     margin: 1rem 0;
     border-radius: 2px;
   }
+  
+  /* Estilos para botones de acción */
+  .btn-action {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0 !important;
+  }
+  
+  .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  }
+  
+  /* Estilos específicos para botones outline de acción */
+  .btn-outline-success.btn-action {
+    color: #43ab01;
+    border: 1px solid #43ab01;
+    background-color: transparent;
+  }
+  
+  .btn-outline-success.btn-action:hover {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    border-color: #43ab01;
+  }
+  
+  .btn-outline-danger.btn-action {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+  }
+  
+  .btn-outline-danger.btn-action:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .btn-outline-warning.btn-action {
+    color: #ffc107;
+    border: 1px solid #ffc107;
+    background-color: transparent;
+  }
+  
+  .btn-outline-warning.btn-action:hover {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border-color: #ffc107;
+  }
+  
+  .btn-outline-primary.btn-action {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+  }
+  
+  .btn-outline-primary.btn-action:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  .btn-outline-info.btn-action {
+    color: #0dcaf0;
+    border: 1px solid #0dcaf0;
+    background-color: transparent;
+  }
+  
+  .btn-outline-info.btn-action:hover {
+    background-color: rgba(13, 202, 240, 0.1);
+    color: #0dcaf0;
+    border-color: #0dcaf0;
+  }
+  
+  .btn-outline-secondary.btn-action {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background-color: transparent;
+  }
+  
+  .btn-outline-secondary.btn-action:hover {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .btn-action i {
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    transition: all 0.2s ease;
+  }
+  
+  /* Estilos para tooltips */
+  .tooltip-inner {
+    padding: 0.4rem 0.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 200px;
+    background-color: #495057;
+    border-radius: 6px;
+  }
+  
+  .tooltip-success .tooltip-inner {
+    background-color: #43ab01;
+  }
+  
+  .tooltip-danger .tooltip-inner {
+    background-color: #dc3545;
+  }
+  
+  .tooltip-warning .tooltip-inner {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .tooltip-primary .tooltip-inner {
+    background-color: #0d6efd;
+  }
+  
+  .tooltip-info .tooltip-inner {
+    background-color: #0dcaf0;
+  }
+  
+  .bs-tooltip-top .tooltip-arrow::before, 
+  .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #495057;
+  }
+  
+  .tooltip-success.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-success.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #43ab01;
+  }
+  
+  .tooltip-danger.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-danger.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #dc3545;
+  }
+  
+  .tooltip-warning.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-warning.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #ffc107;
+  }
+  
+  .tooltip-primary.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-primary.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #0d6efd;
+  }
+  
+  .tooltip-info.bs-tooltip-top .tooltip-arrow::before, 
+  .tooltip-info.bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before {
+    border-top-color: #0dcaf0;
+  }
+  
+  .tooltip {
+    font-size: 0.8rem;
+    opacity: 0.95 !important;
+  }
 </style>
 
-<!-- Script para hacer las filas de la tabla clickeables -->
+<!-- Script para hacer las filas de la tabla clickeables y activar tooltips -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Agregar estilo CSS para filas clickeables
@@ -1117,7 +1294,18 @@
       }
     `;
     document.head.appendChild(style);
-      // Hacer que las filas de la tabla sean clickeables
+      
+    // Inicializar tooltips con opciones mejoradas
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        delay: { show: 50, hide: 50 },
+        container: 'body',
+        animation: true
+      });
+    });
+    
+    // Hacer que las filas de la tabla sean clickeables
     document.querySelectorAll('.trabajo-row').forEach(row => {
       row.addEventListener('click', function(e) {
         // Evitar que el clic funcione si se hace en un botón o enlace dentro de la fila
@@ -1131,7 +1319,28 @@
         if (trabajoId) {
           window.location.href = '/jobs/' + trabajoId;
         }
-      });    });
+      });
+    });
+    
+    // Función para mostrar notificaciones
+    function showNotification(message, type = 'info') {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+      alertDiv.style.top = '20px';
+      alertDiv.style.right = '20px';
+      alertDiv.style.zIndex = '9999';
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.body.appendChild(alertDiv);
+      
+      // Auto-ocultar después de 3 segundos
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alertDiv);
+        bsAlert.close();
+      }, 3000);
+    }
   });
 </script>
 {% endblock %}
