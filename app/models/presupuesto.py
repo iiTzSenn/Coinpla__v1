@@ -8,27 +8,26 @@ class Presupuesto:
     En lugar de usar herencia, esta clase se encarga de crear y manipular
     objetos Job con estados de presupuesto.
     """
-    
     @staticmethod
     def crear(nombre_cliente, apellido_cliente, telefono, email, descripcion, 
-             fecha, hora, duracion, tecnico_id, **kwargs):
+             fecha, hora, duracion, tecnico_id, cantidad=0, tipo_plaga=None, **kwargs):
         """
         Crea un nuevo presupuesto (un Job con estado='Pendiente')
         """
         from app.extensions import db
         
         # Crear el objeto Job que representará el presupuesto
-        # Nota: El email se almacena en el campo descripcion con un prefijo especial
-        descripcion_completa = f"Email: {email}\n\n{descripcion}"
-        
         trabajo = Job(
             nombre_cliente=nombre_cliente,
             apellido_cliente=apellido_cliente,
             telefono=telefono,
-            descripcion=descripcion_completa,  # Almacenamos el email aquí
+            email=email,  # Ahora guardamos el email directamente en su campo correspondiente
+            descripcion=descripcion,
             fecha=fecha,
             hora=hora,
             duracion=duracion,
+            cantidad=cantidad,  # Guardamos la cantidad (importe)
+            tipo_plaga=tipo_plaga,  # Guardamos el tipo de plaga
             technician_id=tecnico_id,  # Mapear tecnico_id a technician_id
             direccion=kwargs.get('direccion', 'Pendiente de asignar'),
             estado='Pendiente'  # Cambiado de 'Presupuesto' a 'Pendiente'

@@ -165,13 +165,13 @@
                 <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
                   <i class="bi bi-file-earmark-text"></i>
                 </a>
-                {% endif %}                <!-- Botón para editar -->                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn" 
-                        data-bs-toggle="modal" 
+                {% endif %}                <!-- Botón para editar -->                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn"                        data-bs-toggle="modal" 
                         data-bs-target="#editJobModal"
                         data-id="{{ trabajo.id }}"
                         data-nombre_cliente="{{ trabajo.nombre_cliente }}"
                         data-apellido_cliente="{{ trabajo.apellido_cliente }}"
                         data-telefono="{{ trabajo.telefono }}"
+                        data-email="{{ trabajo.email }}"
                         data-direccion="{{ trabajo.direccion }}"
                         data-codigo_postal="{{ trabajo.codigo_postal }}"
                         data-descripcion="{{ trabajo.descripcion }}"
@@ -454,15 +454,14 @@
                 </label>
                 <input type="text" class="form-control" id="modalNombreCliente" name="nombre_cliente" 
                        required style="border-radius: 0.5rem;">
-              </div>
-              <div class="col-lg-4 col-md-6">
+              </div>              <div class="col-lg-4 col-md-6">
                 <label for="modalApellidoCliente" class="form-label">
                   <i class="bi bi-person-fill me-1 small text-muted"></i>Apellido:
                 </label>
                 <input type="text" class="form-control" id="modalApellidoCliente" name="apellido_cliente" 
                        style="border-radius: 0.5rem;">
               </div>
-              <div class="col-lg-4 col-md-12">
+              <div class="col-lg-4 col-md-6">
                 <label for="modalTelefono" class="form-label">
                   <i class="bi bi-telephone-fill me-1 small text-muted"></i>Teléfono:
                 </label>
@@ -473,6 +472,13 @@
                 <div id="telefono-error" class="invalid-feedback">
                   Formato de teléfono inválido
                 </div>
+              </div>
+              <div class="col-lg-4 col-md-6">
+                <label for="modalEmail" class="form-label">
+                  <i class="bi bi-envelope-fill me-1 small text-muted"></i>Email:
+                </label>
+                <input type="email" class="form-control" id="modalEmail" name="email" 
+                       placeholder="email@ejemplo.com" style="border-radius: 0.5rem;">
               </div>
             </div>
             

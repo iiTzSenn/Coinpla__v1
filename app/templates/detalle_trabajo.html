@@ -1,272 +1,524 @@
 {% extends 'base.html' %}
-{% block title %}{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }}{% endblock %}
+{% block title %}{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }} - Detalles{% endblock %}
 
 {% block content %}
 {% from "components/page_header.html" import page_header %}
-{% from "components/form_fields.html" import text_field, phone_field %}
 
-<!-- Breadcrumb estilizado según la imagen -->
+<!-- Cabecera con navegación mejorada -->
 <div class="d-flex align-items-center mb-4 mt-3">
-  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
-  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
-  <span class="fw-bold" style="color: #000; font-size: 20px;">Trabajos</span>
-  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
-  <span class="fw-bold" style="color: #888; font-size: 20px;">Trabajo Nº_{{ trabajo.id }}</span>
+  <a href="{{ url_for('jobs.index') }}" class="fw-bold text-decoration-none" style="color: #2E7D32; font-size: 18px;">Inicio</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #2E7D32; font-size: 18px;">Trabajos</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 18px;">Trabajo Nº_{{ trabajo.id }}</span>
 </div>
 
-<div class="container mb-5">
-  <div class="row">
-    <!-- Columna principal con detalles del trabajo -->
+<!-- Status banner para el estado del trabajo -->
+<div class="status-banner mb-4" style="border-left: 6px solid {{ 
+    '#FFA726' if trabajo.estado == 'Pendiente' else 
+    '#2E7D32' if trabajo.estado == 'Completado' else 
+    '#2196F3' if trabajo.estado == 'En Proceso' else
+    '#757575' if trabajo.estado == 'Presupuesto' else
+    '#757575' 
+  }}; 
+  background-color: {{ 
+    'rgba(255, 167, 38, 0.1)' if trabajo.estado == 'Pendiente' else 
+    'rgba(46, 125, 50, 0.1)' if trabajo.estado == 'Completado' else 
+    'rgba(33, 150, 243, 0.1)' if trabajo.estado == 'En Proceso' else
+    'rgba(117, 117, 117, 0.1)' if trabajo.estado == 'Presupuesto' else
+    'rgba(117, 117, 117, 0.1)' 
+  }};
+  padding: 15px 20px; 
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;">
+  <div class="d-flex align-items-center">
+    <i class="bi {{ 
+      'bi-hourglass-split' if trabajo.estado == 'Pendiente' else 
+      'bi-check-circle-fill' if trabajo.estado == 'Completado' else 
+      'bi-gear-wide-connected' if trabajo.estado == 'En Proceso' else
+      'bi-file-earmark-text' if trabajo.estado == 'Presupuesto' else
+      'bi-question-circle' 
+    }}" style="font-size: 1.5rem; margin-right: 15px; color: {{ 
+      '#FFA726' if trabajo.estado == 'Pendiente' else 
+      '#2E7D32' if trabajo.estado == 'Completado' else 
+      '#2196F3' if trabajo.estado == 'En Proceso' else
+      '#757575' if trabajo.estado == 'Presupuesto' else
+      '#757575' 
+    }};"></i>
+    <div>
+      <h5 class="mb-0">Estado: {{ trabajo.estado }}</h5>
+      <p class="mb-0 text-muted">Última actualización: {{ trabajo.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
+    </div>
+  </div>
+  <div>
+    {% if trabajo.estado != 'Completado' %}
+    <form method="POST" action="{{ url_for('jobs.completar_trabajo', id=trabajo.id) }}" class="d-inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-success action-button">
+        <i class="bi bi-check-circle me-2"></i>Marcar como Completado
+      </button>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="container-fluid px-0 mb-5">
+  <div class="row g-4">
+    <!-- Columna principal con tarjetas de información -->
     <div class="col-lg-8">
-      <div class="card shadow-sm" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-        <!-- Encabezado con datos principales -->
-        <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
-          <i class="bi bi-info-circle" style="font-size: 1rem; color: #6c757d;"></i>
-          <span style="font-size: 1rem; color: #6c757d; font-weight: 500;">Información del Servicio</span>
+      <!-- Tarjeta de información del cliente -->
+      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-person-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información del Cliente</span>
         </div>
         
-        <!-- Información organizada en secciones -->
-        <div class="card-body">
-          <!-- Datos del cliente -->
-          <div class="mb-4">
-            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-person me-2"></i>Información del Cliente</h6>
-            <dl class="row mb-0">
-              <dt class="col-sm-4">Nombre:</dt>
-              <dd class="col-sm-8">{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }}</dd>
-
-              {% if trabajo.telefono %}
-              <dt class="col-sm-4">Teléfono:</dt>
-              <dd class="col-sm-8">{{ trabajo.telefono }}</dd>
-              {% endif %}
-            </dl>
-          </div>
-
-          <!-- Datos de localización -->
-          <div class="mb-4">
-            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-geo-alt me-2"></i>Ubicación</h6>
-            <dl class="row mb-0">
-              <dt class="col-sm-4">Dirección:</dt>
-              <dd class="col-sm-8">{{ trabajo.direccion }}</dd>
-
-              {% if trabajo.codigo_postal %}
-              <dt class="col-sm-4">Código Postal:</dt>
-              <dd class="col-sm-8">{{ trabajo.codigo_postal }}</dd>
-              {% endif %}
-            </dl>
-          </div>
-          
-          <!-- Detalles del servicio -->
-          <div class="mb-4">
-            <h6 class="border-bottom pb-2 mb-3"><i class="bi bi-tools me-2"></i>Detalles del Servicio</h6>
-            <dl class="row mb-0">
-              <dt class="col-sm-4">Fecha:</dt>
-              <dd class="col-sm-8">{{ trabajo.fecha.strftime('%d/%m/%Y') }}</dd>
-
-              <dt class="col-sm-4">Hora:</dt>
-              <dd class="col-sm-8">{{ trabajo.hora }}</dd>
-              
-              <dt class="col-sm-4">Descripción:</dt>
-              <dd class="col-sm-8">{{ trabajo.descripcion }}</dd>
-
-              <dt class="col-sm-4">Técnico:</dt>
-              <dd class="col-sm-8">{% if trabajo.technician %}{{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}{% else %}Sin asignar{% endif %}</dd>
-
-              <dt class="col-sm-4">Cantidad:</dt>
-              <dd class="col-sm-8">{{ trabajo.cantidad|default('N/A', true) }}{% if trabajo.cantidad %} €{% endif %}</dd>
-              
-              <dt class="col-sm-4">Duración:</dt>
-              <dd class="col-sm-8">
-                {% if trabajo.duracion == 'corta' %}
-                  Corta (1 hora)
-                {% elif trabajo.duracion == 'media' %}
-                  Media (2 horas)
-                {% elif trabajo.duracion == 'larga' %}
-                  Larga (3 horas)
-                {% else %}
-                  {{ trabajo.duracion }}
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 info-table">
+              <tbody>
+                <tr>
+                  <td class="fw-medium text-muted" style="width: 30%; border-right: 1px solid #f2f2f2;">Nombre completo</td>
+                  <td class="text-dark"><span class="fw-medium">{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }}</span></td>
+                </tr>
+                {% if trabajo.telefono %}
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Teléfono</td>
+                  <td class="text-dark"><a href="tel:{{ trabajo.telefono }}" class="text-decoration-none"><i class="bi bi-telephone-fill text-success me-1"></i>{{ trabajo.telefono }}</a></td>
+                </tr>
                 {% endif %}
-              </dd>
-            </dl>
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Dirección</td>
+                  <td class="text-dark">{{ trabajo.direccion }}</td>
+                </tr>
+                {% if trabajo.codigo_postal %}
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Código Postal</td>
+                  <td class="text-dark">{{ trabajo.codigo_postal }}</td>
+                </tr>
+                {% endif %}
+                <!-- Campos adicionales -->                {% if trabajo.email %}
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Email</td>
+                  <td class="text-dark"><a href="mailto:{{ trabajo.email }}" class="text-decoration-none"><i class="bi bi-envelope-fill text-success me-1"></i>{{ trabajo.email }}</a></td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
           </div>
         </div>
+      </div>
+
+      <!-- Tarjeta de detalles del servicio -->
+      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-tools me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Detalles del Servicio</span>
+        </div>
         
-        <!-- Acciones disponibles -->
-        <div class="card-footer d-flex gap-2 justify-content-center" style="background-color: #f9f9f9; border-top: 1px solid #cbc6c6;">
-          <a href="{{ url_for('jobs.listar_trabajos') }}" class="btn btn-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Volver
-          </a>
-          
-          {% if trabajo.estado == 'Completado' %}
-          <button type="button" class="btn btn-success" style="opacity: 0.65; pointer-events: none;" title="Esta función estará disponible próximamente">
-            <i class="bi bi-receipt me-1"></i> Ver Factura
-          </button>
-          {% endif %}
-          
-          <button type="button" class="btn btn-info" style="opacity: 0.65; pointer-events: none;" title="Esta función estará disponible próximamente">
-            <i class="bi bi-file-earmark-text me-1"></i> Ver Presupuesto
-          </button>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 info-table">
+              <tbody>
+                <tr>
+                  <td class="fw-medium text-muted" style="width: 30%; border-right: 1px solid #f2f2f2;">Técnico asignado</td>
+                  <td class="text-dark">
+                    {% if trabajo.technician %}
+                      <span class="d-flex align-items-center">
+                        <i class="bi bi-person-badge-fill text-success me-2"></i>
+                        {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
+                      </span>
+                    {% else %}
+                      <span class="badge bg-secondary">Sin asignar</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Fecha programada</td>
+                  <td class="text-dark">
+                    <i class="bi bi-calendar-check me-2 text-success"></i>{{ trabajo.fecha.strftime('%d/%m/%Y') }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Hora</td>
+                  <td class="text-dark">
+                    <i class="bi bi-clock me-2 text-success"></i>{{ trabajo.hora }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Duración estimada</td>
+                  <td class="text-dark">
+                    <i class="bi bi-hourglass-split me-2 text-success"></i>
+                    {% if trabajo.duracion == 'corta' %}
+                      Corta (1 hora)
+                    {% elif trabajo.duracion == 'media' %}
+                      Media (2 horas)
+                    {% elif trabajo.duracion == 'larga' %}
+                      Larga (3 horas)
+                    {% else %}
+                      {{ trabajo.duracion }}
+                    {% endif %}
+                  </td>
+                </tr>                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Importe</td>
+                  <td class="text-dark">
+                    <span class="fw-bold fs-5 {{ 'text-success' if trabajo.cantidad else 'text-muted' }}">
+                      <i class="bi bi-cash-coin me-2"></i>{{ trabajo.cantidad|default('0.00') }} €
+                    </span>
+                  </td>
+                </tr>                <!-- Tipo de plaga siempre visible -->
+                <tr>
+                  <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Tipo de plaga</td>
+                  <td class="text-dark">
+                    <span class="d-flex align-items-center">
+                      <i class="bi bi-bug-fill me-2 text-danger"></i>
+                      {{ trabajo.tipo_plaga|default('No especificado') }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de descripción -->
+      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-file-text me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Descripción del Trabajo</span>
+        </div>
+        
+        <div class="card-body p-4">
+          <div class="description-box p-3" style="background-color: #f9f9f9; border-radius: 8px;">
+            <p class="mb-0">{{ trabajo.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historial del trabajo -->
+      <div class="card shadow-sm" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-clock-history me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Historial del Trabajo</span>
+        </div>
+        
+        <div class="card-body p-3">
+          <div class="timeline">
+            {% if trabajo.history %}
+              {% for item in trabajo.history|sort(attribute='created_at', reverse=true) %}
+                <div class="timeline-item">
+                  <div class="timeline-marker"></div>
+                  <div class="timeline-content">
+                    <h6 class="mb-1">{{ item.action }}</h6>
+                    <p class="text-muted small mb-0">{{ item.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                    {% if item.details %}
+                      <p class="mb-0 mt-1">{{ item.details }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-center text-muted">
+                <i class="bi bi-info-circle me-2"></i>No hay historial disponible
+              </div>
+            {% endif %}
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- Columna secundaria con información adicional -->
-    <div class="col-lg-4 mt-4 mt-lg-0">
-      <!-- Resumen del trabajo - Con estado resaltado -->
-      <div class="card shadow-sm mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-        <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-          <i class="bi bi-clipboard-data" style="font-size: 1rem; color: #6c757d;"></i>
-          <span style="font-size: 1rem; color: #6c757d; font-weight: 500;">Resumen</span>
+    <!-- Columna lateral con acciones y resumen -->
+    <div class="col-lg-4">
+      <!-- Información de trabajo -->
+      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-info-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información de Trabajo</span>
         </div>
+        
         <div class="card-body">
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-              <span>ID del Trabajo:</span>
-              <span class="badge rounded-pill bg-primary">{{ trabajo.id }}</span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-              <span>Estado:</span>
-              <!-- Estado resaltado con colores y diseño mejorado - Verde más llamativo para Completado -->
-              <span class="badge rounded-pill fw-semibold fs-6 px-3 py-2" 
-                style="background-color: {{ 
-                  '#FFA726' if trabajo.estado == 'Pendiente' else 
-                  '#2E7D32' if trabajo.estado == 'Completado' else 
-                  '#2196F3' if trabajo.estado == 'En Proceso' else
-                  '#757575' 
-                }}; color: white; box-shadow: {{ 
-                  '0 3px 6px rgba(46,125,50,0.3)' if trabajo.estado == 'Completado' else 
-                  '0 2px 4px rgba(0,0,0,0.1)'
-                }};">
-                {{ trabajo.estado }}
-              </span>
-            </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-              <span>Fecha:</span>
-              <span>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</span>
-            </li>
-          </ul>
+          <div class="info-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <span class="text-muted">ID del Trabajo</span>
+            <span class="badge bg-primary px-3 py-2">{{ trabajo.id }}</span>
+          </div>
+          
+          <div class="info-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <span class="text-muted">Estado</span>
+            <span class="badge px-3 py-2" style="background-color: {{ 
+              '#FFA726' if trabajo.estado == 'Pendiente' else 
+              '#2E7D32' if trabajo.estado == 'Completado' else 
+              '#2196F3' if trabajo.estado == 'En Proceso' else
+              '#757575' if trabajo.estado == 'Presupuesto' else
+              '#757575' 
+            }};">{{ trabajo.estado }}</span>
+          </div>
+          
+          <div class="info-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <span class="text-muted">Fecha de creación</span>
+            <span>{{ trabajo.created_at.strftime('%d/%m/%Y') }}</span>
+          </div>
+
+          {% if trabajo.numero_trabajo %}
+          <div class="info-item d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+            <span class="text-muted">Número de trabajo</span>
+            <span class="badge bg-secondary px-3 py-2">{{ trabajo.numero_trabajo }}</span>
+          </div>
+          {% endif %}
+
+          {% if trabajo.prioridad %}
+          <div class="info-item d-flex justify-content-between align-items-center">
+            <span class="text-muted">Prioridad</span>
+            <span class="badge {{ 
+              'bg-danger' if trabajo.prioridad == 'Alta' else 
+              'bg-warning text-dark' if trabajo.prioridad == 'Media' else 
+              'bg-success' if trabajo.prioridad == 'Baja' else 
+              'bg-secondary' 
+            }} px-3 py-2">{{ trabajo.prioridad }}</span>
+          </div>
+          {% endif %}
         </div>
       </div>
-      
+
       <!-- Acciones rápidas -->
-      <div class="card shadow-sm" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
-        <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
-          <i class="bi bi-lightning" style="font-size: 1rem; color: #6c757d;"></i>
-          <span style="font-size: 1rem; color: #6c757d; font-weight: 500;">Acciones Rápidas</span>
+      <div class="card shadow-sm mb-4" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-lightning-charge me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Acciones Rápidas</span>
         </div>
+        
         <div class="card-body">
-          <div class="d-grid gap-2">
-            {% if trabajo.estado != 'Completado' %}
-            <form method="POST" action="{{ url_for('jobs.completar_trabajo', id=trabajo.id) }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-success btn-block w-100 action-button">
-                <i class="bi bi-check-circle me-1"></i> Marcar como Completado
+          <div class="d-grid gap-3">            <a href="{{ url_for('jobs.listar_trabajos') }}" class="btn btn-outline-success action-button">
+              <i class="bi bi-arrow-left me-2"></i>Volver a Trabajos
+            </a>
+            
+            <button type="button" class="btn btn-outline-info action-button" onclick="window.print();">
+              <i class="bi bi-printer me-2"></i>Imprimir Detalles
+            </button>
+            
+            <a href="#" class="btn btn-outline-warning action-button" 
+              data-bs-toggle="modal" data-bs-target="#editJobModal"
+              data-id="{{ trabajo.id }}"
+              data-nombre_cliente="{{ trabajo.nombre_cliente }}"
+              data-apellido_cliente="{{ trabajo.apellido_cliente }}"
+              data-telefono="{{ trabajo.telefono }}"
+              data-direccion="{{ trabajo.direccion }}"
+              data-codigo_postal="{{ trabajo.codigo_postal }}"
+              data-descripcion="{{ trabajo.descripcion }}"
+              data-duracion="{{ trabajo.duracion }}"
+              data-fecha="{{ trabajo.fecha.strftime('%Y-%m-%d') }}"
+              data-hora="{{ trabajo.hora }}"
+              data-tecnico_id="{{ trabajo.technician_id or '' }}"
+              data-estado="{{ trabajo.estado }}"
+              data-cantidad="{{ trabajo.cantidad or '' }}"
+              data-tipo_plaga="{{ trabajo.tipo_plaga or '' }}">
+              <i class="bi bi-pencil-square me-2"></i>Editar Trabajo
+            </a>
+            
+            {% if trabajo.estado == 'Completado' %}
+            <a href="#" class="btn btn-outline-success action-button">
+              <i class="bi bi-receipt me-2"></i>Ver Factura
+            </a>
+            {% endif %}
+            
+            {% if trabajo.estado == 'Presupuesto' %}
+            <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}" style="display: inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-success action-button w-100">
+                <i class="bi bi-check-circle me-2"></i>Aprobar Presupuesto
               </button>
             </form>
             {% endif %}
             
-            <button type="button" class="btn btn-primary btn-block w-100 action-button" onclick="window.print();" style="display: block !important; visibility: visible !important;">
-              <i class="bi bi-printer me-1"></i> Imprimir Detalles
+            <button type="button" class="btn btn-outline-danger action-button" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ trabajo.id }}">
+              <i class="bi bi-trash me-2"></i>Eliminar Trabajo
             </button>
           </div>
         </div>
+      </div>
+      
+      <!-- Google Map (si hay dirección) -->
+      {% if trabajo.direccion and trabajo.codigo_postal %}
+      <div class="card shadow-sm" style="border-radius: 10px; border: none; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07) !important;">
+        <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
+          <i class="bi bi-geo-alt me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
+          <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Ubicación</span>
+        </div>
+        
+        <div class="card-body p-0">
+          <div id="map-container" style="height: 200px; width: 100%; background-color: #f8f9fa; display: flex; align-items: center; justify-content: center;">            <a href="https://www.google.com/maps/search/?api=1&query={{ trabajo.direccion|urlencode }}+{{ trabajo.codigo_postal|urlencode }}" target="_blank" class="btn btn-outline-success m-3">
+              <i class="bi bi-map me-2"></i>Ver en Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal para confirmar eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 10px; border: none;">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <i class="bi bi-exclamation-triangle-fill text-warning" style="font-size: 3rem;"></i>
+        <h5 class="mt-3">¿Estás seguro?</h5>
+        <p class="text-muted">¿Realmente deseas eliminar este trabajo? Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer border-0">
+        <form method="POST" action="{{ url_for('jobs.eliminar_trabajo', id=trabajo.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Estilos adicionales para impresión y botones -->
+<!-- Estilos adicionales específicos para esta página -->
 <style>
-  @media print {
-    .navbar, .sidebar, .card-header, .card-footer, .breadcrumb, .btn, .col-lg-4 {
-      display: none !important;
-    }
-    
-    body {
-      font-size: 12pt;
-    }
-    
-    .card {
-      border: none !important;
-      box-shadow: none !important;
-    }
-    
-    .card-body {
-      padding: 0 !important;
-    }
-    
-    .container {
-      width: 100% !important;
-      max-width: 100% !important;
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-    
-    h6 {
-      font-size: 14pt;
-      margin-top: 20pt;
-    }
-    
-    .status {
-      border: 1px solid #333;
-      background-color: transparent !important;
-      color: #333 !important;
-    }
+  /* Estilos para la tabla de información */
+  .info-table td {
+    padding: 15px 20px;
+    vertical-align: middle;
+  }
+    .info-table tr:hover {
+    background-color: rgba(46, 125, 50, 0.03);
   }
   
-  /* Estilos para asegurar visibilidad de botones */
-  .btn-primary, 
-  .btn-secondary,
-  .btn-success,
-  .btn-info {
-    display: inline-block !important;
-    visibility: visible !important;
-  }
-
-  /* Estilos específicos para el botón de impresión */
-  button[onclick*="print"] {
-    display: block !important;
-    visibility: visible !important;
-    background-color: #0d6efd !important;
-    color: white !important;
-  }
-
-  /* Estilos para botones deshabilitados */
-  .btn:disabled, .btn[disabled] {
-    opacity: 0.65;
-    cursor: not-allowed;
-    pointer-events: none;
+  /* Estilos para la línea de tiempo */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
   }
   
-  /* Estilos específicos para el estado Completado */
-  .status-paid {
-    background-color: #d4edda !important;
-    color: #155724 !important;
-    font-weight: 600 !important;
+  .timeline:before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: #e9ecef;
   }
   
-  /* Añadir un pequeño icono de check para el estado completado */
-  .status-paid::before {
-    content: "✓ ";
+  .timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+  }
+    .timeline-marker {
+    position: absolute;
+    left: -30px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #2E7D32;
+    box-shadow: 0 0 0 4px white;
   }
   
-  /* Estilos para los botones de acción en la página de detalles */
+  .timeline-content {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f2f2f2;
+  }
+  
+  .timeline-item:last-child .timeline-content {
+    border-bottom: none;
+  }
+  
+  /* Estilos para los botones de acción */
   .action-button {
-    border-radius: 1rem !important; /* Mismo redondeo que los contenedores */
-    padding: 0.75rem 1.25rem !important; /* Padding más amplio para mejor apariencia */
-    font-weight: 500 !important;
-    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
-    border: none !important; /* Eliminar borde */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important; /* Sombra sutil */
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   .action-button:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   }
   
   .action-button:active {
-    transform: translateY(0) !important;
-    box-shadow: 0 2px 3px rgba(0,0,0,0.1) !important;
+    transform: translateY(0);
+  }
+  
+  /* Estilos para impresión */
+  @media print {
+    .navbar, .sidebar, .btn, .card-header, .col-lg-4, .action-button, .modal {
+      display: none !important;
+    }
+    
+    .card {
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+      break-inside: avoid;
+    }
+    
+    .container-fluid {
+      padding: 0 !important;
+    }
+    
+    .status-banner {
+      border: 1px solid #ddd;
+      border-left-width: 5px;
+      background-color: #fff !important;
+      color: #000 !important;
+    }
+    
+    .timeline:before {
+      background-color: #ddd;
+    }
+    
+    .timeline-marker {
+      border: 1px solid #000;
+      background-color: #fff;
+    }
+    
+    /* Asegurar que se imprima todo el contenido */
+    body {
+      font-size: 12pt;
+      color: #000;
+    }
+    
+    h5, h6 {
+      color: #000 !important;
+    }
+    
+    .text-muted {
+      color: #555 !important;
+    }
   }
 </style>
+
+<!-- Script para manejar la interacción del usuario -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Configurar el modal de eliminar
+    const deleteModal = document.getElementById('confirmDeleteModal');
+    if (deleteModal) {
+      deleteModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const jobId = button.getAttribute('data-id');
+        
+        // Actualizar el formulario con el ID correcto
+        const form = deleteModal.querySelector('form');
+        if (form) {
+          form.action = `{{ url_for('jobs.eliminar_trabajo', id=0) }}`.replace('0', jobId);
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}

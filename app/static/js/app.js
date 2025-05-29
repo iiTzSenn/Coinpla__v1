@@ -97,10 +97,10 @@ function setupModals() {
           const jobId = this.getAttribute('data-id');
           const form = document.getElementById('editJobForm');
           form.action = `/jobs/edit/${jobId}`;
-            // Rellenar formulario
-          document.getElementById('modalNombreCliente').value = this.getAttribute('data-nombre_cliente') || '';
+            // Rellenar formulario          document.getElementById('modalNombreCliente').value = this.getAttribute('data-nombre_cliente') || '';
           document.getElementById('modalApellidoCliente').value = this.getAttribute('data-apellido_cliente') || '';
           document.getElementById('modalTelefono').value = this.getAttribute('data-telefono') || '';
+          document.getElementById('modalEmail').value = this.getAttribute('data-email') || '';
           document.getElementById('modalDireccion').value = this.getAttribute('data-direccion') || '';
           document.getElementById('modalCodigoPostal').value = this.getAttribute('data-codigo_postal') || '';
           document.getElementById('modalDescripcion').value = this.getAttribute('data-descripcion') || '';

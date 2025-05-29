@@ -253,6 +253,19 @@ def listar_trabajos():
 @login_required
 def ver_trabajo(id):
     trabajo = Job.query.get_or_404(id)
+    
+    # Añadimos el correo electrónico del técnico si está asignado
+    if trabajo.technician and trabajo.technician.email:
+        trabajo.correo = trabajo.technician.email
+    
+    # Nos aseguramos de que la cantidad sea un número (evitar N/A)
+    if trabajo.cantidad is None:
+        trabajo.cantidad = 0.0
+    
+    # Asignar un valor por defecto al tipo de plaga si es necesario
+    if trabajo.tipo_plaga is None:
+        trabajo.tipo_plaga = "No especificado"
+    
     return render_template('detalle_trabajo.html', trabajo=trabajo)
 
 # Se eliminó la ruta para añadir trabajo, ya que la lógica se ha movido a la creación de presupuestos.
@@ -272,12 +285,12 @@ def editar_trabajo(id):
         current_tech = Technician.query.get(trabajo.technician_id)
         if current_tech:
             tecnicos.append(current_tech)
-
+            
     trabajo.nombre_cliente = request.form.get('nombre_cliente')
     trabajo.apellido_cliente = request.form.get('apellido_cliente')
     trabajo.direccion = request.form.get('direccion')
     trabajo.descripcion = request.form.get('descripcion')
-
+    
     telefono_raw = request.form.get('telefono')
     try:
         trabajo.telefono = validar_y_normalizar_telefono(telefono_raw) if telefono_raw else None
@@ -292,6 +305,9 @@ def editar_trabajo(id):
     trabajo.duracion = request.form.get('duracion')
     trabajo.fecha = datetime.strptime(request.form.get('fecha'), '%Y-%m-%d')
     trabajo.hora = request.form.get('hora')
+    trabajo.tipo_plaga = request.form.get('tipo_plaga')
+    trabajo.cantidad = float(request.form.get('cantidad') or 0)
+    trabajo.email = request.form.get('email')
 
     nuevo_tecnico = request.form.get('tecnico_id')
     if nuevo_tecnico:
@@ -422,6 +438,8 @@ def crear_presupuesto():
     fecha_str = request.form.get('fecha')
     hora_str = request.form.get('hora')
     duracion = request.form.get('duracion') or 'media'
+    cantidad = request.form.get('cantidad') or 0
+    tipo_plaga = request.form.get('tipo_plaga')
 
     # Validar y procesar fecha y hora
     fecha_manual = bool(fecha_str)
@@ -523,8 +541,7 @@ def crear_presupuesto():
 
     # Convertir hora a string
     hora_str = hora.strftime('%H:%M')
-    
-    # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
+      # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
     nuevo_presupuesto = Presupuesto.crear(
         nombre_cliente=nombre_cliente,
         apellido_cliente=apellido_cliente,
@@ -534,7 +551,9 @@ def crear_presupuesto():
         fecha=fecha,
         hora=hora_str,
         duracion=duracion,
-        tecnico_id=candidato.id
+        tecnico_id=candidato.id,
+        cantidad=cantidad,
+        tipo_plaga=tipo_plaga
     )
     
     # Generar y enviar el presupuesto por correo electrónico

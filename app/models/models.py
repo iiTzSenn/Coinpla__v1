@@ -94,6 +94,7 @@ class Job(db.Model):
     cantidad = db.Column(db.Float, default=0)  # Cambiado de costo_estimado a cantidad
     tipo_plaga = db.Column(db.String(100), nullable=True)  # Nuevo campo para tipo de plaga
     numero_trabajo = db.Column(db.Integer, unique=True, nullable=True)
+    email = db.Column(db.String(100), nullable=True)  # Campo para el email del cliente
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     history = db.relationship('JobHistory', backref='job', lazy=True, cascade="all, delete-orphan")
