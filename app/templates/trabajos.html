@@ -165,8 +165,7 @@
                 <a href="{{ url_for('jobs.completar_comprobante', id=trabajo.id) }}" class="btn btn-sm btn-info btn-action action-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Completar comprobante de trabajo">
                   <i class="bi bi-file-earmark-text"></i>
                 </a>
-                {% endif %}                <!-- Botón para editar -->
-                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn" 
+                {% endif %}                <!-- Botón para editar -->                <button class="btn btn-sm btn-warning editar-trabajo btn-action action-btn" 
                         data-bs-toggle="modal" 
                         data-bs-target="#editJobModal"
                         data-id="{{ trabajo.id }}"
@@ -182,6 +181,7 @@
                         data-tecnico_id="{{ trabajo.technician_id or '' }}"
                         data-estado="{{ trabajo.estado }}"
                         data-cantidad="{{ trabajo.cantidad or '' }}"
+                        data-tipo_plaga="{{ trabajo.tipo_plaga or '' }}"
                         data-bs-custom-class="tooltip-warning"
                         title="Editar trabajo">
                   <i class="bi bi-pencil-square"></i>
@@ -314,14 +314,30 @@
                     <div class="form-text small">
                       <i class="bi bi-clock me-1 text-green"></i>Opcional
                     </div>
-                  </div>
-                  <div class="col-md-12">
+                  </div>                  <div class="col-md-12">
                     <label for="duracion" class="form-label">Duración Estimada:</label>
                     <select class="form-select" id="duracion" name="duracion" style="border-radius: 0.5rem;" required>
                       <option value="corta">Corta (1 hora)</option>
                       <option value="media" selected>Media (2 horas)</option>
                       <option value="larga">Larga (3 horas)</option>
                     </select>
+                  </div>
+                  <div class="col-md-12">
+                    <label for="tipo_plaga" class="form-label">Tipo de Plaga:</label>
+                    <select class="form-select" id="tipo_plaga" name="tipo_plaga" style="border-radius: 0.5rem;">
+                      <option value="">Seleccione tipo de plaga</option>
+                      <option value="Cucaracha Americana (Periplaneta Americana)">Cucaracha Americana (Periplaneta Americana)</option>
+                      <option value="Cucaracha Alemana (Blatella Germanica)">Cucaracha Alemana (Blatella Germanica)</option>
+                      <option value="Rata Campo (Rattus Rattus)">Rata Campo (Rattus Rattus)</option>
+                      <option value="Rata Alcantarilla (Rattus Norvegicus)">Rata Alcantarilla (Rattus Norvegicus)</option>
+                      <option value="Ratón Común (Mus Musculus)">Ratón Común (Mus Musculus)</option>
+                      <option value="Hormiga Común (Lasius Niger)">Hormiga Común (Lasius Niger)</option>
+                      <option value="Chinche Cama (Cimex Lectularius)">Chinche Cama (Cimex Lectularius)</option>
+                      <option value="Moscas, Mosquitos (Dípteros)">Moscas, Mosquitos (Dípteros)</option>
+                    </select>
+                    <div class="form-text small">
+                      <i class="bi bi-bug me-1 text-green"></i>Seleccione para servicios de control de plagas
+                    </div>
                   </div>
                   <div class="col-md-12">
                     <label for="cantidad" class="form-label">Importe Total (€):</label>
@@ -423,9 +439,7 @@
                   <option value="larga">Larga (3 horas)</option>
                 </select>
               </div>
-            </div>
-  
-            <div class="row g-3 mb-3">              <div class="col-md-6">                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
+            </div>            <div class="row g-3 mb-3">              <div class="col-md-6">                <label for="modalTecnicoId" class="form-label">Técnico Asignado</label>
                 <select class="form-select" id="modalTecnicoId" name="tecnico_id" style="border-radius: 0.5rem;">
                   <option value="">Sin asignar</option>
                   {% for tecnico in tecnicos %}
@@ -450,6 +464,26 @@
                   <option value="En Proceso">En Proceso</option>
                   <option value="Completado">Completado</option>
                 </select>
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-md-12">
+                <label for="modalTipoPlaga" class="form-label">Tipo de Plaga</label>
+                <select class="form-select" id="modalTipoPlaga" name="tipo_plaga" style="border-radius: 0.5rem;">
+                  <option value="">Seleccione tipo de plaga</option>
+                  <option value="Cucaracha Americana (Periplaneta Americana)">Cucaracha Americana (Periplaneta Americana)</option>
+                  <option value="Cucaracha Alemana (Blatella Germanica)">Cucaracha Alemana (Blatella Germanica)</option>
+                  <option value="Rata Campo (Rattus Rattus)">Rata Campo (Rattus Rattus)</option>
+                  <option value="Rata Alcantarilla (Rattus Norvegicus)">Rata Alcantarilla (Rattus Norvegicus)</option>
+                  <option value="Ratón Común (Mus Musculus)">Ratón Común (Mus Musculus)</option>
+                  <option value="Hormiga Común (Lasius Niger)">Hormiga Común (Lasius Niger)</option>
+                  <option value="Chinche Cama (Cimex Lectularius)">Chinche Cama (Cimex Lectularius)</option>
+                  <option value="Moscas, Mosquitos (Dípteros)">Moscas, Mosquitos (Dípteros)</option>
+                </select>
+                <small class="form-text text-muted">
+                  <i class="bi bi-bug me-1"></i>Seleccione para servicios de control de plagas
+                </small>
               </div>
             </div>
           </div>

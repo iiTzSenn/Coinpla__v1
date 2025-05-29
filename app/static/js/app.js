@@ -97,8 +97,7 @@ function setupModals() {
           const jobId = this.getAttribute('data-id');
           const form = document.getElementById('editJobForm');
           form.action = `/jobs/edit/${jobId}`;
-          
-          // Rellenar formulario
+            // Rellenar formulario
           document.getElementById('modalNombreCliente').value = this.getAttribute('data-nombre_cliente') || '';
           document.getElementById('modalApellidoCliente').value = this.getAttribute('data-apellido_cliente') || '';
           document.getElementById('modalTelefono').value = this.getAttribute('data-telefono') || '';
@@ -110,6 +109,8 @@ function setupModals() {
           document.getElementById('modalDuracion').value = this.getAttribute('data-duracion') || '';
           document.getElementById('modalTecnicoId').value = this.getAttribute('data-tecnico_id') || '';
           document.getElementById('modalEstado').value = this.getAttribute('data-estado') || '';
+          document.getElementById('modalTipoPlaga').value = this.getAttribute('data-tipo_plaga') || '';
+          document.getElementById('modalCantidad').value = this.getAttribute('data-cantidad') || '';
         });
       });
     }
