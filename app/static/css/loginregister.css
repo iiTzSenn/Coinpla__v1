@@ -23,9 +23,10 @@ html {
 
 body {
   min-height: 100vh;
-  background-image: url('/static/img/Coinpla_1.webp'); /* Actualizada a la nueva imagen */
-  background-size: cover;
-  background-position: calc(100% + 400px) center; /* Movida 400px a la derecha */
+  background: url('/static/img/coinplaportaada.jpg') calc(100% + 600px) center no-repeat;
+  background-size: auto 100vh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -207,4 +208,12 @@ form div.incorrect input {
 
 #error-message {
   color: #f06272;
+}
+
+.logo-login {
+  display: block;
+  margin: 0 auto 24px auto;
+  max-width: 220px;
+  width: 60%;
+  height: auto;
 }

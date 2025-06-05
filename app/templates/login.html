@@ -48,6 +48,7 @@
   {{ flash_messages() }}
   
   <div class="wrapper">
+    <img src="{{ url_for('static', filename='img/logocoinpla.png') }}" alt="Logo Coinpla" class="logo-login">
     <h1>Iniciar sesión</h1>
     <p id="error-message"></p>
     <form id="form" method="POST" action="{{ url_for('auth.login') }}">
