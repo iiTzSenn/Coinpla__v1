@@ -325,7 +325,7 @@ select:focus,
 }
 
 .table .btn-sm.btn-success:hover {
-  background-color: #28a745;
+  background-color: #43ab01;
 }
 
 .table .btn-sm.btn-info:hover {
@@ -584,7 +584,7 @@ select:focus,
 }
 
 .dashboard-card.completados {
-  background: linear-gradient(90deg, #28a745, #43ab01); /* Gradiente verde oscuro para Completados */
+  background: linear-gradient(90deg, #43ab01, #43ab01); /* Gradiente verde corporativo para Completados */
 }
 
 .dashboard-card.facturacion {
@@ -1003,6 +1003,6 @@ table.custom-table {
 }
 
 .badge-verificado {
-  background-color: #28a745;
+  background-color: #43ab01;
   color: white;
 }

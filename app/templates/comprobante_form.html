@@ -1,7 +1,54 @@
 {% extends 'base.html' %}
 {% block title %}Comprobante de Servicio{% endblock %}
 
+{% block head_extra %}
+<style>
+  .form-control:focus, .form-check-input:focus {
+    border-color: #43ab01 !important;
+    box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25) !important;
+  }
+  
+  .form-check-input:checked {
+    background-color: #43ab01 !important;
+    border-color: #43ab01 !important;
+  }
+  
+  .btn-green {
+    background-color: #43ab01;
+    color: white;
+    border: 1px solid #43ab01;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+  
+  .btn-green:hover {
+    background-color: #3a9701;
+    color: white;
+    border: 1px solid #3a9701;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-header {
+    background-color: rgba(67, 171, 1, 0.1) !important;
+    color: #43ab01 !important;
+    font-weight: 500;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
+<!-- Breadcrumb estilizado -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <a href="/" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Inicio</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Trabajos</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 18px;">Comprobante</span>
+</div>
+
 <div class="container mt-4 mb-5">
   <h4 class="mb-4 text-center">🧾 Comprobante de Servicio DDD</h4>
   <form method="POST" action="{{ url_for('jobs.guardar_comprobante', id=trabajo.id) }}" id="comprobanteForm">
@@ -172,7 +219,7 @@
 
     <!-- Enviar -->
     <div class="text-center">
-      <button type="submit" class="btn btn-third px-5">Guardar Comprobante</button>
+      <button type="submit" class="btn btn-green px-5">Guardar Comprobante</button>
     </div>
   </form>
 </div>

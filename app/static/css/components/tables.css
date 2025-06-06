@@ -75,8 +75,8 @@
 }
 
 .minimal-pagination:hover {
-  color: #495057;
-  background-color: #e9ecef;
+  color: #43ab01;
+  background-color: rgba(67, 171, 1, 0.1);
   border-radius: 0.25rem;
 }
 

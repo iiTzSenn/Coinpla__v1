@@ -1,9 +1,8 @@
 {% macro stats_card(value, label, type, icon) %}
-<div class="col-md-3 mb-4">
-  <div class="dashboard-card {{ type }}" data-icon="{{ icon }}">
+<div class="col-md-3 mb-4">  <div class="dashboard-card {{ type }}" data-icon="{{ icon }}">
     <div class="card-body text-center">
-      <h4 class="counter" data-target="{{ value }}">0</h4>
-      <p class="card-text">{{ label }}</p>
+      <h4 class="counter fw-bold" data-target="{{ value }}">0</h4>
+      <p class="card-text fw-bold">{{ label }}</p>
     </div>
   </div>
 </div>

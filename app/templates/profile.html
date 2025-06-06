@@ -3,12 +3,36 @@
 
 {% block head_extra %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+<style>
+  .btn-green {
+    background-color: #43ab01;
+    color: white;
+    border: 1px solid #43ab01;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+  
+  .btn-green:hover {
+    background-color: #3a9701;
+    color: white;
+    border: 1px solid #3a9701;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-control:focus {
+    border-color: #43ab01 !important;
+    box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25) !important;
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- Breadcrumb estilizado -->
+<!-- Breadcrumb estilizado con verde corporativo -->
 <div class="d-flex align-items-center mb-4 mt-3">
-  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <a href="/" class="fw-bold" style="color: #43ab01; font-size: 20px; text-decoration: none;">Inicio</a>
   <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
   <span class="fw-bold" style="color: #888; font-size: 20px;">Mi Perfil</span>
 </div>
@@ -32,9 +56,8 @@
       <div class="col">
         <h3 class="fw-bold mb-1">{{ current_user.username }}</h3>
         <p class="text-muted mb-0">{{ current_user.email }}</p>
-      </div>
-      <div class="col-auto">
-        <button type="button" class="btn btn-sm btn-outline-primary" id="btnEditarPerfil" style="border-radius: 0.6rem; cursor: pointer;">
+      </div>      <div class="col-auto">
+        <button type="button" class="btn btn-sm btn-outline-success" id="btnEditarPerfil" style="border-radius: 0.6rem; cursor: pointer; border-color: #43ab01; color: #43ab01;">
           <i class="bi bi-pencil-square me-1"></i>Editar
         </button>
       </div>
@@ -47,7 +70,7 @@
   <div class="col-lg-6">
     <div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
       <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
-        <i class="bi bi-person-vcard me-2" style="font-size: 1.2rem; color: #28a745;"></i>
+        <i class="bi bi-person-vcard me-2" style="font-size: 1.2rem; color: #43ab01;"></i>
         <h4 class="mb-0" style="font-size: 0.9rem; font-weight: 600; color: #333;">Datos Personales</h4>
       </div>
       
@@ -138,8 +161,7 @@
               </div>
               
               <div class="col-12 mt-4">
-                <div class="d-flex">
-                  <button type="submit" class="btn btn-success px-4" style="border-radius: 0.6rem;">
+                <div class="d-flex">                  <button type="submit" class="btn btn-green px-4" style="border-radius: 0.6rem;">
                     <i class="bi bi-check-circle me-2"></i>Guardar Cambios
                   </button>
                   <button type="reset" class="btn btn-outline-secondary ms-2 px-4" style="border-radius: 0.6rem;">
@@ -161,7 +183,7 @@
   <div class="col-lg-6">
     <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
       <div class="card-header d-flex align-items-center" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6;">
-        <i class="bi bi-info-circle me-2" style="font-size: 1.2rem; color: #28a745;"></i>
+        <i class="bi bi-info-circle me-2" style="font-size: 1.2rem; color: #43ab01;"></i>
         <h4 class="mb-0" style="font-size: 0.9rem; font-weight: 600; color: #333;">Información de Cuenta</h4>
       </div>
       <div class="card-body p-0">

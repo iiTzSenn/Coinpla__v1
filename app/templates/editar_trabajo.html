@@ -2,6 +2,15 @@
 {% block title %}Editar Trabajo{% endblock %}
 
 {% block content %}
+<!-- Breadcrumb estilizado -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <a href="/" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Inicio</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Trabajos</a>
+  <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 18px;">Editar Trabajo</span>
+</div>
+
 <h2 class="mb-4">Editar Trabajo</h2>
 <form method="POST" action="{{ url_for('jobs.editar_trabajo', id=trabajo.id) }}" class="mb-4" id="formEditarTrabajo">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

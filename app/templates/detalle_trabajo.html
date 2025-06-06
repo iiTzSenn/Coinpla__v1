@@ -6,9 +6,9 @@
 
 <!-- Cabecera con navegación mejorada -->
 <div class="d-flex align-items-center mb-4 mt-3">
-  <a href="{{ url_for('jobs.index') }}" class="fw-bold text-decoration-none" style="color: #2E7D32; font-size: 18px;">Inicio</a>
+  <a href="{{ url_for('jobs.index') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Inicio</a>
   <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
-  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #2E7D32; font-size: 18px;">Trabajos</a>
+  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Trabajos</a>
   <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
   <span class="fw-bold" style="color: #888; font-size: 18px;">Trabajo Nº_{{ trabajo.id }}</span>
 </div>
@@ -55,8 +55,7 @@
   <div>
     {% if trabajo.estado != 'Completado' %}
     <form method="POST" action="{{ url_for('jobs.completar_trabajo', id=trabajo.id) }}" class="d-inline">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <button type="submit" class="btn btn-success action-button">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">      <button type="submit" class="btn btn-green action-button">
         <i class="bi bi-check-circle me-2"></i>Marcar como Completado
       </button>
     </form>
@@ -85,7 +84,7 @@
                 {% if trabajo.telefono %}
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Teléfono</td>
-                  <td class="text-dark"><a href="tel:{{ trabajo.telefono }}" class="text-decoration-none"><i class="bi bi-telephone-fill text-success me-1"></i>{{ trabajo.telefono }}</a></td>
+                  <td class="text-dark"><a href="tel:{{ trabajo.telefono }}" class="text-decoration-none"><i class="bi bi-telephone-fill text-green me-1"></i>{{ trabajo.telefono }}</a></td>
                 </tr>
                 {% endif %}
                 <tr>
@@ -101,7 +100,7 @@
                 <!-- Campos adicionales -->                {% if trabajo.email %}
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Email</td>
-                  <td class="text-dark"><a href="mailto:{{ trabajo.email }}" class="text-decoration-none"><i class="bi bi-envelope-fill text-success me-1"></i>{{ trabajo.email }}</a></td>
+                  <td class="text-dark"><a href="mailto:{{ trabajo.email }}" class="text-decoration-none"><i class="bi bi-envelope-fill text-green me-1"></i>{{ trabajo.email }}</a></td>
                 </tr>
                 {% endif %}
               </tbody>
@@ -122,7 +121,7 @@
                   <td class="fw-medium text-muted" style="width: 30%; border-right: 1px solid #f2f2f2;">Técnico asignado</td>
                   <td class="text-dark">
                     {% if trabajo.technician %}
-                      <i class="bi bi-person-badge-fill text-success me-2"></i>
+                      <i class="bi bi-person-badge-fill text-green me-2"></i>
                       {{ trabajo.technician.nombre }} {{ trabajo.technician.apellido or '' }}
                     {% else %}
                       <span class="badge bg-secondary">Sin asignar</span>
@@ -132,19 +131,19 @@
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Fecha programada</td>
                   <td class="text-dark">
-                    <i class="bi bi-calendar-check me-2 text-success"></i>{{ trabajo.fecha.strftime('%d/%m/%Y') }}
+                    <i class="bi bi-calendar-check me-2 text-green"></i>{{ trabajo.fecha.strftime('%d/%m/%Y') }}
                   </td>
                 </tr>
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Hora</td>
                   <td class="text-dark">
-                    <i class="bi bi-clock me-2 text-success"></i>{{ trabajo.hora }}
+                    <i class="bi bi-clock me-2 text-green"></i>{{ trabajo.hora }}
                   </td>
                 </tr>
                 <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Duración estimada</td>
                   <td class="text-dark">
-                    <i class="bi bi-hourglass-split me-2 text-success"></i>
+                    <i class="bi bi-hourglass-split me-2 text-green"></i>
                     {% if trabajo.duracion == 'corta' %}
                       Corta (1 hora)
                     {% elif trabajo.duracion == 'media' %}
@@ -158,7 +157,7 @@
                 </tr>                <tr>
                   <td class="fw-medium text-muted" style="border-right: 1px solid #f2f2f2;">Importe</td>
                   <td class="text-dark">
-                    <span class="fw-bold fs-5 {{ 'text-success' if trabajo.cantidad else 'text-muted' }}">
+                    <span class="fw-bold fs-5 {{ 'text-green' if trabajo.cantidad else 'text-muted' }}">
                       <i class="bi bi-cash-coin me-2"></i>{{ trabajo.cantidad|default('0.00') }} €
                     </span>
                   </td>
@@ -310,8 +309,7 @@
             
             {% if trabajo.estado == 'Presupuesto' %}
             <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}" style="display: inline;">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              <button type="submit" class="btn btn-success action-button w-100">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <button type="submit" class="btn btn-green action-button w-100">
                 <i class="bi bi-check-circle me-2"></i>Aprobar Presupuesto
               </button>
             </form>
@@ -369,6 +367,25 @@
 
 <!-- Estilos adicionales específicos para esta página -->
 <style>
+  /* Botón verde corporativo */
+  .btn-green {
+    background-color: #43ab01;
+    color: white;
+    border: 1px solid #43ab01;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+  
+  .btn-green:hover {
+    background-color: #3a9701;
+    color: white;
+    border: 1px solid #3a9701;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
   /* Estilos para la tabla de información */
   .info-table td {
     padding: 15px 20px;

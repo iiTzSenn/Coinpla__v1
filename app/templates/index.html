@@ -2,42 +2,53 @@
 {% block title %}Dashboard - Coinpla{% endblock %}
 
 {% block content %}
+<!-- Breadcrumb estilizado con verde corporativo -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <span class="fw-bold" style="color: #43ab01; font-size: 20px;">Inicio</span>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Dashboard</span>
+</div>
+
 <div class="container mt-4">
-  <h4 class="mb-4 text-center">Panel General - Todos los Trabajos</h4>
+  <h4 class="mb-4 text-center fw-bold" style="color: #43ab01;">Panel General - Todos los Trabajos</h4>
   {% if trabajos %}
-    <div class="table-responsive">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Dirección</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for trabajo in trabajos %}
-          <tr>
-            <td>{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
-            <td>{{ trabajo.direccion }}</td>
-            <td>{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
-            <td>{{ trabajo.hora }}</td>
-            <td>{{ trabajo.estado }}</td>
-            <td>
-              <a href="#" class="btn btn-sm btn-outline-primary">Ver Detalles</a>
-              {% if trabajo.estado == 'Completado' %}
-              <a href="#" class="btn btn-sm btn-success">Comprobante</a>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6;">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead style="background-color: #43ab01; color: white;">
+              <tr>
+                <th style="border: none; padding: 1rem;">Cliente</th>
+                <th style="border: none; padding: 1rem;">Dirección</th>
+                <th style="border: none; padding: 1rem;">Fecha</th>
+                <th style="border: none; padding: 1rem;">Hora</th>
+                <th style="border: none; padding: 1rem;">Estado</th>
+                <th style="border: none; padding: 1rem;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for trabajo in trabajos %}
+              <tr>
+                <td style="padding: 1rem;">{{ trabajo.nombre_cliente }} {% if trabajo.apellido_cliente %}{{ trabajo.apellido_cliente }}{% endif %}</td>
+                <td style="padding: 1rem;">{{ trabajo.direccion }}</td>
+                <td style="padding: 1rem;">{{ trabajo.fecha.strftime('%d/%m/%Y') }}</td>
+                <td style="padding: 1rem;">{{ trabajo.hora }}</td>
+                <td style="padding: 1rem;">{{ trabajo.estado }}</td>
+                <td style="padding: 1rem;">
+                  <a href="#" class="btn btn-sm btn-outline-success" style="border-radius: 0.5rem; margin-right: 0.5rem;">Ver Detalles</a>
+                  {% if trabajo.estado == 'Completado' %}
+                  <a href="#" class="btn btn-sm" style="background-color: #43ab01; color: white; border-radius: 0.5rem;">Comprobante</a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   {% else %}
-    <div class="alert alert-info text-center mt-4">
+    <div class="alert text-center mt-4" style="background-color: rgba(67, 171, 1, 0.1); border: 1px solid #43ab01; color: #43ab01; border-radius: 1rem;">
       <i class="bi bi-info-circle"></i> No hay trabajos registrados.
     </div>
   {% endif %}

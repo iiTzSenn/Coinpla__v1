@@ -19,15 +19,14 @@
   .clickable-row td {
     transition: color 0.3s ease;
   }
-  
-  .clickable-row:hover td {
-    color: #28a745;
+    .clickable-row:hover td {
+    color: #43ab01;
   }
 </style>
 
 <!-- Breadcrumb estilizado según la imagen -->
 <div class="d-flex align-items-center mb-4 mt-3">
-  <span class="fw-bold" style="color: #000; font-size: 20px;">Inicio</span>
+  <a href="/" class="fw-bold" style="color: #43ab01; font-size: 20px; text-decoration: none;">Inicio</a>
   <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
   <span class="fw-bold" style="color: #888; font-size: 20px;">Historial</span>
 </div>
@@ -126,10 +125,9 @@
           </div>
         </div>
       </div>
-      
-      <!-- Botón para limpiar filtros -->
+        <!-- Botón para limpiar filtros -->
       <a href="{{ url_for('jobs.historial') }}" class="btn btn-sm btn-outline-secondary chart-period-btn" style="border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
-        <i class="bi bi-arrow-repeat me-1" style="color: #28a745;"></i>
+        <i class="bi bi-arrow-repeat me-1" style="color: #43ab01;"></i>
         <span>Limpiar filtros</span>
       </a>
     </div>
@@ -271,9 +269,8 @@
       btn.addEventListener('mouseover', function() {
         this.style.backgroundColor = '#218838';
       });
-      
-      btn.addEventListener('mouseout', function() {
-        this.style.backgroundColor = '#28a745';
+        btn.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '#43ab01';
       });
     });
   });
@@ -317,11 +314,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
-  }
-    .chart-period-btn:hover {
+  }    .chart-period-btn:hover {
     background-color: #e9ecef;
     color: #495057;
-    border-color: #28a745;
+    border-color: #43ab01;
   }
   
   .chart-period-menu .dropdown-item {
@@ -331,19 +327,18 @@
     transition: all 0.2s ease;
     position: relative;
   }
-  
-  .chart-period-menu .dropdown-item:hover {
-    background-color: rgba(40, 167, 69, 0.1); /* Verde claro igual que en dashboard */
+    .chart-period-menu .dropdown-item:hover {
+    background-color: rgba(67, 171, 1, 0.1); /* Verde claro igual que en dashboard */
     color: #495057;
   }
   
   .chart-period-menu .dropdown-item:active {
-    background-color: #28a745; /* Verde para estado activo */
+    background-color: #43ab01; /* Verde para estado activo */
     color: white;
   }
   
   .chart-period-menu .dropdown-item i {
-    color: #28a745; /* Verde para los iconos */
+    color: #43ab01; /* Verde para los iconos */
     width: 1.2rem;
     text-align: center;
     transition: all 0.2s ease;
@@ -361,7 +356,7 @@
   
   /* Botón verde */
   .btn-green {
-    background-color: #28a745 !important;
+    background-color: #43ab01 !important;
     color: white !important;
     border-radius: 0.5rem;
     font-size: 0.85rem;
@@ -369,7 +364,7 @@
     transition: all 0.3s ease;
   }
     .btn-green:hover {
-    background-color: #218838 !important;
+    background-color: #3a9701 !important;
     color: white !important;
   }
   
@@ -395,16 +390,15 @@
     height: calc(2.25rem + 2px);
     width: 100%;
   }
-  
-  .chart-period-select:hover {
-    background-color: rgba(40, 167, 69, 0.05);
-    border-color: rgba(40, 167, 69, 0.2);
+    .chart-period-select:hover {
+    background-color: rgba(67, 171, 1, 0.05);
+    border-color: rgba(67, 171, 1, 0.2);
     color: #495057;
   }
   
   .chart-period-select:focus {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+    border-color: #43ab01 !important;
+    box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25) !important;
     outline: none;
   }
   
@@ -424,20 +418,18 @@
     transition: all 0.2s ease;
     font-size: 0.8rem;
   }
-  
-  .select-container:hover .select-icon {
-    color: #28a745;
+    .select-container:hover .select-icon {
+    color: #43ab01;
   }
   
   /* Botón de filtrar con estilo verde */
   .btn-filter {
-    background-color: #28a745;
+    background-color: #43ab01;
     color: white;
     border: none;
     font-weight: 500;
-  }
-    .btn-filter:hover, .btn-filter:focus {
-    background-color: #218838;
+  }    .btn-filter:hover, .btn-filter:focus {
+    background-color: #3a9701;
     color: white;
   }
   
@@ -453,11 +445,10 @@
     text-align: center;
     margin: 0;
     transition: all 0.2s ease;
-  }
-    .minimal-pagination:hover:not(.disabled) {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: #28a745;
-    border-color: #28a745;
+  }    .minimal-pagination:hover:not(.disabled) {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    border-color: #43ab01;
   }
   
   .pagination {
@@ -497,10 +488,9 @@
   .breadcrumb-item {
     font-weight: bold !important;
   }
-  
-  .form-control:focus, .form-select:focus {
-    border-color: #28a745 !important;
-    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+    .form-control:focus, .form-select:focus {
+    border-color: #43ab01 !important;
+    box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25) !important;
   }
 </style>
 {% endblock %}

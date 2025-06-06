@@ -75,10 +75,10 @@
 
 /* Botones específicos */
 .btn-success.btn-action {
-  background-color: #28a745;
+  background-color: #43ab01;
 }
 .btn-success.btn-action:hover {
-  background-color: #218838;
+  background-color: #3a9701;
 }
 
 .btn-danger.btn-action {
