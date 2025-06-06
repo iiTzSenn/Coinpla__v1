@@ -576,19 +576,19 @@ select:focus,
 }
 
 .dashboard-card.trabajos {
-  background: linear-gradient(90deg, #5e63ff, #42d1f5); /* Gradiente para Trabajos Totales */
+  background: linear-gradient(90deg, #43ab01, #66C70A); /* Gradiente verde para Trabajos Totales */
 }
 
 .dashboard-card.pendientes {
-  background: linear-gradient(90deg, #ff9f43, #ff6f61); /* Gradiente para Pendientes */
+  background: linear-gradient(90deg, #66C70A, #85eb3c); /* Gradiente verde claro para Pendientes */
 }
 
 .dashboard-card.completados {
-  background: linear-gradient(90deg, #28a745, #85eb3c); /* Gradiente para Completados */
+  background: linear-gradient(90deg, #28a745, #43ab01); /* Gradiente verde oscuro para Completados */
 }
 
 .dashboard-card.facturacion {
-  background: linear-gradient(90deg, #17a2b8, #42d1f5); /* Gradiente para Facturación */
+  background: linear-gradient(90deg, #3a9701, #55b002); /* Gradiente verde intermedio para Facturación */
 }
 
 .dashboard-card::before {
@@ -669,9 +669,9 @@ table.custom-table {
   transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Cambiar el color de fondo al hacer hover a un gris más oscuro */
+/* Cambiar el color de fondo al hacer hover a un verde suave */
 .custom-table tbody tr:hover {
-  background-color: rgba(0, 255, 0, 0.1); /* Fondo verde claro semitransparente, similar al dropdown */
+  background-color: rgba(67, 171, 1, 0.1); /* Fondo verde claro semitransparente */
   transform: translateY(-2px); /* Efecto sutil de elevación en lugar de escala */
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1); /* Ligera sombra para dar profundidad */
 }
@@ -816,7 +816,7 @@ table.custom-table {
 }
 
 .dashboard-table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.1); /* Fondo azul claro semitransparente */
+  background-color: rgba(67, 171, 1, 0.1); /* Fondo verde claro semitransparente */
   transform: translateY(-2px); /* Efecto de elevación */
 }
 

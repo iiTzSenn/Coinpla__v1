@@ -149,7 +149,7 @@
 }
 
 .dashboard-table tbody tr:hover {
-  background-color: rgba(0, 123, 255, 0.1);
+  background-color: rgba(67, 171, 1, 0.1);
   transform: translateY(-2px);
 }
 

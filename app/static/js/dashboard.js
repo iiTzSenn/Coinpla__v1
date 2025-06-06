@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("Aplicando filtro de 6 meses por defecto");
   filterChart(180);
   filterFacturacionChart(180);
-
   // Inicializar contadores con datos del servidor
   fetch('/api/dashboard_stats') 
     .then(response => {
@@ -22,9 +21,23 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       const counters = document.querySelectorAll('.counter');
       counters.forEach(counter => {
-        const type = counter.closest('.dashboard-card').classList[1]; 
+        const cardClasses = counter.closest('.dashboard-card').classList; 
+        let type;
+        
+        // Identificar el tipo de tarjeta
+        if (cardClasses.contains('trabajos')) {
+          type = 'trabajos';
+        } else if (cardClasses.contains('pendientes')) {
+          type = 'pendientes';
+        } else if (cardClasses.contains('completados')) {
+          type = 'completados';
+        } else if (cardClasses.contains('facturacion')) {
+          type = 'facturacion';
+        }
+        
         const target = data[type] || 0; 
         counter.setAttribute('data-target', target);
+        
         const updateCounter = () => {
           const current = +counter.innerText;
           const increment = Math.ceil(target / 100);
@@ -32,7 +45,15 @@ document.addEventListener('DOMContentLoaded', function() {
             counter.innerText = current + increment;
             setTimeout(updateCounter, 15);
           } else {
-            counter.innerText = target.toLocaleString();
+            // Para facturación, mostrar con formato de euros
+            if (type === 'facturacion') {
+              counter.innerText = target.toLocaleString(undefined, { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+              }) + ' €';
+            } else {
+              counter.innerText = target.toLocaleString();
+            }
           }
         };
         updateCounter();
@@ -72,15 +93,14 @@ function initCharts() {
     const trabajosLineChart = new Chart(trabajosLineCtx, {
       type: 'line',
       data: {
-        labels: mesesLabels,
-        datasets: [{
+        labels: mesesLabels,        datasets: [{
           label: 'Trabajos por mes',
           data: trabajosMes,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgba(54, 162, 235, 1)',
+          backgroundColor: 'rgba(67, 171, 1, 0.2)', /* Verde corporativo con transparencia */
+          borderColor: 'rgba(67, 171, 1, 1)', /* Verde corporativo sólido */
           borderWidth: 2,
           tension: 0.4, // Curvas suaves
-          pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+          pointBackgroundColor: 'rgba(67, 171, 1, 1)', /* Verde corporativo para puntos */
           pointRadius: 4,
           pointHoverRadius: 6
         }]
@@ -109,12 +129,11 @@ function initCharts() {
     new Chart(facturacionBarCtx, {
       type: 'bar',
       data: {
-        labels: mesesLabels,
-        datasets: [{
+        labels: mesesLabels,        datasets: [{
           label: 'Facturación de trabajos completados (€)',
           data: facturacionMes,
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(102, 199, 10, 0.7)', /* Verde claro corporativo */
+          borderColor: 'rgba(102, 199, 10, 1)', /* Verde claro sólido */
           borderWidth: 1
         }]
       },
@@ -126,7 +145,6 @@ function initCharts() {
       }
     });
   }
-
   // Gráfico de distribución (pie chart) para técnicos con trabajos completados
   if (document.getElementById('distribucionChart')) {
     const distribucionCtx = document.getElementById('distribucionChart').getContext('2d');
@@ -141,11 +159,18 @@ function initCharts() {
     }
     // Limitar a 10 técnicos si hay más
     const tecnicosData = datosTecnicos.length > 10 ? datosTecnicos.slice(0, 10) : datosTecnicos;
+    // Paleta de colores verde corporativo
     const colors = [
-      'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)',
-      'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
-      'rgba(201, 203, 207, 0.7)', 'rgba(123, 239, 178, 0.7)', 'rgba(255, 87, 51, 0.7)',
-      'rgba(0, 123, 255, 0.7)'
+      'rgba(67, 171, 1, 0.8)',     // Verde corporativo principal
+      'rgba(102, 199, 10, 0.8)',   // Verde claro corporativo
+      'rgba(34, 139, 34, 0.8)',    // Verde bosque
+      'rgba(50, 205, 50, 0.8)',    // Verde lima
+      'rgba(124, 252, 0, 0.8)',    // Verde césped
+      'rgba(85, 200, 85, 0.8)',    // Verde medio
+      'rgba(46, 125, 50, 0.8)',    // Verde oscuro
+      'rgba(139, 195, 74, 0.8)',   // Verde claro suave
+      'rgba(76, 175, 80, 0.8)',    // Verde material
+      'rgba(129, 199, 132, 0.8)'   // Verde pastel
     ];
     new Chart(distribucionCtx, {
       type: 'pie',
@@ -215,32 +240,37 @@ function initCharts() {
       }
     });
   }
-
   // Gráfico circular para técnicos y trabajos realizados
   if (document.getElementById('tecnicosPieChart')) {
     const tecnicosPieCtx = document.getElementById('tecnicosPieChart').getContext('2d');
     const tecnicosData = datosTecnicos.length > 15 ? datosTecnicos.slice(0, 15) : datosTecnicos;
+    // Paleta de colores verde corporativo extendida
+    const coloresVerdes = [
+      'rgba(67, 171, 1, 0.8)',     // Verde corporativo principal
+      'rgba(102, 199, 10, 0.8)',   // Verde claro corporativo
+      'rgba(34, 139, 34, 0.8)',    // Verde bosque
+      'rgba(50, 205, 50, 0.8)',    // Verde lima
+      'rgba(124, 252, 0, 0.8)',    // Verde césped
+      'rgba(85, 200, 85, 0.8)',    // Verde medio
+      'rgba(46, 125, 50, 0.8)',    // Verde oscuro
+      'rgba(139, 195, 74, 0.8)',   // Verde claro suave
+      'rgba(76, 175, 80, 0.8)',    // Verde material
+      'rgba(129, 199, 132, 0.8)',  // Verde pastel
+      'rgba(165, 214, 167, 0.8)',  // Verde muy claro
+      'rgba(27, 94, 32, 0.8)',     // Verde muy oscuro
+      'rgba(104, 159, 56, 0.8)',   // Verde oliva
+      'rgba(174, 213, 129, 0.8)',  // Verde claro grisáceo
+      'rgba(51, 105, 30, 0.8)'     // Verde pino
+    ];
     new Chart(tecnicosPieCtx, {
       type: 'pie',
       data: {
         labels: tecnicosData.map(tecnico => tecnico.nombre),
         datasets: [{
           data: tecnicosData.map(tecnico => tecnico.trabajos_realizados),
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(153, 102, 255, 0.7)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(153, 102, 255, 1)'
-          ],
-          borderWidth: 1
+          backgroundColor: coloresVerdes.slice(0, tecnicosData.length),
+          borderColor: coloresVerdes.slice(0, tecnicosData.length).map(color => color.replace('0.8', '1')),
+          borderWidth: 2
         }]
       },
       options: {
@@ -250,7 +280,6 @@ function initCharts() {
       }
     });
   }
-
   // Gráfico circular de técnicos y trabajos completados
   if (document.getElementById('tecnicosChart')) {
     const tecnicosChartCtx = document.getElementById('tecnicosChart').getContext('2d');
@@ -264,47 +293,33 @@ function initCharts() {
       return;
     }
     const tecnicosData = datosTecnicos.length > 15 ? datosTecnicos.slice(0, 15) : datosTecnicos;
+    // Paleta de colores verde corporativo extendida para más técnicos
+    const coloresVerdes = [
+      'rgba(67, 171, 1, 0.8)',     // Verde corporativo principal
+      'rgba(102, 199, 10, 0.8)',   // Verde claro corporativo
+      'rgba(34, 139, 34, 0.8)',    // Verde bosque
+      'rgba(50, 205, 50, 0.8)',    // Verde lima
+      'rgba(124, 252, 0, 0.8)',    // Verde césped
+      'rgba(85, 200, 85, 0.8)',    // Verde medio
+      'rgba(46, 125, 50, 0.8)',    // Verde oscuro
+      'rgba(139, 195, 74, 0.8)',   // Verde claro suave
+      'rgba(76, 175, 80, 0.8)',    // Verde material
+      'rgba(129, 199, 132, 0.8)',  // Verde pastel
+      'rgba(165, 214, 167, 0.8)',  // Verde muy claro
+      'rgba(27, 94, 32, 0.8)',     // Verde muy oscuro
+      'rgba(104, 159, 56, 0.8)',   // Verde oliva
+      'rgba(174, 213, 129, 0.8)',  // Verde claro grisáceo
+      'rgba(51, 105, 30, 0.8)'     // Verde pino
+    ];
     new Chart(tecnicosChartCtx, {
       type: 'pie',
       data: {
         labels: tecnicosData.map(tecnico => tecnico.nombre),
         datasets: [{
           data: tecnicosData.map(tecnico => tecnico.trabajos_completados),
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',   // Rojo
-            'rgba(54, 162, 235, 0.7)',   // Azul
-            'rgba(75, 192, 192, 0.7)',   // Verde azulado
-            'rgba(255, 206, 86, 0.7)',   // Amarillo
-            'rgba(153, 102, 255, 0.7)',  // Morado
-            'rgba(255, 159, 64, 0.7)',   // Naranja
-            'rgba(201, 203, 207, 0.7)',  // Gris
-            'rgba(100, 149, 237, 0.7)',  // Azul aciano
-            'rgba(255, 105, 180, 0.7)',  // Rosa fuerte
-            'rgba(144, 238, 144, 0.7)',  // Verde claro
-            'rgba(255, 218, 185, 0.7)',  // Melocotón
-            'rgba(221, 160, 221, 0.7)',  // Ciruela
-            'rgba(64, 224, 208, 0.7)',   // Turquesa
-            'rgba(255, 222, 173, 0.7)',  // Miel
-            'rgba(135, 206, 235, 0.7)'   // Azul cielo
-          ],
-          borderColors: [
-            'rgb(2, 2, 2)',     // Rojo
-            'rgba(54, 162, 235, 1)',     // Azul
-            'rgba(75, 192, 192, 1)',     // Verde azulado
-            'rgba(255, 206, 86, 1)',     // Amarillo
-            'rgba(153, 102, 255, 1)',    // Morado
-            'rgba(255, 159, 64, 1)',     // Naranja
-            'rgba(201, 203, 207, 1)',    // Gris
-            'rgba(100, 149, 237, 1)',    // Azul aciano
-            'rgba(255, 105, 180, 1)',    // Rosa fuerte
-            'rgba(144, 238, 144, 1)',    // Verde claro
-            'rgba(255, 218, 185, 1)',    // Melocotón
-            'rgba(221, 160, 221, 1)',    // Ciruela
-            'rgba(64, 224, 208, 1)',     // Turquesa
-            'rgba(255, 222, 173, 1)',    // Miel
-            'rgba(135, 206, 235, 1)'     // Azul cielo
-          ],
-          borderWidth: 1
+          backgroundColor: coloresVerdes.slice(0, tecnicosData.length),
+          borderColor: coloresVerdes.slice(0, tecnicosData.length).map(color => color.replace('0.8', '1')),
+          borderWidth: 2
         }]
       },
       options: {
@@ -632,27 +647,32 @@ function updateDistribucionChart(month, year) {
       distribucionContainer.classList.remove('loading-chart');
       return;
     }
-    
-    // Ordenar por cantidad de trabajos completados descendente y limitar a 10 técnicos si hay más
+      // Ordenar por cantidad de trabajos completados descendente y limitar a 10 técnicos si hay más
     datosParaMostrar.sort((a, b) => b.trabajos_completados - a.trabajos_completados);
     const tecnicosData = datosParaMostrar.length > 10 ? datosParaMostrar.slice(0, 10) : datosParaMostrar;
     
+    // Paleta de colores verde corporativo
     const colors = [
-      'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)',
-      'rgba(255, 206, 86, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)',
-      'rgba(201, 203, 207, 0.7)', 'rgba(123, 239, 178, 0.7)', 'rgba(255, 87, 51, 0.7)',
-      'rgba(0, 123, 255, 0.7)'
+      'rgba(67, 171, 1, 0.8)',     // Verde corporativo principal
+      'rgba(102, 199, 10, 0.8)',   // Verde claro corporativo
+      'rgba(34, 139, 34, 0.8)',    // Verde bosque
+      'rgba(50, 205, 50, 0.8)',    // Verde lima
+      'rgba(124, 252, 0, 0.8)',    // Verde césped
+      'rgba(85, 200, 85, 0.8)',    // Verde medio
+      'rgba(46, 125, 50, 0.8)',    // Verde oscuro
+      'rgba(139, 195, 74, 0.8)',   // Verde claro suave
+      'rgba(76, 175, 80, 0.8)',    // Verde material
+      'rgba(129, 199, 132, 0.8)'   // Verde pastel
     ];
-    
-    new Chart(distribucionCtx, {
+      new Chart(distribucionCtx, {
       type: 'pie',
       data: {
         labels: tecnicosData.map(tecnico => tecnico.nombre),
         datasets: [{
           data: tecnicosData.map(tecnico => tecnico.trabajos_completados),
           backgroundColor: colors.slice(0, tecnicosData.length),
-          borderColor: colors.slice(0, tecnicosData.length).map(color => color.replace('0.7', '1')),
-          borderWidth: 1
+          borderColor: colors.slice(0, tecnicosData.length).map(color => color.replace('0.8', '1')),
+          borderWidth: 2
         }]
       },
       options: {

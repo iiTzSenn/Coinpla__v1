@@ -203,16 +203,6 @@ def index():
                            años_disponibles=años_disponibles,
                            generate_dashboard_work_row=generate_dashboard_work_row)
 
-@jobs_bp.route('/api/dashboard_stats')
-@login_required
-def dashboard_stats():
-    stats = {
-        "trabajos": Job.query.count(),
-        "pendientes": Job.query.filter_by(estado="Pendiente").count(),
-        "completados": Job.query.filter_by(estado="Completado").count()
-    }
-    return jsonify(stats)
-
 @jobs_bp.route('/listar_trabajos')
 @login_required
 def listar_trabajos():
