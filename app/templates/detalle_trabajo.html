@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block title %}{{ trabajo.nombre_cliente }} {{ trabajo.apellido_cliente or '' }} - Detalles{% endblock %}
 
+{% block styles %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/detalle_trabajo.css') }}">
+{% endblock %}
+
 {% block content %}
 {% from "components/page_header.html" import page_header %}
 
@@ -20,14 +24,14 @@
     '#2196F3' if trabajo.estado == 'En Proceso' else
     '#757575' if trabajo.estado == 'Presupuesto' else
     '#757575' 
-  }}; 
-  background-color: {{ 
-    'rgba(255, 167, 38, 0.1)' if trabajo.estado == 'Pendiente' else 
-    'rgba(46, 125, 50, 0.1)' if trabajo.estado == 'Completado' else 
-    'rgba(33, 150, 243, 0.1)' if trabajo.estado == 'En Proceso' else
-    'rgba(117, 117, 117, 0.1)' if trabajo.estado == 'Presupuesto' else
-    'rgba(117, 117, 117, 0.1)' 
-  }};
+  }};   background-color: {{ 
+    '#FFF2D9' if trabajo.estado == 'Pendiente' else 
+    '#E6F5DF' if trabajo.estado == 'Completado' else 
+    '#D7EFFF' if trabajo.estado == 'En Proceso' else
+    '#EEEEEE' if trabajo.estado == 'Presupuesto' else
+    '#EEEEEE' 
+  }} !important;
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.2) !important;
   padding: 15px 20px; 
   border-radius: 10px;
   display: flex;
@@ -52,10 +56,9 @@
       <p class="mb-0 text-muted">Última actualización: {{ trabajo.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
     </div>
   </div>
-  <div>
-    {% if trabajo.estado != 'Completado' %}
+  <div>    {% if trabajo.estado != 'Completado' %}
     <form method="POST" action="{{ url_for('jobs.completar_trabajo', id=trabajo.id) }}" class="d-inline">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">      <button type="submit" class="btn btn-green action-button">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">      <button type="submit" class="btn btn-green action-button" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.3);">
         <i class="bi bi-check-circle me-2"></i>Marcar como Completado
       </button>
     </form>
@@ -64,10 +67,9 @@
 </div>
 
 <div class="container-fluid px-0 mb-5">
-  <div class="row g-4">
-    <!-- Columna principal con tarjetas de información -->
+  <div class="row g-4">    <!-- Columna principal con tarjetas de información -->
     <div class="col-lg-8">      <!-- Tarjeta de información del cliente -->
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-person-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información del Cliente</span>
@@ -108,7 +110,7 @@
           </div>
         </div>
       </div>      <!-- Tarjeta de detalles del servicio -->
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-tools me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Detalles del Servicio</span>
@@ -174,7 +176,7 @@
           </div>
         </div>
       </div>      <!-- Tarjeta de descripción -->
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-file-text me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Descripción del Trabajo</span>
@@ -186,7 +188,7 @@
           </div>
         </div>
       </div>      <!-- Historial del trabajo -->
-      <div class="card shadow-sm">
+      <div class="card shadow-sm" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-clock-history me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Historial del Trabajo</span>
@@ -216,10 +218,9 @@
         </div>
       </div>
     </div>
-    
-    <!-- Columna lateral con acciones y resumen -->
+      <!-- Columna lateral con acciones y resumen -->
     <div class="col-lg-4">      <!-- Información de trabajo -->
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-info-circle me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Información de Trabajo</span>
@@ -267,22 +268,20 @@
           {% endif %}
         </div>
       </div>      <!-- Acciones rápidas -->
-      <div class="card shadow-sm mb-4">
+      <div class="card shadow-sm mb-4" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-lightning-charge me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Acciones Rápidas</span>
         </div>
         
-        <div class="card-body">
-          <div class="d-grid gap-3">            <a href="{{ url_for('jobs.listar_trabajos') }}" class="btn btn-outline-success action-button">
+        <div class="card-body">          <div class="d-grid gap-3">            <a href="{{ url_for('jobs.listar_trabajos') }}" class="btn btn-outline-success action-button" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);">
               <i class="bi bi-arrow-left me-2"></i>Volver a Trabajos
             </a>
             
-            <button type="button" class="btn btn-outline-info action-button" onclick="window.print();">
+            <button type="button" class="btn btn-outline-info action-button" onclick="window.print();" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);">
               <i class="bi bi-printer me-2"></i>Imprimir Detalles
             </button>
-            
-            <a href="#" class="btn btn-outline-warning action-button" 
+              <a href="#" class="btn btn-outline-warning action-button" 
               data-bs-toggle="modal" data-bs-target="#editJobModal"
               data-id="{{ trabajo.id }}"
               data-nombre_cliente="{{ trabajo.nombre_cliente }}"
@@ -297,33 +296,31 @@
               data-tecnico_id="{{ trabajo.technician_id or '' }}"
               data-estado="{{ trabajo.estado }}"
               data-cantidad="{{ trabajo.cantidad or '' }}"
-              data-tipo_plaga="{{ trabajo.tipo_plaga or '' }}">
+              data-tipo_plaga="{{ trabajo.tipo_plaga or '' }}"
+              style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);">
               <i class="bi bi-pencil-square me-2"></i>Editar Trabajo
             </a>
-            
-            {% if trabajo.estado == 'Completado' %}
-            <a href="#" class="btn btn-outline-success action-button">
+              {% if trabajo.estado == 'Completado' %}
+            <a href="#" class="btn btn-outline-success action-button" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);">
               <i class="bi bi-receipt me-2"></i>Ver Factura
             </a>
             {% endif %}
-            
-            {% if trabajo.estado == 'Presupuesto' %}
+              {% if trabajo.estado == 'Presupuesto' %}
             <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=trabajo.id) }}" style="display: inline;">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <button type="submit" class="btn btn-green action-button w-100">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">              <button type="submit" class="btn btn-green action-button w-100" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.3);">
                 <i class="bi bi-check-circle me-2"></i>Aprobar Presupuesto
               </button>
             </form>
             {% endif %}
             
-            <button type="button" class="btn btn-outline-danger action-button" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ trabajo.id }}">
+            <button type="button" class="btn btn-outline-danger action-button" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ trabajo.id }}" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);">
               <i class="bi bi-trash me-2"></i>Eliminar Trabajo
             </button>
           </div>
         </div>
       </div>
         <!-- Google Map (si hay dirección) -->
-      {% if trabajo.direccion and trabajo.codigo_postal %}
-      <div class="card shadow-sm">
+      {% if trabajo.direccion and trabajo.codigo_postal %}      <div class="card shadow-sm" style="box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;">
         <div class="card-header d-flex align-items-center" style="background-color: #f8f9fa; border-bottom: 1px solid #eee; padding: 15px 20px;">
           <i class="bi bi-geo-alt me-2" style="font-size: 1.4rem; color: #2E7D32;"></i>
           <span style="font-size: 1.1rem; font-weight: 600; color: #212529;">Ubicación</span>
@@ -342,9 +339,8 @@
 </div>
 
 <!-- Modal para confirmar eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: 10px; border: none;">
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 10px; border: none; box-shadow: 0 10px 30px rgba(67, 171, 1, 0.4) !important;"><!-- Sombra verde más intensa para el modal -->
       <div class="modal-header border-0">
         <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -377,16 +373,14 @@
     padding: 0.5rem 1.5rem;
     font-weight: 500;
   }
-  
-  .btn-green:hover {
+    .btn-green:hover {
     background-color: #3a9701;
     color: white;
     border: 1px solid #3a9701;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(67, 171, 1, 0.25);
   }
-  
-  /* Estilos para la tabla de información */
+    /* Estilos para la tabla de información */
   .info-table td {
     padding: 15px 20px;
     vertical-align: middle;
@@ -394,6 +388,7 @@
   .info-table tr:hover {
     background-color: rgba(46, 125, 50, 0.03);
     transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(67, 171, 1, 0.1);
     transition: all 0.2s ease;
   }
   

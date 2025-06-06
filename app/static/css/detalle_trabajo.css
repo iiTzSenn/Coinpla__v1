@@ -1,0 +1,74 @@
+/* Estilos específicos para la página de detalle de trabajo */
+
+/* Cambia las sombras de todas las tarjetas a un color verde */
+.card.shadow-sm {
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto hover con sombra verde más intensa */
+.card.shadow-sm:hover {
+  box-shadow: 0 6px 15px rgba(67, 171, 1, 0.25) !important;
+}
+
+/* Status banner con sombra verde más pronunciada */
+.status-banner {
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.2) !important;
+}
+
+/* Tablas con sombra verde */
+.table-responsive {
+  box-shadow: 0 3px 10px rgba(67, 171, 1, 0.1);
+  border-radius: 8px;
+}
+
+/* Botones con sombra verde */
+.btn.action-button {
+  box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn.action-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(67, 171, 1, 0.35);
+}
+
+/* Tarjetas de acción con sombra verde */
+.action-card {
+  box-shadow: 0 4px 10px rgba(67, 171, 1, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(67, 171, 1, 0.25);
+}
+
+/* Status banner con sombra verde */
+.status-banner {
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.15);
+}
+
+/* Aplicar sombras verdes a todos los botones en la página */
+.btn {
+  box-shadow: 0 2px 6px rgba(67, 171, 1, 0.15);
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  box-shadow: 0 4px 10px rgba(67, 171, 1, 0.25);
+}
+
+/* Inputs con sombra sutil verde al enfocar */
+.form-control:focus,
+.form-select:focus {
+  box-shadow: 0 0 0 0.25rem rgba(67, 171, 1, 0.25) !important;
+  border-color: rgba(67, 171, 1, 0.5) !important;
+}
+
+/* Tablas con filas que tienen sombra al pasar el mouse */
+.table tbody tr:hover {
+  box-shadow: 0 3px 8px rgba(67, 171, 1, 0.2);
+  position: relative;
+  z-index: 1;
+}

@@ -15,9 +15,9 @@
 }
 
 .flash-message {
-  background-color: #fff;
+  background-color: #fff !important;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.25) !important; /* Sombra verde consistente con el diseño */
   margin-bottom: 10px;
   overflow: hidden;
   transform: translateY(100px);
@@ -27,7 +27,7 @@
 
 .flash-message.show-notification {
   transform: translateY(0);
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .flash-content {
@@ -75,6 +75,8 @@
 /* Estilos específicos por tipo de notificación */
 .flash-success {
   border-left: 4px solid #43ab01;
+  background-color: #e6f5df !important; /* Color sólido verde claro */
+  opacity: 1 !important;
 }
 
 .flash-success .flash-icon {
@@ -87,6 +89,8 @@
 
 .flash-danger {
   border-left: 4px solid #dc3545;
+  background-color: #f8d7da !important; /* Color sólido rojo claro */
+  opacity: 1 !important;
 }
 
 .flash-danger .flash-icon {
@@ -99,6 +103,8 @@
 
 .flash-warning {
   border-left: 4px solid #ffc107;
+  background-color: #fff3cd !important; /* Color sólido amarillo claro */
+  opacity: 1 !important;
 }
 
 .flash-warning .flash-icon {
@@ -111,6 +117,8 @@
 
 .flash-info {
   border-left: 4px solid #17a2b8;
+  background-color: #d1ecf1 !important; /* Color sólido azul claro */
+  opacity: 1 !important;
 }
 
 .flash-info .flash-icon {
@@ -134,40 +142,45 @@
 }
 
 .notification-container .alert {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.25) !important; /* Sombra verde consistente con el diseño */
   border-left: 5px solid;
   padding: 0.75rem 1rem;
   margin: 0;
-  transition: all 0.5s ease-in-out, height 0.8s ease, opacity 0.8s ease, margin 0.8s ease;
+  transition: all 0.5s ease-in-out, height 0.8s ease, margin 0.8s ease;
+  opacity: 1 !important;
 }
 
 .notification-container .alert.shrink {
   margin-top: -50px;
   margin-bottom: -10px;
-  opacity: 0;
   height: 0;
   padding: 0;
   border: none;
+  display: none; /* Ocultar completamente en lugar de usar opacidad */
 }
 
 .notification-container .alert-success {
   border-left-color: #43ab01;
-  background-color: rgba(67, 171, 1, 0.1);
+  background-color: #e6f5df !important; /* Color sólido verde claro */
+  opacity: 1 !important;
 }
 
 .notification-container .alert-danger {
   border-left-color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.1);
+  background-color: #f8d7da !important; /* Color sólido rojo claro */
+  opacity: 1 !important;
 }
 
 .notification-container .alert-warning {
   border-left-color: #ffc107;
-  background-color: rgba(255, 193, 7, 0.1);
+  background-color: #fff3cd !important; /* Color sólido amarillo claro */
+  opacity: 1 !important;
 }
 
 .notification-container .alert-info {
   border-left-color: #17a2b8;
-  background-color: rgba(23, 162, 184, 0.1);
+  background-color: #d1ecf1 !important; /* Color sólido azul claro */
+  opacity: 1 !important;
 }
 
 .notification-container .bi {

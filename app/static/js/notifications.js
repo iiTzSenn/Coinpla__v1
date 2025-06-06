@@ -18,8 +18,8 @@ function setupNotifications() {
     const delay = baseDelay + (index * incrementDelay);
     
     // Auto-ocultar después del tiempo especificado
-    setTimeout(() => {
-      // Añade la clase para disparar la animación CSS
+    setTimeout(() => {      // Añade la clase para disparar la animación CSS, pero manteniendo la opacidad
+      notification.style.opacity = "1 !important"; // Asegurar que se mantiene sólido
       notification.classList.add('shrink');
       
       // Elimina el elemento después de que termine la animación
