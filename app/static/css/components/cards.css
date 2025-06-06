@@ -95,28 +95,52 @@
 }
 
 .dashboard-card .card-body h4 {
-  font-size: 3rem; /* Tamaño más grande para el número */
-  font-weight: 700;
-  font-family: 'Roboto', sans-serif; /* Fuente profesional */
+  font-size: 3.5rem; /* Números más grandes y prominentes */
+  font-weight: 800; /* Más negrita */
+  font-family: 'Inter', 'Roboto', sans-serif; /* Fuente moderna */
   margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Sombra en el texto */
+  background: linear-gradient(45deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .dashboard-card .card-body p {
-  font-size: 1.2rem; /* Ajustar tamaño de la descripción */
-  font-weight: 500;
-  font-family: 'Roboto', sans-serif;
-  margin-top: 0.5rem;
-  color: rgba(255, 255, 255, 0.8); /* Texto más claro */
+  font-size: 1.1rem; 
+  font-weight: 600;
+  font-family: 'Inter', 'Roboto', sans-serif;
+  margin-top: 0.75rem;
+  color: rgba(255, 255, 255, 0.95); /* Texto más visible */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.3px; /* Espaciado moderno */
 }
 
 .dashboard-card::before {
   content: attr(data-icon); /* Usar atributo personalizado para íconos */
-  font-size: 5rem;
+  font-size: 5.5rem; /* Iconos más grandes */
   position: absolute;
-  top: 10px;
-  right: 10px;
-  color: rgba(255, 255, 255, 0.2);
+  top: 5px;
+  right: 15px;
+  color: rgba(255, 255, 255, 0.15); /* Más transparente */
   z-index: 0;
+  transition: all 0.4s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); /* Sombra en el icono */
+}
+
+/* Mejorar visibilidad del icono en tarjeta de completados */
+.dashboard-card.completados::before {
+  color: rgba(255, 255, 255, 0.35) !important; /* Más visible */
+  background: rgba(255, 255, 255, 0.1); /* Fondo sutil */
+  border-radius: 50%; /* Fondo circular */
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem !important; /* Tamaño más pequeño pero más visible */
+  top: 15px;
+  right: 20px;
 }
 
 /* Tarjetas de gráficos con tamaño uniforme */

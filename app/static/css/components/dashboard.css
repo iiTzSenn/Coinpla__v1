@@ -1,0 +1,95 @@
+/* Dashboard Components Styling */
+
+/* Card Styling Refinements */
+.dashboard-card {
+  padding: 1.25rem !important;
+  border-radius: 1rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  color: #fff !important; /* Asegurar que el texto sea blanco */
+}
+
+/* Mejorar la tipografía de las tarjetas */
+.dashboard-card .card-body {
+  position: relative;
+  z-index: 1;
+}
+
+.dashboard-card h4.counter {
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card p.card-text {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0;
+  opacity: 0.9;
+  letter-spacing: 0.3px;
+}
+
+/* Gradientes mejorados y menos intensos */
+.dashboard-card.trabajos {
+  background: linear-gradient(135deg, #3d9b01, #538d2f);
+  border-left: 4px solid #2d7501;
+}
+
+.dashboard-card.pendientes {
+  background: linear-gradient(135deg, #538d2f, #65a33d);
+  border-left: 4px solid #3d7728;
+}
+
+.dashboard-card.completados {
+  background: linear-gradient(135deg, #3a8d01, #4c9c1c);
+  border-left: 4px solid #2c6e01;
+}
+
+.dashboard-card.facturacion {
+  background: linear-gradient(135deg, #34850f, #499530);
+  border-left: 4px solid #286709;
+}
+
+/* Efectos hover suavizados */
+.dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Decoración con íconos más sutil */
+.dashboard-card::before {
+  content: "\2605";
+  font-family: Arial, sans-serif;
+  font-size: 80px;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  color: rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+/* Estilo para gráficos */
+.chart-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.chart-card .card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 1rem 1.25rem;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+}

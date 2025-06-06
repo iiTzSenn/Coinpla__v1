@@ -567,28 +567,46 @@ select:focus,
    ================================================ */
 .dashboard-card {
   padding: 1rem;
-  border-radius: 1rem;
+  border-radius: 1.5rem; /* Bordes más redondeados */
   color: #fff;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra permanente para todas las tarjetas */
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición suave y moderna */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* Sombra más suave */
+  cursor: pointer; /* Indicar que es interactivo */
+}
+
+/* Efecto de resplandor sutil */
+.dashboard-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+
+.dashboard-card:hover::after {
+  transform: translateX(100%);
 }
 
 .dashboard-card.trabajos {
-  background: linear-gradient(90deg, #43ab01, #66C70A); /* Gradiente verde para Trabajos Totales */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente azul-púrpura moderno */
 }
 
 .dashboard-card.pendientes {
-  background: linear-gradient(90deg, #66C70A, #85eb3c); /* Gradiente verde claro para Pendientes */
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); /* Gradiente rosa-coral vibrante */
 }
 
 .dashboard-card.completados {
-  background: linear-gradient(90deg, #43ab01, #43ab01); /* Gradiente verde corporativo para Completados */
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); /* Gradiente azul-cyan fresco */
 }
 
 .dashboard-card.facturacion {
-  background: linear-gradient(90deg, #3a9701, #55b002); /* Gradiente verde intermedio para Facturación */
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); /* Gradiente verde-turquesa elegante */
 }
 
 .dashboard-card::before {
@@ -612,7 +630,7 @@ select:focus,
 }
 
 .dashboard-card.completados::before {
-  content: "✔"; /* Ícono para Completados */
+  content: "✅"; /* Ícono para Completados - Emoji más visible */
 }
 
 .dashboard-card.facturacion::before {
@@ -620,13 +638,30 @@ select:focus,
 }
 
 .dashboard-card:hover {
-  transform: translateY(-5px); /* Relieve al pasar el ratón */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3); /* Sombra más pronunciada al hover */
+  transform: translateY(-8px) scale(1.02); /* Más elevación y ligero aumento de escala */
+  box-shadow: 0 15px 30px rgba(0,0,0,0.25); /* Sombra más suave y elegante */
 }
 
 .dashboard-card:hover::before {
-  transform: scale(1.2); /* Ícono ligeramente más grande */
-  color: rgba(255, 255, 255, 0.2); /* Ícono más visible */
+  transform: scale(1.3) rotate(10deg); /* Ícono más grande con rotación */
+  color: rgba(255, 255, 255, 0.3); /* Ícono más visible */
+}
+
+/* Efectos de brillo adicionales para cada tarjeta */
+.dashboard-card.trabajos:hover {
+  box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+}
+
+.dashboard-card.pendientes:hover {
+  box-shadow: 0 15px 30px rgba(240, 147, 251, 0.4);
+}
+
+.dashboard-card.completados:hover {
+  box-shadow: 0 15px 30px rgba(79, 172, 254, 0.4);
+}
+
+.dashboard-card.facturacion:hover {
+  box-shadow: 0 15px 30px rgba(67, 233, 123, 0.4);
 }
 
 .dashboard-card .card-body {
@@ -1005,4 +1040,38 @@ table.custom-table {
 .badge-verificado {
   background-color: #43ab01;
   color: white;
+}
+
+/* Animaciones para las tarjetas del dashboard */
+@keyframes cardSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dashboard-card {
+  animation: cardSlideIn 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+/* Delay escalonado para cada tarjeta */
+.dashboard-card.trabajos {
+  animation-delay: 0.1s;
+}
+
+.dashboard-card.pendientes {
+  animation-delay: 0.2s;
+}
+
+.dashboard-card.completados {
+  animation-delay: 0.3s;
+}
+
+.dashboard-card.facturacion {
+  animation-delay: 0.4s;
 }
