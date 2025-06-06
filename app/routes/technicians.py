@@ -78,13 +78,22 @@ def toggle_tecnico(id):
 @login_required
 def eliminar_tecnico(id):
     tecnico = Technician.query.get_or_404(id)
+    
+    # Liberamos los trabajos asignados al técnico antes de eliminarlo
     trabajos = Job.query.filter_by(technician_id=id).all()
     for trabajo in trabajos:
         trabajo.technician_id = None
-        historial = JobHistory(job_id=trabajo.id, action='Desasignación', details='Técnico eliminado')
+        historial = JobHistory(job_id=trabajo.id, action='Desasignación', details='Técnico eliminado del sistema')
         db.session.add(historial)
 
+    # Eliminamos el técnico
     db.session.delete(tecnico)
     db.session.commit()
-    flash("Técnico eliminado", "success")
+    flash("Técnico eliminado correctamente", "success")
+    
+    # Verificar si la petición viene de la página de administración de usuarios
+    referer = request.headers.get('Referer', '')
+    if 'admin/users' in referer:
+        return redirect(url_for('admin.admin_users'))
+    
     return redirect(url_for('technicians.listar_tecnicos'))

@@ -158,3 +158,108 @@
     cancel_text="Cancelar"
 ) }}
 {% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips de Bootstrap
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        delay: { show: 50, hide: 50 },
+        container: 'body',
+        animation: true
+      });
+    });
+    
+    // Configurar modal de eliminación de técnico
+    document.querySelectorAll('.confirm-delete-tech').forEach(button => {
+      button.addEventListener('click', function() {
+        const techId = this.getAttribute('data-id');
+        const form = document.querySelector('#confirmDeleteTechModal form');
+        form.action = "{{ url_for('technicians.eliminar_tecnico', id=0) }}".replace('0', techId);
+      });
+    });
+    
+    // Configurar botones de toggle de disponibilidad
+    document.querySelectorAll('.toggle-disponibilidad').forEach(button => {
+      button.addEventListener('click', function() {
+        const form = this.closest('form');
+        if (form) {
+          form.submit();
+        }
+      });
+    });
+    
+    // Configurar modal de edición de técnico
+    document.querySelectorAll('.editar-tecnico').forEach(button => {
+      button.addEventListener('click', function() {
+        const techId = this.getAttribute('data-id');
+        const form = document.getElementById('editTecnicoForm');
+        form.action = "{{ url_for('technicians.editar_tecnico', id=0) }}".replace('0', techId);
+        
+        // Rellenar formulario
+        document.getElementById('modalFirstName').value = this.getAttribute('data-first_name') || '';
+        document.getElementById('modalLastName').value = this.getAttribute('data-last_name') || '';
+        document.getElementById('modalTelefono').value = this.getAttribute('data-telefono') || '';
+      });
+    });
+    
+    // Validación de teléfono en formulario de añadir técnico
+    const addTechForm = document.getElementById("addTechForm");
+    const telefonoInput = document.getElementById("telefono");
+    
+    if (addTechForm && telefonoInput) {
+      addTechForm.addEventListener("submit", function(e) {
+        const telefono = telefonoInput.value.trim();
+        const telefonoRegex = /^(?:\+34\s?)?\d{9}$/;
+        if (telefono && !telefonoRegex.test(telefono)) {
+          e.preventDefault();
+          telefonoInput.classList.add("is-invalid");
+          if (!document.getElementById("telefono-error-tech")) {
+            const errorDiv = document.createElement("div");
+            errorDiv.id = "telefono-error-tech";
+            errorDiv.className = "invalid-feedback d-block";
+            errorDiv.innerText = "Formato de teléfono inválido. Usa +34 612345678 o 612345678.";
+            telefonoInput.parentNode.appendChild(errorDiv);
+          }
+        } else {
+          telefonoInput.classList.remove("is-invalid");
+          const errorDiv = document.getElementById("telefono-error-tech");
+          if (errorDiv) {
+            errorDiv.remove();
+          }
+        }
+      });
+    }
+    
+    // Validación de teléfono en modal de editar técnico
+    const editTechForm = document.getElementById("editTecnicoForm");
+    const modalTelefonoInput = document.getElementById("modalTelefono");
+    
+    if (editTechForm && modalTelefonoInput) {
+      editTechForm.addEventListener("submit", function(e) {
+        const telefono = modalTelefonoInput.value.trim();
+        const telefonoRegex = /^(?:\+34\s?)?\d{9}$/;
+        if (telefono && !telefonoRegex.test(telefono)) {
+          e.preventDefault();
+          modalTelefonoInput.classList.add("is-invalid");
+          if (!document.getElementById("modal-telefono-error")) {
+            const errorDiv = document.createElement("div");
+            errorDiv.id = "modal-telefono-error";
+            errorDiv.className = "invalid-feedback d-block";
+            errorDiv.innerText = "Formato de teléfono inválido. Usa +34 612345678 o 612345678.";
+            modalTelefonoInput.parentNode.appendChild(errorDiv);
+          }
+        } else {
+          modalTelefonoInput.classList.remove("is-invalid");
+          const errorDiv = document.getElementById("modal-telefono-error");
+          if (errorDiv) {
+            errorDiv.remove();
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

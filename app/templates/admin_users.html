@@ -437,11 +437,12 @@
                   {% else %}
                     <span class="badge badge-custom badge-ocupado">Ocupado</span>
                   {% endif %}
-                </td><td>
+                </td>                <td>
                   <div class="action-buttons-container">
                     <button type="button" class="btn btn-sm btn-outline-primary btn-action edit-tech-btn" data-id="{{ tecnico.id }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar técnico">
                       <i class="bi bi-pencil"></i>
-                    </button>                    <button type="button" 
+                    </button>
+                    <button type="button" 
                       class="btn btn-sm {% if tecnico.available %}btn-outline-success{% else %}btn-outline-warning{% endif %} btn-action toggle-availability-btn" 
                       data-id="{{ tecnico.id }}" 
                       data-available="{{ tecnico.available|lower }}" 
@@ -452,8 +453,8 @@
                       data-bs-custom-class="{% if tecnico.available %}tooltip-success{% else %}tooltip-warning{% endif %}">
                         <i class="bi bi-{% if tecnico.available %}toggle-on{% else %}toggle-off{% endif %}"></i>
                     </button>
-                    <form method="POST" action="{{ url_for('technicians.eliminar_tecnico', id=tecnico.id) }}" style="display:inline;">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <form method="POST" action="{{ url_for('technicians.eliminar_tecnico', id=tecnico.id) }}">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                       <button type="submit" class="btn btn-sm btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar técnico" data-bs-custom-class="tooltip-danger">
                         <i class="bi bi-trash"></i>
                       </button>
@@ -710,7 +711,14 @@
 </script>
 
 <!-- Estilos adicionales para la paginación y otros elementos -->
-<style>  /* Estilos para la paginación minimalista */  .minimal-pagination {
+<style>  /* Estilos para formularios dentro de action-buttons-container */
+  .action-buttons-container form {
+    display: inline-flex !important;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Estilos para la paginación minimalista */  .minimal-pagination {
     width: 32px;
     height: 32px;
     display: flex;
