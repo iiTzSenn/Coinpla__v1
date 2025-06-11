@@ -3,9 +3,10 @@ from app.models.models import Job, Technician, User, JobHistory, JobCategory, Jo
 from app.models.presupuesto import Presupuesto
 from app.models.comprobante import Comprobante
 from app.models.factura import Factura
+from app.models.service import ServiceType, ServiceSubcategory, MaintenancePlan
 
 # Exportar los modelos para que puedan ser importados desde app.models
 __all__ = [
     "Job", "Technician", "User", "JobHistory", "JobCategory", "JobComment", "JobFile",
-    "Presupuesto", "Comprobante", "Factura"
+    "Presupuesto", "Comprobante", "Factura", "ServiceType", "ServiceSubcategory", "MaintenancePlan"
 ]

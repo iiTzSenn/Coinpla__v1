@@ -11,7 +11,11 @@ config = context.config
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
-fileConfig(config.config_file_name)
+try:
+    fileConfig(config.config_file_name)
+except KeyError:
+    # No formatters section in the config
+    logging.basicConfig()
 logger = logging.getLogger('alembic.env')
 
 

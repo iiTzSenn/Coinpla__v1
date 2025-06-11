@@ -8,10 +8,11 @@ class Presupuesto:
     En lugar de usar herencia, esta clase se encarga de crear y manipular
     objetos Job con estados de presupuesto.
     """
-    
     @staticmethod
     def crear(nombre_cliente, apellido_cliente, telefono, email, descripcion, 
-             fecha, hora, duracion, tecnico_id, cantidad=0, tipo_plaga=None, direccion=None, codigo_postal=None, **kwargs):
+             fecha, hora, duracion, tecnico_id, cantidad=0, tipo_plaga=None, direccion=None, codigo_postal=None,
+             service_type=None, service_subcategories=None, enable_maintenance=False, 
+             maintenance_frequency=None, maintenance_duration=None, **kwargs):
         """
         Crea un nuevo presupuesto (un Job con estado='Pendiente')
         """
@@ -22,18 +23,22 @@ class Presupuesto:
             nombre_cliente=nombre_cliente,
             apellido_cliente=apellido_cliente,
             telefono=telefono,
-            email=email,  # Ahora guardamos el email directamente en su campo correspondiente
+            email=email,
             descripcion=descripcion,
             fecha=fecha,
             hora=hora,
             duracion=duracion,
-            cantidad=cantidad,  # Guardamos la cantidad (importe)
-            tipo_plaga=tipo_plaga,  # Guardamos el tipo de plaga
-            technician_id=tecnico_id,  # Mapear tecnico_id a technician_id
+            cantidad=cantidad,
+            tipo_plaga=tipo_plaga,
+            technician_id=tecnico_id,
             direccion=direccion if direccion else 'Pendiente de asignar',
-            codigo_postal=codigo_postal,  # Añadir código postal
-            estado='Pendiente'  # Cambiado de 'Presupuesto' a 'Pendiente'
+            codigo_postal=codigo_postal,
+            estado='Pendiente'
         )
+          # Guardar la información del servicio
+        if service_type:
+            trabajo.service_type_id = service_type.id if hasattr(service_type, 'id') else None
+        trabajo.service_subcategories = service_subcategories
         
         db.session.add(trabajo)
         db.session.commit()

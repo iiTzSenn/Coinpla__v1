@@ -95,6 +95,16 @@ class Job(db.Model):
     tipo_plaga = db.Column(db.String(100), nullable=True)  # Nuevo campo para tipo de plaga
     numero_trabajo = db.Column(db.Integer, unique=True, nullable=True)
     email = db.Column(db.String(100), nullable=True)  # Campo para el email del cliente
+    
+    # Nuevos campos para servicios
+    service_type_id = db.Column(db.Integer, db.ForeignKey('service_types.id'), nullable=True)
+    service_type = db.relationship('ServiceType', backref='jobs', lazy=True)
+    service_subcategories = db.Column(db.String(500), nullable=True)  # Guardado como JSON string
+    
+    # Campos para mantenimiento
+    has_maintenance = db.Column(db.Boolean, default=False)
+    maintenance_plans = db.relationship('MaintenancePlan', backref='job', lazy=True, cascade="all, delete-orphan")
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     history = db.relationship('JobHistory', backref='job', lazy=True, cascade="all, delete-orphan")

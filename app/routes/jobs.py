@@ -427,9 +427,18 @@ def crear_presupuesto():
     hora_str = request.form.get('hora')
     duracion = request.form.get('duracion') or 'media'
     cantidad = request.form.get('cantidad') or 0
+    direccion = request.form.get('direccion')
+    codigo_postal = request.form.get('codigo_postal')
+    
+    # Datos de servicios
+    service_type = request.form.get('service_type')
     tipo_plaga = request.form.get('tipo_plaga')
-    direccion = request.form.get('direccion')  # Obtener la dirección del formulario
-    codigo_postal = request.form.get('codigo_postal')  # Obtener el código postal también
+    subcategories = request.form.getlist('subcategories')  # Lista de subcategorías seleccionadas
+    
+    # Datos de mantenimiento
+    enable_maintenance = request.form.get('enable_maintenance') == 'on'
+    maintenance_frequency = request.form.get('maintenance_frequency')
+    maintenance_duration = request.form.get('maintenance_duration')
 
     # Validar y procesar fecha y hora
     fecha_manual = bool(fecha_str)
@@ -527,24 +536,54 @@ def crear_presupuesto():
         # Si todavía no hay candidato, informar al usuario
         if not candidato:
             flash("No hay técnicos disponibles en ese horario. Por favor, seleccione otra fecha u hora.", "warning")
-            return redirect(url_for('jobs.listar_trabajos'))
-
-    # Convertir hora a string
-    hora_str = hora.strftime('%H:%M')    # Usar el método estático crear() de la clase Presupuesto en lugar de instanciar directamente
+            return redirect(url_for('jobs.listar_trabajos'))    # Convertir hora a string
+    hora_str = hora.strftime('%H:%M')
+    
+    # Preparar datos adicionales de servicio
+    import json
+    service_subcategories = json.dumps(subcategories) if subcategories else None
+    
+    # Enriquecer descripción con información de servicios
+    descripcion_detallada = descripcion
+    if service_type:
+        descripcion_detallada += f"\n\nServicio: {service_type}"
+        if tipo_plaga:
+            descripcion_detallada += f"\nTipo de plaga: {tipo_plaga}"
+        if subcategories:
+            descripcion_detallada += f"\nSubcategorías: {', '.join(subcategories)}"
+    
+    # Añadir información de mantenimiento a la descripción
+    if enable_maintenance and maintenance_frequency and maintenance_duration:
+        descripcion_detallada += f"\n\nPlan de mantenimiento: {maintenance_frequency.capitalize()}"
+        if maintenance_duration:
+            frecuencia_unidad = {
+                'mensual': 'meses',
+                'bimensual': 'bimestres',
+                'trimestral': 'trimestres',
+                'semestral': 'semestres'
+            }.get(maintenance_frequency, 'periodos')
+            descripcion_detallada += f" durante {maintenance_duration} {frecuencia_unidad}"
+    
+    # Crear el presupuesto
     nuevo_presupuesto = Presupuesto.crear(
         nombre_cliente=nombre_cliente,
         apellido_cliente=apellido_cliente,
         telefono=telefono,
         email=email,
-        descripcion=descripcion,
+        descripcion=descripcion_detallada,
         fecha=fecha,
         hora=hora_str,
         duracion=duracion,
         tecnico_id=candidato.id,
         cantidad=cantidad,
         tipo_plaga=tipo_plaga,
-        direccion=direccion,  # Pasar la dirección explícitamente
-        codigo_postal=codigo_postal  # Pasar el código postal también
+        direccion=direccion,
+        codigo_postal=codigo_postal,
+        service_type=service_type,
+        service_subcategories=service_subcategories,
+        enable_maintenance=enable_maintenance,
+        maintenance_frequency=maintenance_frequency,
+        maintenance_duration=maintenance_duration
     )
     
     # Generar y enviar el presupuesto por correo electrónico

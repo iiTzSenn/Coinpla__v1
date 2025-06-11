@@ -1,0 +1,558 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Presupuesto{% endblock %}
+
+{% block styles %}
+<style>
+    .service-option {
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 2px solid transparent;
+    }
+    .service-option:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .service-option.selected {
+        border-color: #007bff;
+        background-color: rgba(0,123,255,0.1);
+    }
+    .subcategory-options {
+        max-height: 200px;
+        overflow-y: auto;
+    }
+    .step-container {
+        display: none;
+    }
+    .step-container.active {
+        display: block;
+    }
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+    }
+    .step {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        position: relative;
+        color: #6c757d;
+    }
+    .step:after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        width: 100%;
+        height: 3px;
+        background: #e9ecef;
+        z-index: -1;
+    }
+    .step:last-child:after {
+        display: none;
+    }
+    .step.active {
+        color: #007bff;
+        font-weight: bold;
+    }
+    .step.completed {
+        color: #28a745;
+    }
+    .step-number {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+        margin-bottom: 10px;
+    }
+    .step.active .step-number {
+        background-color: #007bff;
+        color: white;
+    }
+    .step.completed .step-number {
+        background-color: #28a745;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Crear Nuevo Presupuesto</h3>
+        </div>
+        <div class="card-body">
+            {% include 'components/flash_messages.html' %}
+            
+            <form id="presupuestoForm" method="POST" action="{{ url_for('presupuestos.crear') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div>Tipo de Servicio</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div>Detalles</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div>Mantenimiento</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div>Información Cliente</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div>Confirmación</div>
+                    </div>
+                </div>
+                
+                <!-- Paso 1: Selección de Tipo de Servicio -->
+                <div id="step1" class="step-container active">
+                    <h4 class="mb-3">Seleccione el tipo de servicio</h4>
+                    
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-4">
+                        {% for type in service_types %}
+                        <div class="col">
+                            <div class="card h-100 service-option" data-service-id="{{ type.id }}" data-service-name="{{ type.name }}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ type.name }}</h5>
+                                    {% if type.description %}
+                                    <p class="card-text small text-muted">{{ type.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <input type="hidden" name="service_type" id="selectedServiceType">
+                    
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="button" id="nextToStep2" class="btn btn-primary" disabled>Continuar</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 2: Detalles del Servicio / Subcategorías -->
+                <div id="step2" class="step-container">
+                    <h4 class="mb-3">Detalles del Servicio: <span id="selectedServiceLabel"></span></h4>
+                    
+                    <div id="subcategoryContainer" class="mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                Seleccione las opciones aplicables:
+                            </div>
+                            <div class="card-body subcategory-options" id="subcategoryOptions">
+                                <!-- Aquí se cargarán dinámicamente las subcategorías -->
+                                <div class="text-center py-3">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción adicional</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3" placeholder="Añade cualquier detalle adicional sobre el servicio requerido"></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" id="backToStep1" class="btn btn-secondary">Anterior</button>
+                        <button type="button" id="nextToStep3" class="btn btn-primary">Continuar</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 3: Opciones de Mantenimiento -->
+                <div id="step3" class="step-container">
+                    <h4 class="mb-3">Opciones de Mantenimiento</h4>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="enableMaintenance" name="enable_maintenance">
+                                <label class="form-check-label" for="enableMaintenance">
+                                    Añadir plan de mantenimiento
+                                </label>
+                            </div>
+                            
+                            <div id="maintenanceOptions" class="mt-3" style="display: none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Seleccione la frecuencia de mantenimiento:</label>
+                                    <div class="btn-group w-100" role="group">
+                                        <input type="radio" class="btn-check" name="maintenance_frequency" id="frequency1" value="Mensual" autocomplete="off">
+                                        <label class="btn btn-outline-secondary" for="frequency1">Mensual</label>
+                                        
+                                        <input type="radio" class="btn-check" name="maintenance_frequency" id="frequency2" value="Bimensual" autocomplete="off">
+                                        <label class="btn btn-outline-secondary" for="frequency2">Bimensual</label>
+                                        
+                                        <input type="radio" class="btn-check" name="maintenance_frequency" id="frequency3" value="Trimestral" autocomplete="off">
+                                        <label class="btn btn-outline-secondary" for="frequency3">Trimestral</label>
+                                        
+                                        <input type="radio" class="btn-check" name="maintenance_frequency" id="frequency4" value="Semestral" autocomplete="off">
+                                        <label class="btn btn-outline-secondary" for="frequency4">Semestral</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" id="backToStep2" class="btn btn-secondary">Anterior</button>
+                        <button type="button" id="nextToStep4" class="btn btn-primary">Continuar</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 4: Información del Cliente -->
+                <div id="step4" class="step-container">
+                    <h4 class="mb-3">Información del Cliente</h4>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="nombre" class="form-label">Nombre*</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="apellido" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="apellido" name="apellido">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telefono" class="form-label">Teléfono*</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" name="direccion">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="codigo_postal" class="form-label">Código Postal</label>
+                            <input type="text" class="form-control" id="codigo_postal" name="codigo_postal">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="fecha" class="form-label">Fecha de visita</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="hora" name="hora" value="09:00" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="tecnico_id" class="form-label">Técnico asignado</label>
+                            <select class="form-select" id="tecnico_id" name="tecnico_id">
+                                <option value="">-- Sin asignar --</option>
+                                <!-- Aquí se cargarían los técnicos disponibles desde el backend -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" id="backToStep3" class="btn btn-secondary">Anterior</button>
+                        <button type="button" id="nextToStep5" class="btn btn-primary">Continuar</button>
+                    </div>
+                </div>
+                
+                <!-- Paso 5: Resumen y Confirmación -->
+                <div id="step5" class="step-container">
+                    <h4 class="mb-3">Resumen del Presupuesto</h4>
+                    
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Detalles del Servicio</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-2">
+                                <div class="col-md-3 fw-bold">Tipo de Servicio:</div>
+                                <div class="col-md-9" id="summary-service-type"></div>
+                            </div>
+                            <div class="row mb-2" id="summary-subcategories-container">
+                                <div class="col-md-3 fw-bold">Opciones:</div>
+                                <div class="col-md-9" id="summary-subcategories"></div>
+                            </div>
+                            <div class="row mb-2" id="summary-maintenance-container">
+                                <div class="col-md-3 fw-bold">Mantenimiento:</div>
+                                <div class="col-md-9" id="summary-maintenance">No</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-3 fw-bold">Cliente:</div>
+                                <div class="col-md-9" id="summary-client"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-3 fw-bold">Contacto:</div>
+                                <div class="col-md-9" id="summary-contact"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-3 fw-bold">Dirección:</div>
+                                <div class="col-md-9" id="summary-address"></div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-md-3 fw-bold">Fecha/Hora:</div>
+                                <div class="col-md-9" id="summary-datetime"></div>
+                            </div>
+                            <div class="row mb-2" id="summary-description-container">
+                                <div class="col-md-3 fw-bold">Descripción:</div>
+                                <div class="col-md-9" id="summary-description"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" id="backToStep4" class="btn btn-secondary">Anterior</button>
+                        <button type="submit" class="btn btn-success">Crear Presupuesto</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables para controlar los pasos
+    let currentStep = 1;
+    const totalSteps = 5;
+    
+    // Selección de Servicio
+    const serviceOptions = document.querySelectorAll('.service-option');
+    const selectedServiceInput = document.getElementById('selectedServiceType');
+    const selectedServiceLabel = document.getElementById('selectedServiceLabel');
+    const nextToStep2Button = document.getElementById('nextToStep2');
+    
+    // Obtener referencias a los botones de navegación
+    const backToStep1 = document.getElementById('backToStep1');
+    const nextToStep3 = document.getElementById('nextToStep3');
+    const backToStep2 = document.getElementById('backToStep2');
+    const nextToStep4 = document.getElementById('nextToStep4');
+    const backToStep3 = document.getElementById('backToStep3');
+    const nextToStep5 = document.getElementById('nextToStep5');
+    const backToStep4 = document.getElementById('backToStep4');
+    
+    // Referencias para el toggle de mantenimiento
+    const enableMaintenance = document.getElementById('enableMaintenance');
+    const maintenanceOptions = document.getElementById('maintenanceOptions');
+    
+    // Funciones para navegar entre pasos
+    function showStep(step) {
+        // Ocultar todos los pasos
+        document.querySelectorAll('.step-container').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Mostrar el paso actual
+        document.getElementById(`step${step}`).classList.add('active');
+        
+        // Actualizar los indicadores de pasos
+        updateStepIndicators(step);
+        
+        // Actualizar el paso actual
+        currentStep = step;
+    }
+    
+    function updateStepIndicators(currentStep) {
+        const steps = document.querySelectorAll('.step');
+        
+        steps.forEach((step, index) => {
+            const stepNum = index + 1;
+            
+            if (stepNum < currentStep) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+            } else if (stepNum === currentStep) {
+                step.classList.add('active');
+                step.classList.remove('completed');
+            } else {
+                step.classList.remove('active', 'completed');
+            }
+        });
+    }
+    
+    // Event listeners para los botones de servicios
+    serviceOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            // Remover selección previa
+            serviceOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Seleccionar la opción actual
+            this.classList.add('selected');
+            
+            // Guardar el ID del servicio seleccionado
+            const serviceId = this.dataset.serviceId;
+            const serviceName = this.dataset.serviceName;
+            selectedServiceInput.value = serviceId;
+            selectedServiceLabel.textContent = serviceName;
+            
+            // Habilitar el botón para continuar
+            nextToStep2Button.disabled = false;
+            
+            // Precargar las subcategorías para este servicio
+            loadSubcategories(serviceId);
+        });
+    });
+    
+    // Función para cargar las subcategorías
+    function loadSubcategories(serviceTypeId) {
+        // Contenedor donde se mostrarán las opciones
+        const subcategoryOptions = document.getElementById('subcategoryOptions');
+        subcategoryOptions.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
+        
+        // Hacer la petición AJAX para obtener las subcategorías
+        fetch(`/api/subcategorias/${serviceTypeId}`)
+            .then(response => response.json())
+            .then(data => {
+                subcategoryOptions.innerHTML = '';
+                
+                if (data.length === 0) {
+                    subcategoryOptions.innerHTML = '<div class="alert alert-info">No hay subcategorías disponibles para este servicio.</div>';
+                    return;
+                }
+                
+                // Crear elementos para cada subcategoría
+                data.forEach(subcategory => {
+                    const div = document.createElement('div');
+                    div.className = 'form-check mb-2';
+                    div.innerHTML = `
+                        <input class="form-check-input" type="checkbox" value="${subcategory.id}" id="subcategory${subcategory.id}" name="subcategories[]">
+                        <label class="form-check-label" for="subcategory${subcategory.id}">
+                            ${subcategory.name}
+                        </label>
+                    `;
+                    subcategoryOptions.appendChild(div);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar subcategorías:', error);
+                subcategoryOptions.innerHTML = '<div class="alert alert-danger">Error al cargar las opciones. Intente nuevamente.</div>';
+            });
+    }
+    
+    // Event listener para el toggle de mantenimiento
+    enableMaintenance.addEventListener('change', function() {
+        if (this.checked) {
+            maintenanceOptions.style.display = 'block';
+        } else {
+            maintenanceOptions.style.display = 'none';
+            // Deseleccionar cualquier frecuencia elegida
+            document.querySelectorAll('input[name="maintenance_frequency"]').forEach(radio => {
+                radio.checked = false;
+            });
+        }
+    });
+    
+    // Event listeners para los botones de navegación
+    nextToStep2Button.addEventListener('click', () => {
+        showStep(2);
+    });
+    
+    backToStep1.addEventListener('click', () => {
+        showStep(1);
+    });
+    
+    nextToStep3.addEventListener('click', () => {
+        showStep(3);
+    });
+    
+    backToStep2.addEventListener('click', () => {
+        showStep(2);
+    });
+    
+    nextToStep4.addEventListener('click', () => {
+        showStep(4);
+    });
+    
+    backToStep3.addEventListener('click', () => {
+        showStep(3);
+    });
+    
+    nextToStep5.addEventListener('click', () => {
+        // Actualizar el resumen antes de mostrar el paso 5
+        updateSummary();
+        showStep(5);
+    });
+    
+    backToStep4.addEventListener('click', () => {
+        showStep(4);
+    });
+    
+    // Función para actualizar el resumen
+    function updateSummary() {
+        // Servicio
+        const serviceType = document.querySelector('.service-option.selected');
+        if (serviceType) {
+            document.getElementById('summary-service-type').textContent = serviceType.dataset.serviceName;
+        }
+        
+        // Subcategorías
+        const selectedSubcategories = Array.from(document.querySelectorAll('input[name="subcategories[]"]:checked'))
+            .map(checkbox => checkbox.nextElementSibling.textContent.trim());
+        
+        if (selectedSubcategories.length > 0) {
+            document.getElementById('summary-subcategories').innerHTML = selectedSubcategories.map(sub => `<div>${sub}</div>`).join('');
+            document.getElementById('summary-subcategories-container').style.display = 'flex';
+        } else {
+            document.getElementById('summary-subcategories-container').style.display = 'none';
+        }
+        
+        // Mantenimiento
+        if (enableMaintenance.checked) {
+            const frequency = document.querySelector('input[name="maintenance_frequency"]:checked');
+            if (frequency) {
+                document.getElementById('summary-maintenance').textContent = `Sí - ${frequency.value}`;
+            } else {
+                document.getElementById('summary-maintenance').textContent = 'Sí';
+            }
+        } else {
+            document.getElementById('summary-maintenance').textContent = 'No';
+        }
+        
+        // Cliente
+        const nombre = document.getElementById('nombre').value;
+        const apellido = document.getElementById('apellido').value;
+        document.getElementById('summary-client').textContent = `${nombre} ${apellido}`;
+        
+        // Contacto
+        const email = document.getElementById('email').value;
+        const telefono = document.getElementById('telefono').value;
+        document.getElementById('summary-contact').textContent = `${telefono} ${email ? '/ ' + email : ''}`;
+        
+        // Dirección
+        const direccion = document.getElementById('direccion').value;
+        const codigoPostal = document.getElementById('codigo_postal').value;
+        document.getElementById('summary-address').textContent = `${direccion} ${codigoPostal ? '(' + codigoPostal + ')' : ''}`;
+        
+        // Fecha/Hora
+        const fecha = document.getElementById('fecha').value;
+        const hora = document.getElementById('hora').value;
+        if (fecha) {
+            const fechaFormateada = new Date(fecha).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            document.getElementById('summary-datetime').textContent = `${fechaFormateada} ${hora}`;
+        }
+        
+        // Descripción
+        const descripcion = document.getElementById('descripcion').value;
+        if (descripcion) {
+            document.getElementById('summary-description').textContent = descripcion;
+            document.getElementById('summary-description-container').style.display = 'flex';
+        } else {
+            document.getElementById('summary-description-container').style.display = 'none';
+        }
+    }
+});
+</script>
+{% endblock %}
