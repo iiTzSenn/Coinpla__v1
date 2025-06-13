@@ -1,81 +1,433 @@
 {% extends 'base.html' %}
-
-{% block title %}Presupuestos{% endblock %}
+{% block title %}Gestión de Presupuestos{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Gestión de Presupuestos</h1>
-        <a href="{{ url_for('presupuestos.crear') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nuevo Presupuesto
-        </a>
-    </div>
-
-    {% include 'components/flash_messages.html' %}
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-light">
-            <h5 class="mb-0">Presupuestos Pendientes</h5>
-        </div>
-        <div class="card-body">
-            {% if presupuestos %}
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Cliente</th>
-                                <th>Fecha</th>
-                                <th>Tipo de Servicio</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for p in presupuestos %}
-                            <tr>
-                                <td>{{ p.id }}</td>
-                                <td>{{ p.nombre_cliente }} {{ p.apellido_cliente }}</td>
-                                <td>{{ p.fecha.strftime('%d/%m/%Y') }}</td>
-                                <td>
-                                    {% if p.service_type %}
-                                        {{ p.service_type.name }}
-                                    {% else %}
-                                        {% if p.tipo_plaga %}
-                                            DDD - {{ p.tipo_plaga }}
-                                        {% else %}
-                                            No especificado
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="badge bg-warning text-dark">Pendiente</span>
-                                </td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a href="{{ url_for('presupuestos.detalle', id=p.id) }}" 
-                                           class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button type="button" class="btn btn-sm btn-outline-success">
-                                            <i class="fas fa-check"></i> Aprobar
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="alert alert-info">
-                    No hay presupuestos pendientes.
-                </div>
-            {% endif %}
-        </div>
-    </div>
+<!-- Breadcrumb estilizado -->
+<div class="d-flex align-items-center mb-4 mt-3">
+  <a href="/" class="fw-bold" style="color: #43ab01; font-size: 20px; text-decoration: none;">Inicio</a>
+  <span style="color: #888; margin: 0 8px; font-size: 20px;">/</span>
+  <span class="fw-bold" style="color: #888; font-size: 20px;">Presupuestos</span>
 </div>
+
+<!-- Botones de acción principales -->
+<div class="d-flex gap-2 mb-4">
+  <button id="toggleRechazadosBtn" class="btn btn-outline-danger" style="border-radius: 1rem;">
+    <i class="bi bi-archive"></i> Ver presupuestos rechazados
+  </button>
+  <div class="ms-auto">
+    <div class="input-group" style="border-radius: 1rem; overflow: hidden; border: 1px solid #cbc6c6;">
+      <input type="text" class="form-control" placeholder="Buscar presupuesto..." id="searchInput" style="border: none; border-radius: 1rem 0 0 1rem;">
+      <button class="btn btn-outline-secondary" type="button" id="searchButton" style="border: none; background-color: #f8f9fa; border-radius: 0 1rem 1rem 0;">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<div id="rechazadosContainer" style="display:none;">
+  <div class="card mb-4" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+    <div class="card-header d-flex align-items-center gap-2" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+      <i class="bi bi-archive" style="font-size: 0.9rem; color: #dc3545;"></i>
+      <span style="font-size: 0.9rem; color: #dc3545; font-weight: 500;">Histórico de Presupuestos Rechazados</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0 dashboard-table">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Técnico</th>
+              <th>Tipo de Servicio</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in presupuestos_rechazados %}
+            <tr class="presupuesto-rechazado-row" data-id="{{ p.id }}" style="cursor:pointer;">
+              <td class="text-center">Nº_{{ p.id }}</td>
+              <td>{{ p.nombre_cliente }} {{ p.apellido_cliente }}</td>
+              <td>{{ p.fecha.strftime('%d/%m/%Y') }}</td>
+              <td>{{ p.hora }}</td>
+              <td>
+                {% if p.technician %}
+                  {{ p.technician.nombre }} {{ p.technician.apellido or '' }}
+                {% else %}
+                  <span class="text-muted">Sin asignar</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.service_type %}
+                  {{ p.service_type.name }}
+                {% else %}
+                  {% if p.tipo_plaga %}
+                    DDD - {{ p.tipo_plaga }}
+                  {% else %}
+                    No especificado
+                  {% endif %}
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge rounded-pill bg-danger">Rechazado</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Paginación para rechazados -->
+      <div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+        <nav aria-label="Paginación de presupuestos rechazados">
+          <ul class="pagination m-0" style="gap: 0.5rem;">
+            <li class="page-item {% if not presupuestos_rechazados_pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page_rech=1) }}">&laquo;</a>
+            </li>
+            <li class="page-item {% if not presupuestos_rechazados_pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page_rech=presupuestos_rechazados_pagination.prev_num) }}">&lt;</a>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">{{ presupuestos_rechazados_pagination.page }} / {{ presupuestos_rechazados_pagination.pages }}</span>
+            </li>
+            <li class="page-item {% if not presupuestos_rechazados_pagination.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page_rech=presupuestos_rechazados_pagination.next_num) }}">&gt;</a>
+            </li>
+            <li class="page-item {% if not presupuestos_rechazados_pagination.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page_rech=presupuestos_rechazados_pagination.pages) }}">&raquo;</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="pendientesContainer">
+  <div class="card" style="border-radius: 1rem; border: 1px solid #cbc6c6; overflow: hidden;">
+    <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #f9f9f9; border-bottom: 1px solid #cbc6c6; border-top-left-radius: 1rem; border-top-right-radius: 1rem;">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-file-earmark-text" style="font-size: 0.9rem; color: #6c757d;"></i>
+        <span style="font-size: 0.9rem; color: #6c757d; font-weight: 500;">Presupuestos Pendientes</span>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      {% if presupuestos %}
+      <div class="table-responsive">
+        <table class="table mb-0 dashboard-table" id="presupuestosTable">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th>Fecha</th>
+              <th>Hora</th>
+              <th>Técnico</th>
+              <th>Tipo de Servicio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in presupuestos %}
+            <tr class="presupuesto-row" data-id="{{ p.id }}" style="cursor:pointer;">
+              <td class="text-center">Nº_{{ p.id }}</td>
+              <td>{{ p.nombre_cliente }} {{ p.apellido_cliente }}</td>
+              <td>{{ p.fecha.strftime('%d/%m/%Y') }}</td>
+              <td>{{ p.hora }}</td>
+              <td>
+                {% if p.technician %}
+                  {{ p.technician.nombre }} {{ p.technician.apellido or '' }}
+                {% else %}
+                  <span class="text-muted">Sin asignar</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if p.service_type %}
+                  {{ p.service_type.name }}
+                {% else %}
+                  {% if p.tipo_plaga %}
+                    DDD - {{ p.tipo_plaga }}
+                  {% else %}
+                    No especificado
+                  {% endif %}
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge rounded-pill bg-secondary">Pendiente</span>
+              </td>
+              <td>
+                <div class="d-flex gap-1 justify-content-center action-buttons-container">
+                  {# Botón de ver detalles eliminado, ya no es necesario #}
+                  <form method="POST" action="{{ url_for('jobs.aprobar_presupuesto', id=p.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-success btn-action" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="tooltip-success" title="Aprobar">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                  </form>
+                  <form method="POST" action="{{ url_for('presupuestos.rechazar', id=p.id) }}" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-danger btn-action" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-custom-class="tooltip-danger" title="Rechazar">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Paginación para pendientes -->
+      <div class="d-flex justify-content-center" style="padding: 10px 0; margin-top: -1px; border-top: 1px solid #cbc6c6; background-color: #f9f9f9; border-bottom-left-radius: 1rem; border-bottom-right-radius: 1rem;">
+        <nav aria-label="Paginación de presupuestos pendientes">
+          <ul class="pagination m-0" style="gap: 0.5rem;">
+            <li class="page-item {% if not presupuestos_pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page=1) }}">&laquo;</a>
+            </li>
+            <li class="page-item {% if not presupuestos_pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page=presupuestos_pagination.prev_num) }}">&lt;</a>
+            </li>
+            <li class="page-item disabled">
+              <span class="page-link minimal-pagination">{{ presupuestos_pagination.page }} / {{ presupuestos_pagination.pages }}</span>
+            </li>
+            <li class="page-item {% if not presupuestos_pagination.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page=presupuestos_pagination.next_num) }}">&gt;</a>
+            </li>
+            <li class="page-item {% if not presupuestos_pagination.has_next %}disabled{% endif %}">
+              <a class="page-link minimal-pagination" href="{{ url_for('presupuestos.index', page=presupuestos_pagination.pages) }}">&raquo;</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      {% else %}
+      <div class="alert alert-info m-3 text-center">
+        <i class="bi bi-info-circle me-2"></i> No hay presupuestos pendientes.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para aprobar/rechazar presupuesto -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 1.5rem; border: 1px solid #43ab01;">
+      <div class="modal-header" style="border-bottom: none; justify-content: center;">
+        <h5 class="modal-title w-100 text-center" id="confirmModalLabel" style="color: #43ab01; font-weight: 600;"></h5>
+      </div>
+      <div class="modal-body text-center">
+        <p id="confirmModalText" style="font-size: 1.1rem; color: #444;"></p>
+      </div>
+      <div class="modal-footer justify-content-center" style="border-top: none;">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-green px-4" id="confirmModalAccept">Aceptar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Búsqueda en tabla de presupuestos
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    function performSearch() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const rows = document.querySelectorAll('#presupuestosTable tbody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+      });
+    }
+    if (searchButton && searchInput) {
+      searchButton.addEventListener('click', performSearch);
+      searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') performSearch();
+      });
+    }
+    // Hacer clicable la fila para ver detalles
+    document.querySelectorAll('.presupuesto-row').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        // Evitar que el clic en botones de acción dispare la navegación
+        if (e.target.closest('.btn-action, form, button')) return;
+        const id = this.getAttribute('data-id');
+        if (id) {
+          window.location.href = '/presupuestos/' + id;
+        }
+      });
+    });
+    // Hacer clicable la fila de rechazados para ver detalles
+    document.querySelectorAll('.presupuesto-rechazado-row').forEach(function(row) {
+      row.addEventListener('click', function(e) {
+        const id = this.getAttribute('data-id');
+        if (id) {
+          window.location.href = '/presupuestos/' + id;
+        }
+      });
+    });
+    // Inicializar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl, {
+        delay: { show: 50, hide: 50 },
+        container: 'body',
+        animation: true
+      });
+    });
+    // Modal de confirmación para aprobar/rechazar
+    let formToSubmit = null;
+    document.querySelectorAll('form[action*="aprobar_presupuesto"], form[action*="rechazar"]').forEach(function(form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        formToSubmit = form;
+        const isAprobar = form.action.includes('aprobar_presupuesto');
+        const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        document.getElementById('confirmModalLabel').textContent = isAprobar ? 'Aprobar Presupuesto' : 'Rechazar Presupuesto';
+        document.getElementById('confirmModalText').textContent = isAprobar
+          ? '¿Estás seguro de que deseas aprobar este presupuesto? Se convertirá en trabajo en proceso.'
+          : '¿Estás seguro de que deseas rechazar este presupuesto? Esta acción no se puede deshacer.';
+        document.getElementById('confirmModalAccept').className = isAprobar ? 'btn btn-green px-4' : 'btn btn-outline-danger px-4';
+        modal.show();
+      });
+    });
+    document.getElementById('confirmModalAccept').addEventListener('click', function() {
+      if (formToSubmit) {
+        formToSubmit.submit();
+      }
+    });
+    // Mostrar/ocultar tabla de rechazados y pendientes
+    const btn = document.getElementById('toggleRechazadosBtn');
+    const rechazados = document.getElementById('rechazadosContainer');
+    const pendientes = document.getElementById('pendientesContainer');
+    if (btn && rechazados && pendientes) {
+      btn.addEventListener('click', function() {
+        const mostrandoRechazados = rechazados.style.display === '';
+        rechazados.style.display = mostrandoRechazados ? 'none' : '';
+        pendientes.style.display = mostrandoRechazados ? '' : 'none';
+        if (!mostrandoRechazados) {
+          btn.classList.remove('btn-outline-danger');
+          btn.classList.add('btn-success');
+          btn.innerHTML = '<i class="bi bi-list-task"></i> Ver presupuestos';
+        } else {
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-outline-danger');
+          btn.innerHTML = '<i class="bi bi-archive"></i> Ver presupuestos rechazados';
+        }
+      });
+    }
+  });
+</script>
+<style>
+  .dashboard-table thead th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom-width: 1px;
+  }
+  .dashboard-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.03);
+  }
+  .action-buttons-container {
+    min-width: 120px;
+  }
+  .btn-action {
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0 !important;
+  }
+  .btn-action i {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+  }
+  .btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  }
+  .btn-outline-success.btn-action {
+    color: #43ab01;
+    border: 1px solid #43ab01;
+    background-color: transparent;
+  }
+  .btn-outline-success.btn-action:hover {
+    background-color: rgba(67, 171, 1, 0.1);
+    color: #43ab01;
+    border-color: #43ab01;
+  }
+  .btn-outline-danger.btn-action {
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    background-color: transparent;
+  }
+  .btn-outline-danger.btn-action:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+  .btn-outline-primary.btn-action {
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    background-color: transparent;
+  }
+  .btn-outline-primary.btn-action:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  .tooltip-inner {
+    padding: 0.4rem 0.8rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    max-width: 200px;
+    background-color: #495057;
+    border-radius: 6px;
+  }
+  .tooltip-success .tooltip-inner { background-color: #43ab01; }
+  .tooltip-danger .tooltip-inner { background-color: #dc3545; }
+  .tooltip-primary .tooltip-inner { background-color: #0d6efd; }
+  .modal-content {
+    box-shadow: 0 8px 32px rgba(67, 171, 1, 0.15);
+    border-radius: 1.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    min-height: unset;
+    max-height: 320px;
+  }
+  .modal-body {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .modal-header, .modal-footer {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .btn-green {
+    background-color: #43ab01;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .btn-green:hover {
+    background-color: #388a01;
+    color: #fff;
+  }
+</style>
 {% endblock %}

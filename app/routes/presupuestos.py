@@ -9,9 +9,22 @@ presupuestos_bp = Blueprint('presupuestos', __name__, url_prefix='/presupuestos'
 @presupuestos_bp.route('/')
 @login_required
 def index():
-    """Página principal de presupuestos"""
-    presupuestos = Presupuesto.obtener_todos()
-    return render_template('presupuestos/index.html', presupuestos=presupuestos)
+    """Página principal de presupuestos con paginación"""
+    page = request.args.get('page', 1, type=int)
+    page_rech = request.args.get('page_rech', 1, type=int)
+    per_page = 15  # Mostrar 15 resultados por página
+    # Paginación para pendientes
+    presupuestos_pagination = Presupuesto.obtener_paginados(page, per_page)
+    presupuestos = presupuestos_pagination.items
+    # Paginación para rechazados
+    from app.models.models import Job
+    presupuestos_rechazados_pagination = Job.query.filter_by(estado='Rechazado').order_by(Job.fecha.desc(), Job.id.desc()).paginate(page=page_rech, per_page=per_page, error_out=False)
+    presupuestos_rechazados = presupuestos_rechazados_pagination.items
+    return render_template('presupuestos/index.html', 
+        presupuestos=presupuestos, 
+        presupuestos_pagination=presupuestos_pagination,
+        presupuestos_rechazados=presupuestos_rechazados,
+        presupuestos_rechazados_pagination=presupuestos_rechazados_pagination)
 
 @presupuestos_bp.route('/crear', methods=['GET', 'POST'])
 @login_required
@@ -83,10 +96,72 @@ def detalle(id):
     if not presupuesto:
         flash('Presupuesto no encontrado', 'danger')
         return redirect(url_for('presupuestos.index'))
-    return render_template('presupuestos/detalle.html', presupuesto=presupuesto)
+    # Procesar la descripción para extraer información estructurada
+    info_servicio = {}
+    info_plaga = {}
+    info_mantenimiento = {}
+    descripcion_limpia = ""
+
+    if presupuesto.descripcion:
+        descripcion_completa = presupuesto.descripcion
+        descripcion_limpia = descripcion_completa
+        if "Servicio:" in descripcion_completa:
+            servicio_parts = descripcion_completa.split("Servicio:", 1)
+            descripcion_limpia = servicio_parts[0].strip()
+            resto = servicio_parts[1]
+            if "Tipo de plaga:" in resto:
+                servicio_nombre = resto.split("Tipo de plaga:", 1)[0].strip()
+                info_servicio["nombre"] = servicio_nombre
+            else:
+                info_servicio["nombre"] = resto.strip()
+        if "Tipo de plaga:" in descripcion_completa:
+            plaga_parts = descripcion_completa.split("Tipo de plaga:", 1)[1]
+            if "Plan de mantenimiento:" in plaga_parts:
+                plaga_tipo = plaga_parts.split("Plan de mantenimiento:", 1)[0].strip()
+                info_plaga["tipo"] = plaga_tipo
+            else:
+                info_plaga["tipo"] = plaga_parts.strip()
+        if "Plan de mantenimiento:" in descripcion_completa:
+            mantenimiento_info = descripcion_completa.split("Plan de mantenimiento:", 1)[1].strip()
+            if "durante" in mantenimiento_info.lower():
+                partes = mantenimiento_info.split("durante", 1)
+                info_mantenimiento["plan"] = partes[0].strip()
+                info_mantenimiento["duracion"] = "durante " + partes[1].strip()
+            else:
+                info_mantenimiento["plan"] = mantenimiento_info
+        if "Servicio:" in descripcion_limpia:
+            descripcion_limpia = descripcion_limpia.split("Servicio:", 1)[0].strip()
+        frases_comunes = ["Desinfeccion y desratizacion", "Desinfección y desratización", "Desinfeccion", "Desinfección", "Desratizacion", "Desratización"]
+        for frase in frases_comunes:
+            if descripcion_limpia.startswith(frase):
+                descripcion_limpia = descripcion_limpia.replace(frase, "", 1).strip()
+        if not descripcion_limpia or descripcion_limpia.isspace():
+            descripcion_limpia = None
+
+    return render_template('presupuestos/detalle.html', 
+                          presupuesto=presupuesto, 
+                          trabajo=presupuesto,  # <- Esto permite que la plantilla de trabajos funcione
+                          desde_presupuestos=True,
+                          info_servicio=info_servicio,
+                          info_plaga=info_plaga,
+                          info_mantenimiento=info_mantenimiento,
+                          descripcion_limpia=descripcion_limpia.strip() if descripcion_limpia else None)
 
 @presupuestos_bp.route('/api/subcategorias/<int:service_type_id>')
 def obtener_subcategorias(service_type_id):
     """API para obtener subcategorías de un tipo de servicio"""
     subcategorias = ServiceSubcategory.query.filter_by(service_type_id=service_type_id).all()
     return jsonify([{'id': s.id, 'name': s.name} for s in subcategorias])
+
+@presupuestos_bp.route('/rechazar/<int:id>', methods=['POST'])
+@login_required
+def rechazar(id):
+    """Rechaza un presupuesto (cambia su estado a 'Rechazado')"""
+    presupuesto = Presupuesto.obtener_por_id(id)
+    if not presupuesto:
+        flash('Presupuesto no encontrado', 'danger')
+        return redirect(url_for('presupuestos.index'))
+    presupuesto.estado = 'Rechazado'
+    db.session.commit()
+    flash('Presupuesto rechazado correctamente.', 'success')
+    return redirect(url_for('presupuestos.index'))

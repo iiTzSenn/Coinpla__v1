@@ -1,6 +1,7 @@
 from datetime import datetime
 from app.extensions import db
 from app.models.models import Job
+from app.models.service import ServiceType
 
 class Presupuesto:
     """
@@ -16,8 +17,15 @@ class Presupuesto:
         """
         Crea un nuevo presupuesto (un Job con estado='Pendiente')
         """
-        from app.extensions import db
-        
+        # Si se pasa solo el ID (y es un número), obtener el objeto ServiceType
+        service_type_obj = None
+        if service_type:
+            try:
+                service_type_id = int(service_type) if not hasattr(service_type, 'id') else service_type.id
+                service_type_obj = ServiceType.query.get(service_type_id)
+            except (ValueError, TypeError):
+                service_type_obj = None
+
         # Crear el objeto Job que representará el presupuesto
         trabajo = Job(
             nombre_cliente=nombre_cliente,
@@ -35,9 +43,9 @@ class Presupuesto:
             codigo_postal=codigo_postal,
             estado='Pendiente'
         )
-          # Guardar la información del servicio
-        if service_type:
-            trabajo.service_type_id = service_type.id if hasattr(service_type, 'id') else None
+        # Guardar la información del servicio
+        if service_type_obj:
+            trabajo.service_type_id = service_type_obj.id
         trabajo.service_subcategories = service_subcategories
         
         db.session.add(trabajo)
@@ -47,16 +55,16 @@ class Presupuesto:
     @staticmethod
     def obtener_todos():
         """
-        Obtiene todos los presupuestos (Jobs con estado='Pendiente')
+        Obtiene todos los presupuestos (Jobs con estado='Pendiente'), ordenados del más nuevo al más antiguo
         """
-        return Job.query.filter_by(estado='Pendiente').all()
+        return Job.query.filter_by(estado='Pendiente').order_by(Job.fecha.desc(), Job.id.desc()).all()
     
     @staticmethod
     def obtener_por_id(id):
         """
-        Obtiene un presupuesto específico por su ID
+        Obtiene un presupuesto específico por su ID, sin importar el estado
         """
-        return Job.query.filter_by(id=id, estado='Pendiente').first()
+        return Job.query.filter_by(id=id).first()
     
     @staticmethod
     def extraer_email(trabajo):
@@ -79,3 +87,10 @@ class Presupuesto:
             if len(lineas) > 1:
                 return lineas[1]
         return trabajo.descripcion
+    
+    @staticmethod
+    def obtener_paginados(page, per_page):
+        """
+        Devuelve un objeto Pagination de presupuestos pendientes
+        """
+        return Job.query.filter_by(estado='Pendiente').order_by(Job.fecha.desc(), Job.id.desc()).paginate(page=page, per_page=per_page, error_out=False)

@@ -213,6 +213,8 @@ def listar_trabajos():
     
     # Iniciar la consulta base
     query = Job.query.filter(Job.estado != 'Completado')
+    # Solo mostrar trabajos que no sean presupuestos pendientes ni rechazados
+    query = query.filter(~Job.estado.in_(['Pendiente', 'Rechazado']))
     
     # Aplicar filtro por estado si está presente
     if estado_filtro:
@@ -712,6 +714,9 @@ def aprobar_presupuesto(id):
     if trabajo.estado != 'Pendiente':
         flash('El trabajo no está en estado pendiente.', 'warning')
         return redirect(url_for('jobs.listar_trabajos'))
+    if trabajo.estado == 'Rechazado':
+        flash('No se puede aprobar un presupuesto que ha sido rechazado.', 'danger')
+        return redirect(url_for('presupuestos.index'))
 
     trabajo.estado = 'En Proceso'
     db.session.commit()

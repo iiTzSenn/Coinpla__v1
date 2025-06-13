@@ -10,11 +10,11 @@
 
 <!-- Cabecera con navegación mejorada -->
 <div class="d-flex align-items-center mb-4 mt-3">
-  <a href="{{ url_for('jobs.index') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Inicio</a>
+  <a href="{{ url_for('presupuestos.index') if desde_presupuestos else url_for('jobs.index') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Inicio</a>
   <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
-  <a href="{{ url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">Trabajos</a>
+  <a href="{{ url_for('presupuestos.index') if desde_presupuestos else url_for('jobs.listar_trabajos') }}" class="fw-bold text-decoration-none" style="color: #43ab01; font-size: 18px;">{{ 'Presupuestos' if desde_presupuestos else 'Trabajos' }}</a>
   <span style="color: #888; margin: 0 8px; font-size: 18px;">/</span>
-  <span class="fw-bold" style="color: #888; font-size: 18px;">Trabajo Nº_{{ trabajo.id }}</span>
+  <span class="fw-bold" style="color: #888; font-size: 18px;">{{ 'Presupuesto' if desde_presupuestos else 'Trabajo' }} Nº_{{ trabajo.id }}</span>
 </div>
 
 <!-- Status banner para el estado del trabajo -->
@@ -31,7 +31,7 @@
     '#EEEEEE' if trabajo.estado == 'Presupuesto' else
     '#EEEEEE' 
   }} !important;
-  box-shadow: 0 4px 12px rgba(67, 171, 1, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(67,171,1,0.2) !important;
   padding: 15px 20px; 
   border-radius: 10px;
   display: flex;
@@ -56,7 +56,7 @@
       <p class="mb-0 text-muted">Última actualización: {{ trabajo.updated_at.strftime('%d/%m/%Y %H:%M') }}</p>
     </div>
   </div>
-  <div>    {% if trabajo.estado != 'Completado' %}
+  <div>    {% if trabajo.estado == 'En Proceso' %}
     <form method="POST" action="{{ url_for('jobs.completar_trabajo', id=trabajo.id) }}" class="d-inline">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">      <button type="submit" class="btn btn-green action-button" style="box-shadow: 0 3px 8px rgba(67, 171, 1, 0.3);">
         <i class="bi bi-check-circle me-2"></i>Marcar como Completado
