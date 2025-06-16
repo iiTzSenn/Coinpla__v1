@@ -14,50 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* =====================
-   3. SIDEBAR TOGGLE
-===================== */
-
-// Función para abrir/cerrar la sidebar
-function toggleSidebar() {
-  var sidebar = document.getElementById('sidebar');
-  sidebar.classList.toggle('close');
-  // En este diseño, no aplicamos efecto de "rotate" al botón
-  // Si deseas agregar algún efecto visual adicional, puedes descomentar la siguiente línea:
-  // document.getElementById('toggle-btn').classList.toggle('rotate');
-  closeAllSubMenus();
-}
-
-/* =====================
-   4. SUBMENU TOGGLE
-===================== */
-
-function toggleSubMenu(button) {
-  var subMenu = button.nextElementSibling;
-  if (!subMenu.classList.contains('show')) {
-    closeAllSubMenus();
-  }
-  subMenu.classList.toggle('show');
-  button.classList.toggle('rotate');
-
-  var sidebar = document.getElementById('sidebar');
-  if (sidebar.classList.contains('close')) {
-    sidebar.classList.remove('close');
-    document.getElementById('toggle-btn').classList.remove('rotate');
-  }
-}
-
-function closeAllSubMenus() {
-  var subMenus = document.querySelectorAll('#sidebar .sub-menu.show');
-  subMenus.forEach(function (menu) {
-    menu.classList.remove('show');
-    var btn = menu.previousElementSibling;
-    if (btn && btn.classList.contains('rotate')) {
-      btn.classList.remove('rotate');
-    }
-  });
-}
-
-/* =====================
    7. HISTORIAL MODAL HANDLER
 ===================== */
 
@@ -179,29 +135,5 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
     calendar.render();
-  }
-  
-  // Opcional: funciones para submenús (si se usan en tu sidebar)
-  const toggleButton = document.getElementById('toggle-btn');
-  const sidebar = document.getElementById('sidebar');
-
-  function toggleSubMenu(button) {
-    if (!button.nextElementSibling.classList.contains('show')) {
-      closeAllSubMenus();
-    }
-    button.nextElementSibling.classList.toggle('show');
-    button.classList.toggle('rotate');
-
-    if (sidebar.classList.contains('close')) {
-      sidebar.classList.remove('close');
-      toggleButton.classList.remove('rotate');
-    }
-  }
-
-  function closeAllSubMenus() {
-    Array.from(sidebar.getElementsByClassName('show')).forEach(ul => {
-      ul.classList.remove('show');
-      ul.previousElementSibling.classList.remove('rotate');
-    });
   }
 });
